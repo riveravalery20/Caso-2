@@ -23,11 +23,11 @@ Nacimientos <- BD_EEVV_Nacimientos_2024 %>%
 # 3. Convertir variables a numéricas (importante antes de cualquier cálculo)
 Nacimientos <- Nacimientos %>%
   mutate(
-    Tiempo_gestación = as.numeric(Tiempo_gestación),
+    Tiempo_gestación = as.numeric(Tiempo_gestación), #
     Tipo_parto = as.numeric(Tipo_parto),
-    Numero_control_prenatal = as.numeric(Numero_control_prenatal),
-    Edad_madre = as.numeric(Edad_madre),
-    Numero_embarazos = as.numeric(Numero_embarazos),
+    Numero_control_prenatal = as.numeric(Numero_control_prenatal), #
+    Edad_madre = as.numeric(Edad_madre), #
+    Numero_embarazos = as.numeric(Numero_embarazos), #
   )
 #Eliminamos registros con valores 99 (sin información)
 
@@ -35,9 +35,10 @@ Nacimientos <- Nacimientos %>%
   filter(
     Edad_madre != 99,
     Numero_control_prenatal != 99,
-    Numero_embarazos != 99
+    Numero_embarazos != 99,
+    !Tiempo_gestación %in% c(6, 9),
+    Tipo_parto != 9
   )
-
 
 # Clasificar el peso
 
