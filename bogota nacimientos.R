@@ -88,7 +88,22 @@ Moderados_muestra <- Moderados %>%
 # Combinar ambas bases
 Base_datos <- bind_rows(Delicados, Moderados_muestra) %>% 
   select(Tiempo_gestación,Tipo_parto,Numero_control_prenatal,Edad_madre,Numero_embarazos,
-         Peso)
+         Peso) %>% mutate(Tipo_parto=case_when(
+           Tipo_parto == 1 ~ "Espontaneo",
+           Tipo_parto == 2 ~ "Cesarea",
+           Tipo_parto == 3 ~ "Instrumentado"
+         )) %>% 
+  mutate(Edad_madre=case_when(
+    Edad_madre == 1 ~ "10-14 años",
+    Edad_madre == 2 ~ "15-19 años",
+    Edad_madre == 3 ~ "20-24 años",
+    Edad_madre == 4 ~ "25-29 años",
+    Edad_madre == 5 ~ "30-34 años",
+    Edad_madre == 6 ~ "35-39 años",
+    Edad_madre == 7 ~ "40-44 años",
+    Edad_madre == 8 ~ "45-49 años",
+    Edad_madre == 9 ~ "50-54 años"
+  ))
 
 s# Verificar proporciones
 prop.table(table(Nacimientos_Bogota_Balanceado$Peso)) * 100
