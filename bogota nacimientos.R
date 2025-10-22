@@ -1,10 +1,10 @@
 library(readr)
 library(dplyr)
+library(tidyverse)
 
 # Cargamos base y visualizamos
 
 BD_EEVV_Nacimientos_2024 <- read_csv("BD-EEVV-Nacimientos-2024.csv")
-View(BD_EEVV_Nacimientos_2024)
 
 # Selección y renombrado de variables
 
@@ -51,7 +51,6 @@ Nacimientos <- Nacimientos %>%
 Nacimientos_SegundoSemestre <- Nacimientos %>%
   mutate(Mes = as.numeric(Mes)) %>%
   filter(Mes %in% c(7, 8, 9, 10, 11, 12))
-View(Nacimientos_SegundoSemestre)
 
 # Proporción de Bogotá en el segundo semestre
 Proporcion_Bogota_SegundoSemestre <- Nacimientos_SegundoSemestre %>%
@@ -65,7 +64,6 @@ print(Proporcion_Bogota_SegundoSemestre)
 Nacimientos_Bogota <- Nacimientos_SegundoSemestre %>%
   filter(Departamento == 11) %>%
   mutate(Departamento = "Bogotá")
-View(Nacimientos_Bogota)
 # Guardar base final de nacimientos de Bogotá (segundo semestre) en CSV
 write_csv(Nacimientos_Bogota, "Nacimientos_Bogota.csv")
 
@@ -88,9 +86,11 @@ Moderados_muestra <- Moderados %>%
   sample_n(size = tamano_moderados)
 
 # Combinar ambas bases
-Nacimientos_Bogota_Balanceado <- bind_rows(Delicados, Moderados_muestra)
+Base_datos <- bind_rows(Delicados, Moderados_muestra) %>% 
+  select(Tiempo_gestación,Tipo_parto,Numero_control_prenatal,Edad_madre,Numero_embarazos,
+         Peso)
 
-# Verificar proporciones
+s# Verificar proporciones
 prop.table(table(Nacimientos_Bogota_Balanceado$Peso)) * 100
 
 # Visualizar en el visor de RStudio
