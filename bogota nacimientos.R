@@ -66,8 +66,33 @@ Nacimientos_Bogota <- Nacimientos_SegundoSemestre %>%
   filter(Departamento == 11) %>%
   mutate(Departamento = "Bogotá")
 View(Nacimientos_Bogota)
+# Guardar base final de nacimientos de Bogotá (segundo semestre) en CSV
+write_csv(Nacimientos_Bogota, "Nacimientos_Bogota.csv")
 
 # Proporción interna de pesos en Bogotá
 prop.table(table(Nacimientos_Bogota$Peso)) * 100
 
+library(dplyr)
+
+# Dividir la base según el tipo de peso
+Delicados <- Nacimientos_Bogota %>% filter(Peso == "Delicado")
+Moderados <- Nacimientos_Bogota %>% filter(Peso == "Moderado")
+
+# Calcular tamaño deseado para tener 45% Delicado y 55% Moderado
+total_deseado <- nrow(Delicados) / 0.45  # 45% corresponde a los delicados
+tamano_moderados <- round(total_deseado * 0.55)
+
+# Submuestrear los moderados
+set.seed(123)  # Para reproducibilidad
+Moderados_muestra <- Moderados %>%
+  sample_n(size = tamano_moderados)
+
+# Combinar ambas bases
+Nacimientos_Bogota_Balanceado <- bind_rows(Delicados, Moderados_muestra)
+
+# Verificar proporciones
+prop.table(table(Nacimientos_Bogota_Balanceado$Peso)) * 100
+
+# Visualizar en el visor de RStudio
+View(Nacimientos_Bogota_Balanceado)
 
