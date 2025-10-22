@@ -29,6 +29,15 @@ Nacimientos <- Nacimientos %>%
     Edad_madre = as.numeric(Edad_madre),
     Numero_embarazos = as.numeric(Numero_embarazos),
   )
+#Eliminamos registros con valores 99 (sin información)
+
+Nacimientos <- Nacimientos %>%
+  filter(
+    Edad_madre != 99,
+    Numero_control_prenatal != 99,
+    Numero_embarazos != 99
+  )
+
 
 # Clasificar el peso
 
