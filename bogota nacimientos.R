@@ -2,7 +2,6 @@ library(readr)
 library(dplyr)
 
 BD_EEVV_Nacimientos_2024 <- read_csv("BD-EEVV-Nacimientos-2024.csv")
-
 #seleccion de variables de 
 
 Nacimientos <- BD_EEVV_Nacimientos_2024 %>%
