@@ -34,6 +34,7 @@ BD_EEVV <- read_csv("BD-EEVV-Nacimientos-2024.csv") %>%
   mutate(Departamento = "Bogotá")
 
 #Balanceo
+set.seed(5)
 
 Delicados <- BD_EEVV %>% filter(Peso == "Delicado")
 Moderados <- BD_EEVV %>% filter(Peso == "Moderado") %>% 
@@ -59,3 +60,11 @@ Base_datos <- bind_rows(Delicados, Moderados) %>%
     Edad_madre == 8 ~ "45-49 años",
     Edad_madre == 9 ~ "50-54 años"
   ))
+
+#KNN
+
+index_muestra <- sample(11873,11873)
+
+index_entrena <- sample(11873,8904)
+
+index_test <- index_muestra[!index_muestra %in% index_entrena]
