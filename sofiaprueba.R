@@ -1,166 +1,169 @@
-set.seed(28)
+library(tidyverse)
+library(caret)
+library(pROC)
 
-Base_datosN=Base_datos %>% 
-  select(-Tipo_parto, -Edad_madre)
+index_muestra <- sample(11873,11873)
 
-View(Base_datosN)
-
-index_muestra <- sample(13049, 10439)
-
-index_entrena <- sample(index_muestra, 8351)
+index_entrena <- sample(11873,8904)
 
 index_test <- index_muestra[!index_muestra %in% index_entrena]
 
+BD_entrena <- Base_datos[index_entrena, ] %>% 
+  filter(!is.na(Peso))
 
-iris_entrena <- Base_datosN[index_entrena, ]
-View(iris_entrena)
-iris_test <- Base_datosN[index_test, ]
-View(iris_test)
+BD_test <- Base_datos[index_test, ]
 
-iris_entrena_input <- iris_entrena[, 1:3]
-iris_entrena_output <- iris_entrena[, 4]
+BD_entrena_input <- BD_entrena[, 1:5]
+BD_entrena_output <- BD_entrena[, 6]
 
-iris_test_input <- iris_test[, -4]
-iris_test_output <- iris_test[, 4]
-
-library(class)
-
-iris_test_output_kNN <- knn(train = iris_entrena_input, 
-                                  cl = iris_entrena_output, 
-                                  test = iris_test_input, 
-                                  k = 3)
-
-iris_test_output_kNN
-
-mean(iris_test_output_kNN == iris_test_output)
-
-table(iris_test_output_kNN, iris_test_output)
-
-data.frame(iris_test_output_kNN, iris_test_output)
+BD_test_input <- BD_test[, -6]
+BD_test_output <- BD_test[, 6]
 
 
-library(tidyverse)
+fit_logit <- glm(Peso ~ Tiempo_gestación 
+                 + Tipo_parto + Numero_control_prenatal 
+                 + Edad_madre + Numero_embarazos, data = BD_entrena, family = binomial())
+summary(fit_logit)  # Rmarkdown
 
-k <- 1:50
-resultado <- data.frame(k, precision = 0)
+p_hat <- predict(fit_logit, newdata = BD_test, type = "response")  # prob( Si )
 
-for(n in k){
-  iris_test_output_kNN <- knn(train = iris_entrena_input, 
-                              cl = iris_entrena_output, 
-                              test = iris_test_input, 
-                              k = n)
-  
-  resultado$precision[n] <- mean(iris_test_output_kNN == iris_test_output)
-}
+pred_clase <- factor(ifelse(p_hat >= 0.5, "Si", "No"), levels = c("Si","No"))
 
-resultado
+confusionMatrix(pred_clase, BD_test$Peso, positive = "Si")
 
-resultado %>% 
-  ggplot() +
-  aes(k, precision) +
-  geom_line()
-
-library(caret)
-
-library(ISLR)
-data(Smarket)
-
-Smarket %>% 
-  head(10)
-
-Smarket <- Smarket %>% 
-  rename(Direccion = Direction) %>% 
-  mutate(Direccion = ifelse(Direccion == "Up", "Sube", "Baja")) %>% 
-  mutate_at(c("Direccion"), ~as.factor(.))
+roc_o <- roc(response = BD_test$Peso, predictor = p_hat, levels = c("No","Si"))
+thr   <- coords(roc_o, x = "best", best.method = "youden", ret = "threshold")
 
 
-set.seed(28)
-indxEntrena <- createDataPartition(y = Smarket$Direccion, p = 0.75, list = FALSE)
+umbral<-as.numeric(thr)
 
-SP_entrena <- Smarket[indxEntrena,]
-SP_test <- Smarket[-indxEntrena,]
+# Recalculamos las predicciones usando el nuevo umbral óptimo.
+pred_clase <- factor(ifelse(p_hat >= umbral, "Si", "No"), levels = c("Si","No"))
 
-
-set.seed(28)
-
-SP_knnEntrenado <- train(Direccion ~ ., 
-                         data = SP_entrena, 
-                         method = "knn",  
-                         tuneLength = 200
-)
+# Nueva matriz de confusión con el umbral ajustado.
+confusionMatrix(pred_clase, test$admit_f, positive = "Si")
 
 
-SP_knnEntrenado
 
-plot(SP_knnEntrenado)
+# ========= 4) ROC =========
 
+# La curva ROC (Receiver Operating Characteristic) muestra
+# la relación entre la tasa de verdaderos positivos (sensibilidad)
+# y la tasa de falsos positivos (1 - especificidad).
+# El área bajo la curva (AUC) mide qué tan bien el modelo distingue
+# entre admitidos y no admitidos. Cuanto más alto el AUC, mejor el modelo.
 
-SP_knnPrediccion <- predict(SP_knnEntrenado, newdata = SP_test )
+auc_val <- auc(roc_o)
 
-prob_knnPrediccion <- predict(SP_knnEntrenado, newdata = SP_test, type = "prob")
-
-prob_knnPrediccion %>% 
-  head(10)
-
-
-confusionMatrix(SP_knnPrediccion, SP_test$Direccion)
+plot(roc_o, main = sprintf("ROC Logit | AUC=%.3f | Umbral=%.3f", auc_val, thr))
 
 
 
 
-library(ROCR)
 
-#Haciendo uso del paquete ROCR podemos graficar la curva ROC, 
-#la cual nos da una idea de la calidad del modelo a partir de las 
-#relaciones entre Falsos Positivos (False Positives) y 
-#Verdaderos Positivos (True Positives) obtenidos sobre el conjunto de validación:
-
-pred1 <- prediction(as.numeric(SP_knnPrediccion), as.numeric(SP_test$Direccion))
-perf1 <- performance(pred1, "tpr", "fpr")
-plot(perf1)
+# Interpretaciones
 
 
 
-#Como podemos ver, la línea resultante está bastante alejada de la diagonal que, 
-#para este tipo de curvas, representa la selección completamente al azar de las 
-#clases, lo que refleja entonces un buen desempeño del clasificador para este 
-#conjunto de datos. A fin de comparar este con los demás clasificadores a 
-#implementar, nos basaremos en el estudio de los resultados de clasificación
-#con el conjunto de validación, así como la curva ROC.
+# - No Information Rate (0.6869):
+#   Es la precisión que lograríamos si el modelo fuera “perezoso”
+#   y predijera siempre la clase mayoritaria. En este caso,
+#   la mayoría de los estudiantes NO son admitidos.
+#   Por tanto, si el modelo dijera “No admitido” para todos,
+#   acertaría el 68.7% de las veces.
+#   Nuestro modelo tiene una precisión de 72.7%, un poco mejor que eso.
+
+# - P-Value [Acc > NIR] (0.22):
+#   Evalúa si esa mejora del 72.7% frente al 68.7% es estadísticamente significativa.
+#   Como el valor p es mayor que 0.05, no podemos afirmar que el modelo
+#   sea significativamente mejor que simplemente decir “No admitido” para todos.
+
+# - Kappa (0.28):
+#   Mide el nivel de acuerdo entre las predicciones del modelo y los valores reales,
+#   corrigiendo el azar. Un valor de 0.28 indica un acuerdo bajo a moderado.
+#   En palabras simples: el modelo acierta algo más de lo que esperaría por casualidad,
+#   pero todavía no es muy confiable para decidir admisiones reales.
+
+# - McNemar's p-value (0.02):
+#   Evalúa si el modelo tiende a equivocarse más con una clase que con la otra.
+#   Como el valor p es menor que 0.05, el modelo muestra un sesgo:
+#   predice con mucha más seguridad los “No admitidos” que los “Admitidos”.
+#   Es decir, tiene dificultades para reconocer a los estudiantes que sí fueron aceptados.
+
+# ----------------------------------------------------------
+#  Indicadores principales
+# ----------------------------------------------------------
+
+# - Sensibilidad (0.35):
+#   De todos los estudiantes que SÍ fueron admitidos,
+#   el modelo solo identificó correctamente el 35%.
+#   Es decir, falla en muchos casos positivos (deja pasar varios admitidos reales).
+
+# - Especificidad (0.90):
+#   De todos los estudiantes que NO fueron admitidos,
+#   el modelo acertó el 90%.
+#   Es bastante bueno reconociendo a quienes no logran la admisión.
+
+# - Valor predictivo positivo (0.61):
+#   Cuando el modelo predice que alguien será admitido,
+#   acierta el 61% de las veces.
+#   Es decir, 6 de cada 10 estudiantes predichos como admitidos realmente lo son.
+
+# - Valor predictivo negativo (0.75):
+#   Cuando el modelo predice que un estudiante NO será admitido,
+#   tiene razón el 75% de las veces.
+
+# - Prevalencia (0.31):
+#   Indica que el 31% de los estudiantes en el conjunto de prueba
+#   fueron realmente admitidos (es decir, los casos positivos son minoría).
+
+# - Balanced Accuracy (0.63):
+#   Promedia la sensibilidad (35%) y la especificidad (90%),
+#   para obtener una medida más justa del rendimiento global.
+#   En este caso, el modelo tiene un desempeño “aceptable” (63%),
+#   aunque sigue siendo más fuerte para reconocer “No admitidos”
+#   que para detectar a los “Sí admitidos”.
 
 
 
 
-#### Definiciones
+
+
+###################### AUC y ROC
 
 
 
-# Accuracy (Exactitud): Es la proporción de predicciones correctas (tanto verdaderos positivos como verdaderos negativos) entre el total de casos examinados. Proporciona una medida general de la calidad del modelo.
-# 
-# 95% CI (Intervalo de Confianza del 95%): Es un rango de valores, derivado de las estadísticas de la muestra, que probablemente contenga el valor real de una población. El 95% indica que hay un 95% de confianza de que el rango contiene dicho valor verdadero.
-# 
-# No Information Rate (Tasa de No Información): Es una tasa de precisión que se podría obtener al hacer predicciones usando la clase más frecuente sin tener en cuenta las características. Es una línea base con la que se compara la exactitud del modelo. Por tanto, el NIR proporciona un punto de referencia básico; cualquier modelo que desarrolles debería ser capaz de superar esta tasa de acierto para ser considerado útil.
-# 
-# P-Value [Acc > NIR] (P-Valor [Exactitud > Tasa de No Información]): Es el valor p que prueba la hipótesis nula de que la exactitud del modelo no es mejor que la tasa de no información. Un valor p bajo sugiere que el modelo tiene una precisión significativamente mejor que la tasa de no información.
-# 
-# Kappa: Es una medida de acuerdo que corrige el acuerdo que se podría esperar por casualidad en la clasificación categórica. El valor de Kappa puede ser interpretado como qué tan mejor es el acuerdo entre las predicciones y los valores verdaderos en comparación con el acuerdo que se esperaría al azar.
-# 
-# Mcnemar's Test P-Value (Valor p del Test de McNemar): Es el valor p asociado con el Test de McNemar, que se utiliza para determinar si hay diferencias entre dos modelos de clasificación sobre los mismos casos.
-# 
-# Sensitivity (Sensibilidad): También conocida como el verdadero positivo, es la proporción de casos positivos reales que fueron identificados correctamente por el modelo.
-# 
-# Specificity (Especificidad): También conocida como el verdadero negativo, es la proporción de casos negativos reales que fueron identificados correctamente por el modelo.
-# 
-# Pos Pred Value (Valor Predictivo Positivo): Es la proporción de casos positivos predichos que son realmente positivos.
-# 
-# Neg Pred Value (Valor Predictivo Negativo): Es la proporción de casos negativos predichos que son realmente negativos.
-# 
-# Prevalence (Prevalencia): Es la proporción de casos positivos en el conjunto de datos.
-# 
-# Detection Rate (Tasa de Detección): Es la proporción de verdaderos positivos en el conjunto de datos.
-# 
-# Detection Prevalence (Prevalencia de Detección): Es la proporción de predicciones positivas en el conjunto de datos.
-# 
-# Balanced Accuracy (Exactitud Equilibrada): Es el promedio de la sensibilidad y la especificidad. Se utiliza cuando las clases están desbalanceadas, es decir, hay más casos en una clase que en la otra.
-
-
+# - La curva ROC (Receiver Operating Characteristic) sirve para evaluar
+#   qué tan bien el modelo logra separar a los "admitidos" de los "no admitidos"
+#   cuando cambiamos el umbral que decide entre “Sí” o “No”.
+#
+#   Por ejemplo:
+#   si el umbral es muy bajo (como 0.2), casi todos serán clasificados como “Sí”,
+#   aumentando la sensibilidad pero también los falsos positivos.
+#   Si el umbral es muy alto (como 0.8), casi todos serán “No”,
+#   bajando los falsos positivos pero también la sensibilidad.
+#
+#   La curva ROC muestra todos esos escenarios posibles:
+#   - En el eje Y: la sensibilidad (qué tanto detecta a los admitidos reales).
+#   - En el eje X: 1 - especificidad (qué tanto se equivoca con los no admitidos).
+#
+#   Un modelo bueno tendrá una curva más “levantada” hacia la esquina superior izquierda.
+#   Un modelo que adivina al azar quedaría como una diagonal (línea de 45°).
+#
+# - El AUC (Área Under the Curve) mide el área bajo esa curva ROC.
+#   Es un número entre 0 y 1 que resume cuán bien el modelo distingue
+#   entre admitidos y no admitidos sin depender de un umbral específico.
+#
+#   Interpretación:
+#   - AUC = 1.0 → modelo perfecto, separa completamente a ambos grupos.
+#   - AUC = 0.5 → modelo sin poder predictivo (equivale a lanzar una moneda).
+#   - AUC = 0.67 (nuestro caso) → el modelo tiene una capacidad moderada
+#     para distinguir entre admitidos y no admitidos.
+#
+#   En palabras simples:
+#   si escogemos al azar un estudiante admitido y uno no admitido,
+#   el modelo tiene un 67% de probabilidad de asignar una probabilidad
+#   más alta de admisión al estudiante que realmente fue admitido.
+#
+#   Así, el AUC nos da una visión general del rendimiento del modelo,
+#   más allá de un punto de corte específico como 0.5 o el umbral óptimo. 
