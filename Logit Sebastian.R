@@ -10,6 +10,7 @@ library(ISLR)
 
 BD_EEVV <- read_csv("BD-EEVV-Nacimientos-2024.csv") %>%
   select(COD_DPTO, PESO_NAC, T_GES, TIPO_PARTO, NUMCONSUL, EDAD_MADRE, N_EMB, MES) %>%
+  na.omit() %>% 
   rename(
     Departamento = COD_DPTO,
     Peso = PESO_NAC,
@@ -23,16 +24,15 @@ BD_EEVV <- read_csv("BD-EEVV-Nacimientos-2024.csv") %>%
   mutate(
     Tiempo_gestación = as.numeric(Tiempo_gestación),
     Numero_control_prenatal = as.numeric(Numero_control_prenatal), 
-    Numero_embarazos = as.numeric(Numero_embarazos))%>% 
+    Numero_embarazos = as.numeric(Numero_embarazos),
+    Mes = as.numeric(Mes))%>% 
   mutate(
     Peso = ifelse(Peso %in% c(5, 6, 7, 8, 9), "No", "Si"),
     Peso = factor(Peso, levels = c("Si", "No"))
-  ) %>% 
-  mutate(Mes = as.numeric(Mes)) %>%
+  )%>%
   filter(Mes %in% c(7, 8, 9, 10, 11, 12)) %>% 
   filter(Departamento == 11) %>%
-  mutate(Departamento = "Bogotá") %>% 
-  na.omit()
+  mutate(Departamento = "Bogotá")
 
 str(BD_EEVV)
 
@@ -77,14 +77,14 @@ index_entrena <- sample(11873,8904)
 
 index_test <- index_muestra[!index_muestra %in% index_entrena]
 
-BD_entrena <- Base_datos[index_entrena, ]
+BD_entrena <- Base_datos[index_entrena, ] %>% 
+  filter(!is.na(Peso))
 
-BD_test <- Base_datos[index_test, ]
+BD_test <- Base_datos[index_test, ] %>% 
+  filter(!is.na(Peso))
 
 BD_entrena_input <- BD_entrena[, 1:5]
 BD_entrena_output <- BD_entrena[, 6]
-
-
 
 BD_test_input <- BD_test[, -6]
 BD_test_output <- BD_test[, 6]
@@ -97,4 +97,21 @@ BD_knnEntrenado <- train(Peso ~ .,
                          tuneLength = 200
 )
 
+
+#K optimo 37
+BD_knnEntrenado
+
+plot(BD_knnEntrenado)
+
+BD_knnPrediccion <- predict(BD_knnEntrenado, newdata = BD_test )
+
+prob_knnPrediccion <- predict(BD_knnEntrenado, newdata = BD_test, type = "prob")
+
+#Matriz de confusion
+
+confusionMatrix(BD_knnPrediccion, BD_test$Peso)
+
+
 str(Base_datos)
+
+str(BD_entrena)
