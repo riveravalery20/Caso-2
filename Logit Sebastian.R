@@ -59,7 +59,7 @@ Base_datos <- bind_rows(Si, No) %>%
     Edad_madre %in% c(1, 2) ~ "Adolescente",
     Edad_madre %in% c(3, 4) ~ "Joven",
     Edad_madre %in% c(5, 6) ~ "Adulta",
-    Edad_madre %in% c(7, 8, 9) ~ "Adulto mayor"),
+    Edad_madre %in% c(7, 8, 9) ~ "Adulta mayor"),
     Tipo_parto = as.factor(Tipo_parto),
     Edad_madre = as.factor(Edad_madre)
   ) %>% 
