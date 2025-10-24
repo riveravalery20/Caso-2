@@ -21,19 +21,22 @@ BD_EEVV <- read_csv("BD-EEVV-Nacimientos-2024.csv") %>%
     Mes = MES
   ) %>% 
   mutate(
-    Tiempo_gestación = as.numeric(Tiempo_gestación), 
-    Tipo_parto = as.numeric(Tipo_parto),
+    Tiempo_gestación = as.numeric(Tiempo_gestación),
     Numero_control_prenatal = as.numeric(Numero_control_prenatal), 
-    Numero_embarazos = as.numeric(Numero_embarazos), 
-  ) %>% 
+    Numero_embarazos = as.numeric(Numero_embarazos))%>% 
   mutate(
-    Peso = ifelse(Peso %in% c(5, 6, 7, 8, 9), "No", "Si")
+    Peso = ifelse(Peso %in% c(5, 6, 7, 8, 9), "No", "Si"),
+    Peso = factor(Peso, levels = c("Si", "No"))
   ) %>% 
   mutate(Mes = as.numeric(Mes)) %>%
   filter(Mes %in% c(7, 8, 9, 10, 11, 12)) %>% 
   filter(Departamento == 11) %>%
   mutate(Departamento = "Bogotá") %>% 
   na.omit()
+
+str(BD_EEVV)
+
+
 
 #Balanceo
 set.seed(5)
@@ -60,8 +63,10 @@ Base_datos <- bind_rows(Si, No) %>%
     Edad_madre == 6 ~ "35-39 años",
     Edad_madre == 7 ~ "40-44 años",
     Edad_madre == 8 ~ "45-49 años",
-    Edad_madre == 9 ~ "50-54 años"
-  )) %>% 
+    Edad_madre == 9 ~ "50-54 años"),
+    Tipo_parto = as.factor(Tipo_parto),
+    Edad_madre = as.factor(Edad_madre)
+  ) %>% 
   filter(complete.cases(.))
 
 #KNN
@@ -79,6 +84,8 @@ BD_test <- Base_datos[index_test, ]
 BD_entrena_input <- BD_entrena[, 1:5]
 BD_entrena_output <- BD_entrena[, 6]
 
+
+
 BD_test_input <- BD_test[, -6]
 BD_test_output <- BD_test[, 6]
 
@@ -89,3 +96,5 @@ BD_knnEntrenado <- train(Peso ~ .,
                          method = "knn",  
                          tuneLength = 200
 )
+
+str(Base_datos)
