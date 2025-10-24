@@ -112,6 +112,22 @@ prob_knnPrediccion <- predict(BD_knnEntrenado, newdata = BD_test, type = "prob")
 confusionMatrix(BD_knnPrediccion, BD_test$Peso)
 
 
-str(Base_datos)
-
+## LOGIT
 str(BD_entrena)
+
+fit_logit <- glm(Peso ~ ., data = BD_entrena, family = binomial())
+
+summary(fit_logit)  # Rmarkdown
+
+p_hat <- predict(fit_logit, newdata = BD_test, type = "response")  # prob( Si )
+
+pred_clase <- factor(ifelse(p_hat >= 0.5, "Si", "No"), levels = c("Si","No"))
+
+confusionMatrix(pred_clase, BD_test$Peso, positive = "Si")
+
+roc_o <- roc(response = BD_test$Peso, predictor = p_hat, levels = c("No","Si"))
+thr   <- coords(roc_o, x = "best", best.method = "youden", ret = "threshold")
+
+
+umbral<-as.numeric(thr)
+
