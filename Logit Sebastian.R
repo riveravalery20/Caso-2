@@ -122,7 +122,7 @@ summary(fit_logit)  # Rmarkdown
 
 p_hat <- predict(fit_logit, newdata = BD_test, type = "response") # prob( Si )
 
-pred_clase <- factor(ifelse(p_hat >= 0.1, "Si", "No"), 
+pred_clase <- factor(ifelse(p_hat >= 0.5, "Si", "No"), 
                      levels = c("Si", "No"))
 
 BD_test$Peso <- factor(BD_test$Peso, levels = c("Si", "No"))
