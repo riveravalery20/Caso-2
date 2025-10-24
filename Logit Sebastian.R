@@ -115,15 +115,20 @@ confusionMatrix(BD_knnPrediccion, BD_test$Peso)
 ## LOGIT
 str(BD_entrena)
 
-fit_logit <- glm(Peso ~ ., data = BD_entrena, family = binomial())
+fit_logit <- glm(Peso ~ Tiempo_gestación 
+                 + Tipo_parto + Numero_control_prenatal +
+                   Numero_embarazos, data = BD_entrena, family = binomial())
 
 summary(fit_logit)  # Rmarkdown
 
-p_hat <- predict(fit_logit, newdata = BD_test, type = "response")  # prob( Si )
+p_hat <- predict(fit_logit, newdata = BD_test, type = "response") # prob( Si )
 
-pred_clase <- factor(ifelse(p_hat >= 0.5, "Si", "No"), levels = c("Si","No"))
+pred_clase <- factor(ifelse(p_hat >= 0.5, "Sí", "No"), 
+                     levels = c("Sí", "No"))
 
-confusionMatrix(pred_clase, BD_test$Peso, positive = "Si")
+BD_test$Peso <- factor(BD_test$Peso, levels = c("Sí", "No"))
+
+confusionMatrix(pred_clase, BD_test$Peso, positive = "Sí")
 
 roc_o <- roc(response = BD_test$Peso, predictor = p_hat, levels = c("No","Si"))
 thr   <- coords(roc_o, x = "best", best.method = "youden", ret = "threshold")
