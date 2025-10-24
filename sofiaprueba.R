@@ -45,7 +45,7 @@ confusionMatrix(pred_clase, test$admit_f, positive = "Si")
 
 
 
-# ========= 4) ROC =========
+# ========= 4) ROC =========NJ
 
 # La curva ROC (Receiver Operating Characteristic) muestra
 # la relación entre la tasa de verdaderos positivos (sensibilidad)
