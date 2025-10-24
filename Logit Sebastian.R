@@ -114,18 +114,23 @@ str(Base_datos)
 table(BD_entrena$Peso)
 table(BD_test$Peso)
 
-fit_logit <- glm(Peso ~ Tiempo_gestación 
-                 + Tipo_parto + Numero_control_prenatal +
-                   Numero_embarazos + Edad_madre, data = BD_entrena, family = binomial())
+
+#lot
+fit_logit <- glm(Peso ~ Tiempo_gestación+ Tipo_parto + Numero_control_prenatal +
+                   Numero_embarazos+Edad_madre, data = BD_entrena, family = binomial())
+
 
 summary(fit_logit)  # Rmarkdown
 
-p_hat <- predict(fit_logit, newdata = BD_test, type = "response") # prob( Si )
+p_hat <- predict(fit_logit, newdata =BD_test, type = "response") # prob( Si )
 
 pred_clase <- factor(ifelse(p_hat >= 0.5, "Si", "No"), 
                      levels = c("Si", "No"))
 
 BD_test$Peso <- factor(BD_test$Peso, levels = c("Si", "No"))
+
+
+
 
 confusionMatrix(pred_clase, BD_test$Peso, positive = "Si")
 
@@ -146,4 +151,8 @@ accuracies <- sapply(thresholds, function(thr) {
 })
 
 print(accuracies)
+
+#Matriz de correlaciones
+
+
 
