@@ -5,7 +5,8 @@ library(dplyr)
 library(tidyverse)
 library(caret)
 library(ISLR)
-
+library(ROCR)
+library(pROC)
 #Base general
 
 BD_EEVV <- read_csv("BD-EEVV-Nacimientos-2024.csv") %>%
@@ -55,15 +56,10 @@ Base_datos <- bind_rows(Si, No) %>%
            Tipo_parto == 3 ~ "Instrumentado"
          )) %>% 
   mutate(Edad_madre=case_when(
-    Edad_madre == 1 ~ "10-14 años",
-    Edad_madre == 2 ~ "15-19 años",
-    Edad_madre == 3 ~ "20-24 años",
-    Edad_madre == 4 ~ "25-29 años",
-    Edad_madre == 5 ~ "30-34 años",
-    Edad_madre == 6 ~ "35-39 años",
-    Edad_madre == 7 ~ "40-44 años",
-    Edad_madre == 8 ~ "45-49 años",
-    Edad_madre == 9 ~ "50-54 años"),
+    Edad_madre %in% c(1, 2) ~ "Adolescente",
+    Edad_madre %in% c(3, 4) ~ "Joven",
+    Edad_madre %in% c(5, 6) ~ "Adulta",
+    Edad_madre %in% c(7, 8, 9) ~ "Adulto mayor"),
     Tipo_parto = as.factor(Tipo_parto),
     Edad_madre = as.factor(Edad_madre)
   ) %>% 
@@ -114,25 +110,40 @@ confusionMatrix(BD_knnPrediccion, BD_test$Peso)
 
 ## LOGIT
 str(BD_entrena)
+str(Base_datos)
+table(BD_entrena$Peso)
+table(BD_test$Peso)
 
 fit_logit <- glm(Peso ~ Tiempo_gestación 
                  + Tipo_parto + Numero_control_prenatal +
-                   Numero_embarazos, data = BD_entrena, family = binomial())
+                   Numero_embarazos + Edad_madre, data = BD_entrena, family = binomial())
 
 summary(fit_logit)  # Rmarkdown
 
 p_hat <- predict(fit_logit, newdata = BD_test, type = "response") # prob( Si )
 
-pred_clase <- factor(ifelse(p_hat >= 0.5, "Sí", "No"), 
-                     levels = c("Sí", "No"))
+pred_clase <- factor(ifelse(p_hat >= 0.1, "Si", "No"), 
+                     levels = c("Si", "No"))
 
-BD_test$Peso <- factor(BD_test$Peso, levels = c("Sí", "No"))
+BD_test$Peso <- factor(BD_test$Peso, levels = c("Si", "No"))
 
-confusionMatrix(pred_clase, BD_test$Peso, positive = "Sí")
+confusionMatrix(pred_clase, BD_test$Peso, positive = "Si")
 
 roc_o <- roc(response = BD_test$Peso, predictor = p_hat, levels = c("No","Si"))
 thr   <- coords(roc_o, x = "best", best.method = "youden", ret = "threshold")
+auc_val <- auc(roc_o)
+
+plot(roc_o, main = sprintf("ROC Logit | AUC=%.3f | Umbral=%.3f", auc_val, thr))
 
 
 umbral<-as.numeric(thr)
+
+thresholds <- seq(0, 0.9, by = 0.1)
+accuracies <- sapply(thresholds, function(thr) {
+  pred <- factor(ifelse(p_hat >= thr, "Si", "No"), levels = c("Si","No"))
+  cm <- confusionMatrix(pred, BD_test$Peso, positive = "Si")
+  cm$overall["Accuracy"]
+})
+
+print(accuracies)
 
