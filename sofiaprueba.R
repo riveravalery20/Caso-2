@@ -19,13 +19,16 @@ BD_entrena_output <- BD_entrena[, 6]
 BD_test_input <- BD_test[, -6]
 BD_test_output <- BD_test[, 6]
 
+# CORRECCIÓN: Asegurar que "No" sea la clase de referencia para que p_hat sea P(desnutrición)
+BD_entrena$Peso <- factor(BD_entrena$Peso, levels = c("No", "Si"))
+BD_test$Peso <- factor(BD_test$Peso, levels = c("No", "Si"))
 
 fit_logit <- glm(Peso ~ Tiempo_gestación 
                  + Tipo_parto + Numero_control_prenatal 
                  + Edad_madre + Numero_embarazos, data = BD_entrena, family = binomial())
 summary(fit_logit)  # Rmarkdown
 
-p_hat <- predict(fit_logit, newdata = BD_test, type = "response")  # prob( Si )
+p_hat <- predict(fit_logit, newdata = BD_test, type = "response")  # prob( Si ) - CORREGIDA
 
 pred_clase <- factor(ifelse(p_hat >= 0.5, "Si", "No"), levels = c("Si","No"))
 
