@@ -1,0 +1,185 @@
+---
+title: "Estadisticas descriptivas"
+author: "Melany Enriquez - Santiago Posada - Sofía Potosí - Valery Rivera-"
+date: "`r Sys.Date()`"
+output: html_document
+---
+```{r}
+library(tidyverse)
+library(kableExtra)
+library(reshape2)
+library(corrplot)
+
+# 1. TABLA DE VARIABLES DEL MODELO ----
+variables_modelo <- data.frame(
+  Variable = c("Peso", "Tiempo_gestación", "Tipo_parto", 
+               "Numero_control_prenatal", "Edad_madre", "Numero_embarazos"),
+  Descripción = c("Clasificación del peso al nacer (Normal/Delicado)",
+                 "Semanas de gestación", 
+                 "Tipo de parto registrado",
+                 "Número de controles prenatales realizados",
+                 "Grupo etario de la madre",
+                 "Número de embarazos previos"),
+  Tipo_Variable = c("Categórica (binaria)", "Cuantitativa continua", 
+                   "Categórica nominal", "Cuantitativa discreta",
+                   "Categórica ordinal", "Cuantitativa discreta"),
+  Notas = c("Variable dependiente - Peso normal: ≥2500g", 
+           "Considerar <37 semanas como prematurez",
+           "Espontáneo/Cesárea/Instrumentado",
+           "Indicador de acceso a salud prenatal",
+           "Rangos definidos por ENSIN",
+           "Incluye embarazo actual")
+)
+
+kable(variables_modelo, caption = "Tabla 1: Variables del Modelo") %>%
+  kable_styling(bootstrap_options = c("striped", "hover")) %>%
+  footnote(general = "Fuente: Elaboración propia en base a la Base de Datos de Nacimientos - 2024",
+           number = c("Datos corresponden al segundo semestre del año 2024"))
+```
+
+```{r}
+# 2. BASE DEPURADA ----
+cat("### Base de Datos Depurada\n")
+cat("La base final contiene", nrow(Base_datos), "observaciones después de aplicar los siguientes filtros:\n")
+cat("- Restricción a Bogotá D.C. (Departamento 11)\n")
+cat("- Periodo: julio a diciembre 2024\n")
+cat("- Eliminación de valores missing\n")
+cat("- Balanceo de clases (60% peso normal, 40% peso delicado)\n\n")
+
+cat("**Distribución de la variable dependiente:**\n")
+prop.table(table(Base_datos$Peso)) %>% round(3) * 100
+```
+
+```{r}
+# 3. ESTADÍSTICAS DESCRIPTIVAS POR PESO ----
+stats_por_peso <- Base_datos %>%
+  group_by(Peso) %>%
+  summarise(
+    n = n(),
+    Tiempo_gestación_media = mean(Tiempo_gestación, na.rm = TRUE),
+    Tiempo_gestación_sd = sd(Tiempo_gestación, na.rm = TRUE),
+    Controles_media = mean(Numero_control_prenatal, na.rm = TRUE),
+    Controles_sd = sd(Numero_control_prenatal, na.rm = TRUE),
+    Embarazos_media = mean(Numero_embarazos, na.rm = TRUE),
+    Embarazos_sd = sd(Numero_embarazos, na.rm = TRUE)
+  ) %>%
+  mutate(across(where(is.numeric), round, 2))
+
+kable(stats_por_peso, caption = "Tabla 2: Estadísticas Descriptivas por Categoría de Peso") %>%
+  kable_styling(bootstrap_options = c("striped", "hover")) %>%
+  footnote(general = "Fuente: Elaboración propia en base a la Base de Datos de Nacimientos - 2024",
+           number = c("Peso normal definido como ≥2500 gramos"))
+
+```
+
+```{r}
+# 4. ANÁLISIS DE VARIABLES CUANTITATIVAS ----
+
+## 4.1 Violin Plot - Tiempo gestación vs Peso ----
+ggplot(Base_datos, aes(x = Peso, y = Tiempo_gestación, fill = Peso)) +
+  geom_violin(alpha = 0.7) +
+  geom_boxplot(width = 0.2, fill = "white") +
+  scale_fill_manual(values = c("#1f77b4", "#ff7f0e")) +
+  labs(title = "Distribución del Tiempo de Gestación por Categoría de Peso",
+       x = "Peso al Nacer", 
+       y = "Semanas de Gestación") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+```{r}
+## 4.2 Boxplot - Controles prenatales vs Peso ----
+ggplot(Base_datos, aes(x = Peso, y = Numero_control_prenatal, fill = Peso)) +
+  geom_boxplot(alpha = 0.7) +
+  scale_fill_manual(values = c("#1f77b4", "#ff7f0e")) +
+  labs(title = "Número de Controles Prenatales por Categoría de Peso",
+       x = "Peso al Nacer", 
+       y = "Número de Controles Prenatales") +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  annotate("text", x = 1.5, y = max(Base_datos$Numero_control_prenatal), 
+           label = "Mayor acceso a controles se asocia\ncon menor riesgo de bajo peso", 
+           size = 3, color = "red")
+```
+
+```{r}
+## 4.3 Dispersión - Controles vs Gestación (estilo trabajo anterior) ----
+ggplot(Base_datos, aes(x = Tiempo_gestación, y = Numero_control_prenatal, color = Peso)) +
+  geom_point(alpha = 0.6, size = 1) +
+  geom_smooth(method = "lm", se = TRUE) +
+  scale_color_manual(values = c("#1f77b4", "#ff7f0e")) +
+  labs(title = "Relación Tiempo de Gestación - Controles Prenatales",
+       x = "Semanas de Gestación", 
+       y = "Número de Controles Prenatales",
+       color = "Peso") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+```
+
+```{r}
+## 4.4 Heatmap de Correlaciones ----
+vars_numericas <- Base_datos %>%
+  select(Tiempo_gestación, Numero_control_prenatal, Numero_embarazos) %>%
+  mutate_all(as.numeric)
+
+cor_matrix <- cor(vars_numericas, use = "complete.obs")
+
+melted_cor <- melt(cor_matrix)
+
+ggplot(melted_cor, aes(x = Var1, y = Var2, fill = value)) +
+  geom_tile() +
+  geom_text(aes(label = round(value, 2)), color = "white", size = 4) +
+  scale_fill_gradient2(low = "#d73027", high = "#1a9850", mid = "white", 
+                       midpoint = 0, limit = c(-1,1), space = "Lab") +
+  labs(title = "Matriz de Correlación - Variables Cuantitativas",
+       x = "", y = "") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
+```{r}
+# 5. ANÁLISIS DE VARIABLES CATEGÓRICAS ----
+
+## 5.1 Distribución de Edad Materna ----
+edad_counts <- Base_datos %>%
+  count(Edad_madre, Peso) %>%
+  group_by(Edad_madre) %>%
+  mutate(porcentaje = n / sum(n) * 100)
+
+ggplot(edad_counts, aes(x = Edad_madre, y = porcentaje, fill = Peso)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_manual(values = c("#1f77b4", "#ff7f0e")) +
+  labs(title = "Distribución del Peso al Nacer por Grupo de Edad Materna",
+       x = "Grupo de Edad", 
+       y = "Porcentaje (%)",
+       fill = "Peso") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_y_continuous(labels = scales::percent_format(scale = 1))
+```
+
+```{r}
+## 5.2 Distribución de Tipo de Parto ----
+parto_counts <- Base_datos %>%
+  count(Tipo_parto, Peso) %>%
+  group_by(Tipo_parto) %>%
+  mutate(porcentaje = n / sum(n) * 100)
+
+ggplot(parto_counts, aes(x = Tipo_parto, y = porcentaje, fill = Peso)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_manual(values = c("#1f77b4", "#ff7f0e")) +
+  labs(title = "Distribución del Peso al Nacer por Tipo de Parto",
+       x = "Tipo de Parto", 
+       y = "Porcentaje (%)",
+       fill = "Peso") +
+  theme_minimal() +
+  scale_y_continuous(labels = scales::percent_format(scale = 1))
+```
+
+```{r}
+# NOTA FINAL GLOBAL ----
+cat("**Nota metodológica:** Todas las gráficas y tablas fueron elaboradas con base en la depuración y filtros descritos en la sección 2. El análisis se circunscribe al municipio de Bogotá D.C. para el segundo semestre de 2024.")
+```
+
