@@ -10,7 +10,7 @@ BD_EEVV <- read_csv("BD-EEVV-Nacimientos-2024.csv") %>%
   select(COD_DPTO, PESO_NAC, T_GES, TIPO_PARTO, NUMCONSUL, EDAD_MADRE, N_EMB, MES) %>%
   rename(
     Departamento = COD_DPTO,
-    Peso = PESO_NAC,
+    Peso_delicado = PESO_NAC,
     Tiempo_gestación = T_GES,
     Tipo_parto = TIPO_PARTO,
     Numero_control_prenatal = NUMCONSUL,
@@ -23,8 +23,8 @@ BD_EEVV <- read_csv("BD-EEVV-Nacimientos-2024.csv") %>%
     Numero_control_prenatal = as.numeric(Numero_control_prenatal), 
     Numero_embarazos = as.numeric(Numero_embarazos))%>% 
   mutate(
-    Peso = ifelse(Peso %in% c(5, 6, 7, 8, 9), "No", "Si"),
-    Peso = factor(Peso, levels = c("Si", "No"))
+    Peso_delicado = ifelse(Peso_delicado %in% c(5, 6, 7, 8, 9), "No", "Si"),
+    Peso_delicado = factor(Peso_delicado, levels = c("Si", "No"))
   ) %>% 
   mutate(Mes = as.numeric(Mes)) %>%
   filter(Mes %in% c(7, 8, 9, 10, 11, 12)) %>% 
@@ -39,15 +39,15 @@ str(BD_EEVV)
 #Balanceo
 set.seed(5)
 
-Si <- BD_EEVV %>% filter(Peso == "Si")
-No <- BD_EEVV %>% filter(Peso == "No") %>% 
+Si <- BD_EEVV %>% filter(Peso_delicado == "Si")
+No <- BD_EEVV %>% filter(Peso_delicado == "No") %>% 
   sample_n(6000)
 
 #Base final
 
 Base_datos <- bind_rows(Si, No) %>% 
   select(Tiempo_gestación,Tipo_parto,Numero_control_prenatal,Edad_madre,Numero_embarazos,
-         Peso) %>% mutate(Tipo_parto=case_when(
+         Peso_delicado) %>% mutate(Tipo_parto=case_when(
            Tipo_parto == 1 ~ "Espontaneo",
            Tipo_parto == 2 ~ "Cesarea",
            Tipo_parto == 3 ~ "Instrumentado"
@@ -68,7 +68,7 @@ Base_datos <- bind_rows(Si, No) %>%
   filter(complete.cases(.))
 
 # Verificar proporciones
-prop.table(table(Base_datos$Peso)) * 100
+prop.table(table(Base_datos$Peso_delicado)) * 100
 
 # Visualizar en el visor de RStudio
 View(Base_datos)
