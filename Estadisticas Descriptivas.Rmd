@@ -120,6 +120,8 @@ kable(variables_modelo,
            number = c("Datos corresponden al segundo semestre del año 2024"))
 ```
 
+#Y1 PESO DELICADO
+
 ```{r tabla1_descriptiva, echo=FALSE}
 # TABLA 1: ESTADÍSTICAS DESCRIPTIVAS POR GRUPO DE PESO
 tabla_descriptiva <- Base_datos %>%
@@ -166,6 +168,62 @@ kable(tabla_descriptiva,
   )
 ```
 
+```{r grafico1_peso_pie, echo=FALSE, fig.width=10, fig.height=6}
+# GRÁFICO 1: DISTRIBUCIÓN DEL PESO DELICADO (PIE CHART)
+tabla_peso <- Base_datos %>%
+  count(Peso_delicado) %>%
+  mutate(Porcentaje = round(100 * n / sum(n), 1))
+
+plot_ly(
+  tabla_peso,
+  labels = ~Peso_delicado,
+  values = ~n,
+  type = 'pie',
+  textposition = 'inside',
+  textinfo = 'label+percent',
+  insidetextorientation = 'radial',
+  marker = list(
+    colors = c('#27AE60', '#E74C3C'),  # Verde para No, Rojo para Si
+    line = list(color = '#FFFFFF', width = 2)
+  ),
+  hovertemplate = paste(
+    '<b>Peso Delicado: %{label}</b><br>',
+    'Frecuencia: %{value}<br>',
+    'Porcentaje: %{percent}<br>',
+    '<extra></extra>'
+  )
+) %>%
+  plotly::layout(
+    title = list(
+      text = "<b>Gráfico 1. Distribución del Peso Delicado del Recién Nacido</b><br><sub>Bogotá - Segundo Semestre 2024</sub>",
+      x = 0.5,
+      font = list(size = 16)
+    ),
+    legend = list(
+      orientation = "h",
+      x = 0.3,
+      y = -0.1,
+      font = list(size = 12)
+    ),
+    annotations = list(
+      list(
+        text = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024",
+        xref = "paper",
+        yref = "paper",
+        x = 0.5,
+        y = -0.2,
+        showarrow = FALSE,
+        font = list(size = 10, color = "#666666"),
+        xanchor = "center"
+      )
+    ),
+    margin = list(b = 100)
+  )
+```
+
+
+#X1 TIEMPO DE GESTACION
+
 ```{r tabla2_tiempo_gestacion, echo=FALSE}
 # TABLA 2: DISTRIBUCIÓN DEL TIEMPO DE GESTACIÓN
 tabla_tiempo_gestacion <- Base_datos %>%
@@ -193,6 +251,66 @@ kable(tabla_tiempo_gestacion,
     general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024."
   )
 ```
+ 
+```{r grafico2_tiempo_vs_peso, echo=FALSE, fig.width=10, fig.height=6}
+# GRÁFICO 2: RELACIÓN TIEMPO DE GESTACIÓN VS PESO DELICADO (BARRAS APILADAS)
+tabla_tiempo_peso <- Base_datos %>%
+  count(Tiempo_gestación, Peso_delicado)
+
+plot_ly(
+  tabla_tiempo_peso,
+  x = ~Tiempo_gestación,
+  y = ~n,
+  color = ~Peso_delicado,
+  colors = c('#27AE60', '#E74C3C'),  # Verde para No, Rojo para Si
+  type = 'bar',
+  text = ~n,
+  textposition = 'inside',
+  hovertemplate = paste(
+    '<b>%{x}</b><br>',
+    'Peso Delicado: %{fullData.name}<br>',
+    'Frecuencia: %{y}<br>',
+    '<extra></extra>'
+  )
+) %>%
+  plotly::layout(
+    barmode = 'stack',
+    title = list(
+      text = "<b>Gráfico 2. Tiempo de Gestación según Peso Delicado</b><br><sub>Bogotá - Segundo Semestre 2024</sub>",
+      x = 0.5,
+      font = list(size = 16)
+    ),
+    xaxis = list(
+      title = "<b>Tiempo de Gestación</b>",
+      tickfont = list(size = 10)
+    ),
+    yaxis = list(
+      title = "<b>Frecuencia</b>"
+    ),
+    legend = list(
+      title = list(text = "<b>Peso Delicado</b>"),
+      orientation = "v",
+      x = 1.02,
+      y = 1
+    ),
+    annotations = list(
+      list(
+        text = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024",
+        xref = "paper",
+        yref = "paper",
+        x = 0.5,
+        y = -0.25,
+        showarrow = FALSE,
+        font = list(size = 10, color = "#666666"),
+        xanchor = "center"
+      )
+    ),
+    margin = list(b = 150)
+  )
+```
+
+
+#X2 TIPO DE PARTO
 
 ```{r tabla3_tipo_parto, echo=FALSE}
 # TABLA 3: DISTRIBUCIÓN DEL TIPO DE PARTO
@@ -223,39 +341,62 @@ kable(tabla_tipo_parto,
   )
 ```
 
-```{r tabla4_edad_madre, echo=FALSE}
-# TABLA 4: DISTRIBUCIÓN POR GRUPOS DE EDAD DE LA MADRE
-tabla_edad_madre <- Base_datos %>%
-  count(Edad_madre) %>%
-  mutate(
-    Porcentaje = round(100 * n / sum(n), 1),
-    Porcentaje_Acumulado = cumsum(Porcentaje)
-  ) %>%
-  arrange(desc(n))  # Ordenar por frecuencia descendente
 
-kable(tabla_edad_madre, 
-      align = c("l", "c", "r", "r"),
-      col.names = c("Grupo de Edad", "Frecuencia", "Porcentaje (%)", "Porcentaje Acumulado (%)"),
-      caption = "TABLA 4. DISTRIBUCIÓN POR GRUPOS DE EDAD DE LA MADRE") %>%
-  kable_styling(
-    bootstrap_options = c("striped", "hover", "condensed"),
-    full_width = FALSE,
-    font_size = 12
-  ) %>%
-  add_header_above(c(" " = 1, "Distribución de Frecuencias" = 3),
-                   background = "#2C3E50", color = "white") %>%
-  row_spec(0, background = "#34495E", color = "white", bold = TRUE) %>%
-  column_spec(1, bold = TRUE, width = "12em") %>%
-  column_spec(2:4, background = "#F4F6F6") %>%
-  row_spec(1:nrow(tabla_edad_madre), 
-           background = rep(c("#FBFCFC", "#F4F6F6"), length.out = nrow(tabla_edad_madre))) %>%
-  footnote(
-    general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024."
+```{r grafico3_tipo_parto, echo=FALSE, fig.width=10, fig.height=6}
+# GRÁFICO 3: DISTRIBUCIÓN DEL TIPO DE PARTO (PIE CHART)
+tabla_parto <- Base_datos %>%
+  count(Tipo_parto) %>%
+  mutate(Porcentaje = round(100 * n / sum(n), 1))
+
+plot_ly(
+  tabla_parto,
+  labels = ~Tipo_parto,
+  values = ~n,
+  type = 'pie',
+  textposition = 'inside',
+  textinfo = 'label+percent',
+  insidetextorientation = 'radial',
+  marker = list(
+    colors = c('#9B59B6', '#1ABC9C', '#F39C12'),
+    line = list(color = '#FFFFFF', width = 2)
+  ),
+  hovertemplate = paste(
+    '<b>%{label}</b><br>',
+    'Frecuencia: %{value}<br>',
+    'Porcentaje: %{percent}<br>',
+    '<extra></extra>'
+  )
+) %>%
+  plotly::layout(
+    title = list(
+      text = "<b>Gráfico 3. Distribución del Tipo de Parto</b><br><sub>Bogotá - Segundo Semestre 2024</sub>",
+      x = 0.5,
+      font = list(size = 16)
+    ),
+    legend = list(
+      orientation = "h",
+      x = 0.25,
+      y = -0.1,
+      font = list(size = 12)
+    ),
+    annotations = list(
+      list(
+        text = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024",
+        xref = "paper",
+        yref = "paper",
+        x = 0.5,
+        y = -0.2,
+        showarrow = FALSE,
+        font = list(size = 10, color = "#666666"),
+        xanchor = "center"
+      )
+    ),
+    margin = list(b = 100)
   )
 ```
 
-```{r tablas5_cruzadas, echo=FALSE}
-# TABLA 5: TABLAS CRUZADAS
+```{r tabla3_cruzadas, echo=FALSE}
+# 3.1 Tipo de parto vs Peso 
 # Función para crear tablas cruzadas completas
 crear_tabla_cruzada_completa <- function(data, variable, nombre_var) {
   # Total general para porcentajes
@@ -291,34 +432,12 @@ crear_tabla_cruzada_completa <- function(data, variable, nombre_var) {
   return(tabla_ancha)
 }
 
-# 5a: Tiempo de gestación vs Peso
-tabla_cruzada_tiempo <- crear_tabla_cruzada_completa(Base_datos, Tiempo_gestación, "Tiempo de Gestación")
-
-kable(tabla_cruzada_tiempo, 
-      align = c("l", "r", "r", "r", "r"),
-      col.names = c("Tiempo de Gestación", "n Sí", "% Sí", "n No", "% No"),
-      caption = "TABLA 5A. DISTRIBUCIÓN CRUZADA - TIEMPO DE GESTACIÓN Y PESO AL NACER") %>%
-  kable_styling(
-    bootstrap_options = c("striped", "hover"),
-    full_width = FALSE,
-    font_size = 11
-  ) %>%
-  add_header_above(c(" " = 1, "Delicado (Sí)" = 2, "Delicado (No)" = 2),
-                   background = c("white", "#E74C3C", "#27AE60"),
-                   color = c("black", "white", "white")) %>%
-  row_spec(0, background = "#34495E", color = "white", bold = TRUE) %>%
-  column_spec(1, bold = TRUE, width = "15em") %>%
-  column_spec(2:3, background = "#FADBD8") %>%
-  column_spec(4:5, background = "#D5F4E6") %>%
-  footnote(general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024.")
-
-# 5b: Tipo de parto vs Peso  
 tabla_cruzada_parto <- crear_tabla_cruzada_completa(Base_datos, Tipo_parto, "Tipo de Parto")
 
 kable(tabla_cruzada_parto, 
       align = c("l", "r", "r", "r", "r"),
       col.names = c("Tipo de Parto", "n Sí", "% Sí", "n No", "% No"),
-      caption = "TABLA 5B. DISTRIBUCIÓN CRUZADA - TIPO DE PARTO Y PESO AL NACER") %>%
+      caption = "TABLA 3.1. DISTRIBUCIÓN CRUZADA - TIPO DE PARTO Y PESO AL NACER") %>%
   kable_styling(
     bootstrap_options = c("striped", "hover"),
     full_width = FALSE,
@@ -333,31 +452,114 @@ kable(tabla_cruzada_parto,
   column_spec(4:5, background = "#D5F4E6") %>%
   footnote(general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024.")
 
-# 5c: Edad de la madre vs Peso
-tabla_cruzada_edad <- crear_tabla_cruzada_completa(Base_datos, Edad_madre, "Edad de la Madre")
 
-kable(tabla_cruzada_edad, 
-      align = c("l", "r", "r", "r", "r"),
-      col.names = c("Edad de la Madre", "n Sí", "% Sí", "n No", "% No"),
-      caption = "TABLA 5C. DISTRIBUCIÓN CRUZADA - EDAD DE LA MADRE Y PESO AL NACER") %>%
-  kable_styling(
-    bootstrap_options = c("striped", "hover"),
-    full_width = FALSE,
-    font_size = 11
-  ) %>%
-  add_header_above(c(" " = 1, "Delicado (Sí)" = 2, "Delicado (No)" = 2),
-                   background = c("white", "#E74C3C", "#27AE60"),
-                   color = c("black", "white", "white")) %>%
-  row_spec(0, background = "#34495E", color = "white", bold = TRUE) %>%
-  column_spec(1, bold = TRUE, width = "12em") %>%
-  column_spec(2:3, background = "#FADBD8") %>%
-  column_spec(4:5, background = "#D5F4E6") %>%
-  footnote(general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024.")
 ```
 
+#X3 EDAD MADRE
+```{r tabla4_edad_madre, echo=FALSE}
+# TABLA 4: DISTRIBUCIÓN POR GRUPOS DE EDAD DE LA MADRE
+tabla_edad_madre <- Base_datos %>%
+  count(Edad_madre) %>%
+  mutate(
+    Porcentaje = round(100 * n / sum(n), 1),
+    Porcentaje_Acumulado = cumsum(Porcentaje)
+  ) %>%
+  arrange(desc(n))  # Ordenar por frecuencia descendente
 
-```{r tabla6_controles_prenatales, echo=FALSE}
-# TABLA 6: ESTADÍSTICAS DE CONTROLES PRENATALES
+kable(tabla_edad_madre, 
+      align = c("l", "c", "r", "r"),
+      col.names = c("Grupo de Edad", "Frecuencia", "Porcentaje (%)", "Porcentaje Acumulado (%)"),
+      caption = "TABLA 4. DISTRIBUCIÓN POR GRUPOS DE EDAD DE LA MADRE") %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width = FALSE,
+    font_size = 12
+  ) %>%
+  add_header_above(c(" " = 1, "Distribución de Frecuencias" = 3),
+                   background = "#2C3E50", color = "white") %>%
+  row_spec(0, background = "#34495E", color = "white", bold = TRUE) %>%
+  column_spec(1, bold = TRUE, width = "12em") %>%
+  column_spec(2:4, background = "#F4F6F6") %>%
+  row_spec(1:nrow(tabla_edad_madre), 
+           background = rep(c("#FBFCFC", "#F4F6F6"), length.out = nrow(tabla_edad_madre))) %>%
+  footnote(
+    general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024."
+  )
+```
+
+```{r grafico4_edad_madre_grouped, echo=FALSE, fig.width=12, fig.height=7}
+# GRÁFICO 4:EDAD MADRE BARRAS AGRUPADAS
+#Preparar datos para barras agrupadas
+
+tabla_edad_peso <- Base_datos %>%
+  count(Edad_madre, Peso_delicado) %>%
+  group_by(Edad_madre) %>%
+  mutate(
+    Total = sum(n),
+    Porcentaje = round(100 * n / Total, 1)
+  ) %>%
+  ungroup()
+
+# Crear gráfico de barras agrupadas
+plot_ly(
+  tabla_edad_peso,
+  x = ~Edad_madre,
+  y = ~n,
+  color = ~Peso_delicado,
+  colors = c('#27AE60', '#E74C3C'),
+  type = 'bar',
+  text = ~paste0(n, " (", Porcentaje, "%)"),
+  textposition = 'outside',
+  textfont = list(size = 10),
+  hovertemplate = paste(
+    '<b>Edad: %{x}</b><br>',
+    'Peso Delicado: %{fullData.name}<br>',
+    'Frecuencia: %{y}<br>',
+    'Porcentaje: %{text}<br>',
+    '<extra></extra>'
+  )
+) %>%
+  plotly::layout(
+    barmode = 'group',
+    title = list(
+      text = "<b>Gráfico 4. Distribución de Peso Delicado según Edad Materna</b><br><sub>Bogotá - Segundo Semestre 2024</sub>",
+      x = 0.5,
+      font = list(size = 16)
+    ),
+    xaxis = list(
+      title = "<b>Edad de la Madre</b>",
+      tickfont = list(size = 10),
+      tickangle = -45
+    ),
+    yaxis = list(
+      title = "<b>Frecuencia</b>"
+    ),
+    legend = list(
+      title = list(text = "<b>Peso Delicado</b>"),
+      orientation = "h",
+      x = 0.5,
+      xanchor = "center",
+      y = -0.25
+    ),
+    annotations = list(
+      list(
+        text = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024",
+        xref = "paper",
+        yref = "paper",
+        x = 0.5,
+        y = -0.35,
+        showarrow = FALSE,
+        font = list(size = 10, color = "#666666"),
+        xanchor = "center"
+      )
+    ),
+    margin = list(b = 150, l = 80, r = 50, t = 100)
+  )
+```
+
+#X4 NUMERO CONTROLES PRENATALES
+```{r tabla5_controles_prenatales, echo=FALSE}
+# TABLA 5: ESTADÍSTICAS DE CONTROLES PRENATALES
 tabla_controles <- Base_datos %>%
   summarise(
     Variable = "Controles Prenatales",
@@ -371,7 +573,7 @@ tabla_controles <- Base_datos %>%
   )
 
 kable(tabla_controles,
-      caption = "TABLA 6. ESTADÍSTICAS DESCRIPTIVAS - CONTROLES PRENATALES",
+      caption = "TABLA 5. ESTADÍSTICAS DESCRIPTIVAS - CONTROLES PRENATALES",
       align = c("l", "r", "r", "r", "r", "r", "r", "r")) %>%
   kable_styling(bootstrap_options = c("striped", "hover"),
                 full_width = FALSE,
@@ -385,7 +587,7 @@ kable(tabla_controles,
 ```
 
 ```{r grafico_controles, echo=FALSE, fig.width=10, fig.height=6}
-# GRÁFICO: DISTRIBUCIÓN DE CONTROLES PRENATALES
+# GRÁFICO 5: DISTRIBUCIÓN DE CONTROLES PRENATALES
 library(ggplot2)
 
 ggplot(Base_datos, aes(x = Numero_control_prenatal)) +
@@ -394,7 +596,7 @@ ggplot(Base_datos, aes(x = Numero_control_prenatal)) +
   geom_density(color = "#E74C3C", linewidth = 1.2) +
   geom_vline(aes(xintercept = mean(Numero_control_prenatal)), 
              color = "#27AE60", linetype = "dashed", linewidth = 1) +
-  labs(title = "Distribución del Número de Controles Prenatales",
+  labs(title = "GRÁFICO 5:Distribución del Número de Controles Prenatales",
        subtitle = "Bogotá - Segundo Semestre 2024",
        x = "Número de Controles Prenatales",
        y = "Densidad",
@@ -406,8 +608,11 @@ ggplot(Base_datos, aes(x = Numero_control_prenatal)) +
         panel.grid.minor = element_blank())
 ```
 
-```{r tabla7_numero_embarazos, echo=FALSE}
-# TABLA 7: ESTADÍSTICAS DE NÚMERO DE EMBARAZOS
+
+# X5 NUMEROS DE EMBARAZOS
+
+```{r tabla6_numero_embarazos, echo=FALSE}
+# TABLA 6: ESTADÍSTICAS DE NÚMERO DE EMBARAZOS
 tabla_embarazos <- Base_datos %>%
   summarise(
     Variable = "Número de Embarazos",
@@ -421,7 +626,7 @@ tabla_embarazos <- Base_datos %>%
   )
 
 kable(tabla_embarazos,
-      caption = "TABLA 7. ESTADÍSTICAS DESCRIPTIVAS - NÚMERO DE EMBARAZOS",
+      caption = "TABLA 6. ESTADÍSTICAS DESCRIPTIVAS - NÚMERO DE EMBARAZOS",
       align = c("l", "r", "r", "r", "r", "r", "r", "r")) %>%
   kable_styling(bootstrap_options = c("striped", "hover"),
                 full_width = FALSE,
@@ -435,14 +640,14 @@ kable(tabla_embarazos,
 ```
 
 ```{r grafico_embarazos, echo=FALSE, fig.width=10, fig.height=6}
-# GRÁFICO: DISTRIBUCIÓN DE NÚMERO DE EMBARAZOS
+# GRÁFICO 6: DISTRIBUCIÓN DE NÚMERO DE EMBARAZOS
 ggplot(Base_datos, aes(x = Numero_embarazos)) +
   geom_histogram(aes(y = after_stat(density)), bins = 20, fill = "#9B59B6", 
                  color = "white", alpha = 0.7) +
   geom_density(color = "#E74C3C", linewidth = 1.2) +
   geom_vline(aes(xintercept = mean(Numero_embarazos)), 
              color = "#27AE60", linetype = "dashed", linewidth = 1) +
-  labs(title = "Distribución del Número de Embarazos",
+  labs(title = "GRÁFICO 6: Distribución del Número de Embarazos",
        subtitle = "Bogotá - Segundo Semestre 2024",
        x = "Número de Embarazos",
        y = "Densidad",
@@ -453,9 +658,9 @@ ggplot(Base_datos, aes(x = Numero_embarazos)) +
         axis.title = element_text(face = "bold"),
         panel.grid.minor = element_blank())
 ```
-
-```{r tabla8_resumen, echo=FALSE}
-# TABLA 8: RESUMEN GENERAL DE OBSERVACIONES
+#TABLAS FINALES
+```{r tabla7_resumen, echo=FALSE}
+# TABLA 7: RESUMEN GENERAL DE OBSERVACIONES
 tabla_resumen <- Base_datos %>%
   count(Peso_delicado) %>%
   mutate(
@@ -492,6 +697,8 @@ kable(tabla_resumen,
   )
 ```
 
+
+#BASE DE DATOS
 ```{r tabla_interactiva, echo=FALSE}
 # TABLA INTERACTIVA FINAL
 reactable(
@@ -596,335 +803,6 @@ tags$div(
 )
 ```
 
-## GRÁFICOS INTERACTIVOS
 
-```{r grafico1_peso_pie, echo=FALSE, fig.width=10, fig.height=6}
-# GRÁFICO 1: DISTRIBUCIÓN DEL PESO DEL RECIÉN NACIDO (PIE CHART)
-tabla_peso <- Base_datos %>%
-  count(Peso_delicado) %>%
-  mutate(
-    Grupo_Peso = ifelse(Peso_delicado == "Si", "Delicado", "Moderado"),
-    Porcentaje = round(100 * n / sum(n), 1)
-  )
 
-plot_ly(
-  tabla_peso,
-  labels = ~Grupo_Peso,
-  values = ~n,
-  type = 'pie',
-  textposition = 'inside',
-  textinfo = 'label+percent',
-  insidetextorientation = 'radial',
-  marker = list(
-    colors = c('#E74C3C', '#27AE60'),
-    line = list(color = '#FFFFFF', width = 2)
-  ),
-  hovertemplate = paste(
-    '<b>%{label}</b><br>',
-    'Frecuencia: %{value}<br>',
-    'Porcentaje: %{percent}<br>',
-    '<extra></extra>'
-  )
-) %>%
-  plotly::layout(
-    title = list(
-      text = "<b>Gráfico 1. Distribución del Peso del Recién Nacido</b><br><sub>Bogotá - Segundo Semestre 2024</sub>",
-      x = 0.5,
-      font = list(size = 16)
-    ),
-    legend = list(
-      orientation = "h",
-      x = 0.3,
-      y = -0.1,
-      font = list(size = 12)
-    ),
-    annotations = list(
-      list(
-        text = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024",
-        xref = "paper",
-        yref = "paper",
-        x = 0.5,
-        y = -0.2,
-        showarrow = FALSE,
-        font = list(size = 10, color = "#666666"),
-        xanchor = "center"
-      )
-    ),
-    margin = list(b = 100)
-  )
-```
 
-```{r grafico2_tiempo_gestacion, echo=FALSE, fig.width=10, fig.height=6}
-# GRÁFICO 2: DISTRIBUCIÓN DEL TIEMPO DE GESTACIÓN (BAR CHART)
-tabla_tg <- Base_datos %>%
-  count(Tiempo_gestación) %>%
-  mutate(Porcentaje = round(100 * n / sum(n), 1))
-
-plot_ly(
-  tabla_tg,
-  x = ~Tiempo_gestación,
-  y = ~Porcentaje,
-  type = 'bar',
-  text = ~paste0(Porcentaje, "%"),
-  textposition = 'outside',
-  marker = list(
-    color = '#3498DB',
-    line = list(color = '#2980B9', width = 1.5)
-  ),
-  hovertemplate = paste(
-    '<b>%{x}</b><br>',
-    'Porcentaje: %{y}%<br>',
-    '<extra></extra>'
-  )
-) %>%
-  plotly::layout(
-    title = list(
-      text = "<b>Gráfico 2. Distribución del Tiempo de Gestación</b><br><sub>Bogotá - Segundo Semestre 2024</sub>",
-      x = 0.5,
-      font = list(size = 16)
-    ),
-    xaxis = list(
-      title = "<b>Tiempo de Gestación</b>",
-      tickfont = list(size = 10)
-    ),
-    yaxis = list(
-      title = "<b>Porcentaje (%)</b>",
-      ticksuffix = "%"
-    ),
-    annotations = list(
-      list(
-        text = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024",
-        xref = "paper",
-        yref = "paper",
-        x = 0.5,
-        y = -0.25,
-        showarrow = FALSE,
-        font = list(size = 10, color = "#666666"),
-        xanchor = "center"
-      )
-    ),
-    margin = list(b = 150)
-  )
-```
-
-```{r grafico3_tipo_parto, echo=FALSE, fig.width=10, fig.height=6}
-# GRÁFICO 3: DISTRIBUCIÓN DEL TIPO DE PARTO (PIE CHART)
-tabla_parto <- Base_datos %>%
-  count(Tipo_parto) %>%
-  mutate(Porcentaje = round(100 * n / sum(n), 1))
-
-plot_ly(
-  tabla_parto,
-  labels = ~Tipo_parto,
-  values = ~n,
-  type = 'pie',
-  textposition = 'inside',
-  textinfo = 'label+percent',
-  insidetextorientation = 'radial',
-  marker = list(
-    colors = c('#9B59B6', '#1ABC9C', '#F39C12'),
-    line = list(color = '#FFFFFF', width = 2)
-  ),
-  hovertemplate = paste(
-    '<b>%{label}</b><br>',
-    'Frecuencia: %{value}<br>',
-    'Porcentaje: %{percent}<br>',
-    '<extra></extra>'
-  )
-) %>%
-  plotly::layout(
-    title = list(
-      text = "<b>Gráfico 3. Distribución del Tipo de Parto</b><br><sub>Bogotá - Segundo Semestre 2024</sub>",
-      x = 0.5,
-      font = list(size = 16)
-    ),
-    legend = list(
-      orientation = "h",
-      x = 0.25,
-      y = -0.1,
-      font = list(size = 12)
-    ),
-    annotations = list(
-      list(
-        text = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024",
-        xref = "paper",
-        yref = "paper",
-        x = 0.5,
-        y = -0.2,
-        showarrow = FALSE,
-        font = list(size = 10, color = "#666666"),
-        xanchor = "center"
-      )
-    ),
-    margin = list(b = 100)
-  )
-```
-
-```{r grafico4_edad_madre, echo=FALSE, fig.width=10, fig.height=6}
-# GRÁFICO 4: DISTRIBUCIÓN POR EDAD DE LA MADRE (BAR CHART)
-tabla_edad <- Base_datos %>%
-  count(Edad_madre) %>%
-  mutate(Porcentaje = round(100 * n / sum(n), 1)) %>%
-  arrange(desc(Porcentaje))
-
-plot_ly(
-  tabla_edad,
-  x = ~reorder(Edad_madre, Porcentaje),
-  y = ~Porcentaje,
-  type = 'bar',
-  text = ~paste0(Porcentaje, "%"),
-  textposition = 'outside',
-  marker = list(
-    color = '#2ECC71',
-    line = list(color = '#27AE60', width = 1.5)
-  ),
-  hovertemplate = paste(
-    '<b>%{x}</b><br>',
-    'Porcentaje: %{y}%<br>',
-    '<extra></extra>'
-  )
-) %>%
-  plotly::layout(
-    title = list(
-      text = "<b>Gráfico 4. Distribución por Grupos de Edad Materna</b><br><sub>Bogotá - Segundo Semestre 2024</sub>",
-      x = 0.5,
-      font = list(size = 16)
-    ),
-    xaxis = list(
-      title = "<b>Edad de la Madre</b>",
-      tickfont = list(size = 10)
-    ),
-    yaxis = list(
-      title = "<b>Porcentaje (%)</b>",
-      ticksuffix = "%"
-    ),
-    annotations = list(
-      list(
-        text = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024",
-        xref = "paper",
-        yref = "paper",
-        x = 0.5,
-        y = -0.25,
-        showarrow = FALSE,
-        font = list(size = 10, color = "#666666"),
-        xanchor = "center"
-      )
-    ),
-    margin = list(b = 150)
-  )
-```
-
-```{r grafico5_tiempo_vs_peso, echo=FALSE, fig.width=10, fig.height=6}
-# GRÁFICO 5: RELACIÓN TIEMPO DE GESTACIÓN VS PESO (BARRAS APILADAS)
-tabla_tiempo_peso <- Base_datos %>%
-  count(Tiempo_gestación, Peso_delicado) %>%
-  mutate(Grupo_Peso = ifelse(Peso_delicado == "Si", "Delicado", "Moderado"))
-
-plot_ly(
-  tabla_tiempo_peso,
-  x = ~Tiempo_gestación,
-  y = ~n,
-  color = ~Grupo_Peso,
-  colors = c('#E74C3C', '#27AE60'),
-  type = 'bar',
-  text = ~n,
-  textposition = 'inside',
-  hovertemplate = paste(
-    '<b>%{x}</b><br>',
-    'Grupo: %{fullData.name}<br>',
-    'Frecuencia: %{y}<br>',
-    '<extra></extra>'
-  )
-) %>%
-  plotly::layout(
-    barmode = 'stack',
-    title = list(
-      text = "<b>Gráfico 5. Tiempo de Gestación según Grupo de Peso</b><br><sub>Bogotá - Segundo Semestre 2024</sub>",
-      x = 0.5,
-      font = list(size = 16)
-    ),
-    xaxis = list(
-      title = "<b>Tiempo de Gestación</b>",
-      tickfont = list(size = 10)
-    ),
-    yaxis = list(
-      title = "<b>Frecuencia</b>"
-    ),
-    legend = list(
-      title = list(text = "<b>Grupo de Peso</b>"),
-      orientation = "v",
-      x = 1.02,
-      y = 1
-    ),
-    annotations = list(
-      list(
-        text = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024",
-        xref = "paper",
-        yref = "paper",
-        x = 0.5,
-        y = -0.25,
-        showarrow = FALSE,
-        font = list(size = 10, color = "#666666"),
-        xanchor = "center"
-      )
-    ),
-    margin = list(b = 150)
-  )
-```
-
-```{r grafico6_resumen_donut, echo=FALSE, fig.width=10, fig.height=6}
-# GRÁFICO 6: RESUMEN GENERAL (DONUT CHART)
-tabla_resumen_graf <- Base_datos %>%
-  count(Peso_delicado) %>%
-  mutate(
-    Categoria = ifelse(Peso_delicado == "Si", "Peso Delicado", "Peso Moderado"),
-    Porcentaje = round(100 * n / sum(n), 1)
-  )
-
-plot_ly(
-  tabla_resumen_graf,
-  labels = ~Categoria,
-  values = ~n,
-  type = 'pie',
-  hole = 0.4,
-  textposition = 'inside',
-  textinfo = 'label+percent',
-  insidetextorientation = 'radial',
-  marker = list(
-    colors = c('#E74C3C', '#27AE60'),
-    line = list(color = '#FFFFFF', width = 3)
-  ),
-  hovertemplate = paste(
-    '<b>%{label}</b><br>',
-    'Frecuencia: %{value}<br>',
-    'Porcentaje: %{percent}<br>',
-    '<extra></extra>'
-  )
-) %>%
-  plotly::layout(
-    title = list(
-      text = "<b>Gráfico 6. Resumen General de Categorías de Peso</b><br><sub>Bogotá - Segundo Semestre 2024</sub>",
-      x = 0.5,
-      font = list(size = 16)
-    ),
-    legend = list(
-      orientation = "h",
-      x = 0.3,
-      y = -0.1,
-      font = list(size = 12)
-    ),
-    annotations = list(
-      list(
-        text = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024",
-        xref = "paper",
-        yref = "paper",
-        x = 0.5,
-        y = -0.2,
-        showarrow = FALSE,
-        font = list(size = 10, color = "#666666"),
-        xanchor = "center"
-      )
-    ),
-    margin = list(b = 100)
-  )
-```
