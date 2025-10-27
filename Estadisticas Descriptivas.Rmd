@@ -255,67 +255,105 @@ kable(tabla_edad_madre,
 
 ```{r tablas5_cruzadas, echo=FALSE}
 # TABLA 5: TABLAS CRUZADAS
-# Función para crear tablas cruzadas consistentes
-crear_tabla_cruzada <- function(data, variable, titulo) {
-  data %>%
+# Función para crear tablas cruzadas completas
+crear_tabla_cruzada_completa <- function(data, variable, nombre_var) {
+  # Total general para porcentajes
+  total_general <- nrow(data)
+  
+  # Crear tabla de frecuencias
+  tabla_freq <- data %>%
     count({{variable}}, Peso_delicado) %>%
-    group_by({{variable}}) %>%
-    mutate(Total_Grupo = sum(n)) %>%
-    ungroup() %>%
-    filter(Peso_delicado == "Si") %>%
-    mutate(Porcentaje_Delicado = round(100 * n / Total_Grupo, 1)) %>%
-    select({{variable}}, n, Porcentaje_Delicado) %>%
-    rename("Frecuencia Delicado" = n, "% Delicado" = Porcentaje_Delicado)
+    mutate(Porcentaje = round(100 * n / total_general, 1))
+  
+  # Pivotar para obtener formato ancho
+  tabla_ancha <- tabla_freq %>%
+    select({{variable}}, Peso_delicado, n, Porcentaje) %>%
+    pivot_wider(
+      names_from = Peso_delicado,
+      values_from = c(n, Porcentaje),
+      values_fill = list(n = 0, Porcentaje = 0)
+    )
+  
+  # Renombrar columnas en el orden correcto
+  if("n_Si" %in% names(tabla_ancha)) {
+    tabla_ancha <- tabla_ancha %>%
+      select({{variable}}, n_Si, Porcentaje_Si, n_No, Porcentaje_No) %>%
+      rename(
+        !!nombre_var := {{variable}},
+        "n Sí" = n_Si,
+        "% Sí" = Porcentaje_Si,
+        "n No" = n_No,
+        "% No" = Porcentaje_No
+      )
+  }
+  
+  return(tabla_ancha)
 }
 
 # 5a: Tiempo de gestación vs Peso
-tabla_cruzada_tiempo <- crear_tabla_cruzada(Base_datos, Tiempo_gestación, "TIEMPO DE GESTACIÓN")
+tabla_cruzada_tiempo <- crear_tabla_cruzada_completa(Base_datos, Tiempo_gestación, "Tiempo de Gestación")
 
 kable(tabla_cruzada_tiempo, 
-      align = c("l", "r", "r"),
-      col.names = c("Tiempo Gestación", "Frecuencia", "% Delicado"),
-      caption = "TABLA 5A. DISTRIBUCIÓN CRUZADA - TIEMPO DE GESTACIÓN") %>%
+      align = c("l", "r", "r", "r", "r"),
+      col.names = c("Tiempo de Gestación", "n Sí", "% Sí", "n No", "% No"),
+      caption = "TABLA 5A. DISTRIBUCIÓN CRUZADA - TIEMPO DE GESTACIÓN Y PESO AL NACER") %>%
   kable_styling(
     bootstrap_options = c("striped", "hover"),
     full_width = FALSE,
     font_size = 11
   ) %>%
+  add_header_above(c(" " = 1, "Delicado (Sí)" = 2, "Delicado (No)" = 2),
+                   background = c("white", "#E74C3C", "#27AE60"),
+                   color = c("black", "white", "white")) %>%
   row_spec(0, background = "#34495E", color = "white", bold = TRUE) %>%
-  column_spec(1, bold = TRUE) %>%
-  column_spec(2:3, background = "#F4F6F6")
+  column_spec(1, bold = TRUE, width = "15em") %>%
+  column_spec(2:3, background = "#FADBD8") %>%
+  column_spec(4:5, background = "#D5F4E6") %>%
+  footnote(general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024.")
 
 # 5b: Tipo de parto vs Peso  
-tabla_cruzada_parto <- crear_tabla_cruzada(Base_datos, Tipo_parto, "TIPO DE PARTO")
+tabla_cruzada_parto <- crear_tabla_cruzada_completa(Base_datos, Tipo_parto, "Tipo de Parto")
 
 kable(tabla_cruzada_parto, 
-      align = c("l", "r", "r"),
-      col.names = c("Tipo Parto", "Frecuencia", "% Delicado"),
-      caption = "TABLA 5B. DISTRIBUCIÓN CRUZADA - TIPO DE PARTO") %>%
+      align = c("l", "r", "r", "r", "r"),
+      col.names = c("Tipo de Parto", "n Sí", "% Sí", "n No", "% No"),
+      caption = "TABLA 5B. DISTRIBUCIÓN CRUZADA - TIPO DE PARTO Y PESO AL NACER") %>%
   kable_styling(
     bootstrap_options = c("striped", "hover"),
     full_width = FALSE,
     font_size = 11
   ) %>%
+  add_header_above(c(" " = 1, "Delicado (Sí)" = 2, "Delicado (No)" = 2),
+                   background = c("white", "#E74C3C", "#27AE60"),
+                   color = c("black", "white", "white")) %>%
   row_spec(0, background = "#34495E", color = "white", bold = TRUE) %>%
-  column_spec(1, bold = TRUE) %>%
-  column_spec(2:3, background = "#F4F6F6")
+  column_spec(1, bold = TRUE, width = "12em") %>%
+  column_spec(2:3, background = "#FADBD8") %>%
+  column_spec(4:5, background = "#D5F4E6") %>%
+  footnote(general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024.")
 
 # 5c: Edad de la madre vs Peso
-tabla_cruzada_edad <- crear_tabla_cruzada(Base_datos, Edad_madre, "EDAD DE LA MADRE")
+tabla_cruzada_edad <- crear_tabla_cruzada_completa(Base_datos, Edad_madre, "Edad de la Madre")
 
 kable(tabla_cruzada_edad, 
-      align = c("l", "r", "r"),
-      col.names = c("Edad Madre", "Frecuencia", "% Delicado"),
-      caption = "TABLA 5C. DISTRIBUCIÓN CRUZADA - EDAD DE LA MADRE") %>%
+      align = c("l", "r", "r", "r", "r"),
+      col.names = c("Edad de la Madre", "n Sí", "% Sí", "n No", "% No"),
+      caption = "TABLA 5C. DISTRIBUCIÓN CRUZADA - EDAD DE LA MADRE Y PESO AL NACER") %>%
   kable_styling(
     bootstrap_options = c("striped", "hover"),
     full_width = FALSE,
     font_size = 11
   ) %>%
+  add_header_above(c(" " = 1, "Delicado (Sí)" = 2, "Delicado (No)" = 2),
+                   background = c("white", "#E74C3C", "#27AE60"),
+                   color = c("black", "white", "white")) %>%
   row_spec(0, background = "#34495E", color = "white", bold = TRUE) %>%
-  column_spec(1, bold = TRUE) %>%
-  column_spec(2:3, background = "#F4F6F6")
+  column_spec(1, bold = TRUE, width = "12em") %>%
+  column_spec(2:3, background = "#FADBD8") %>%
+  column_spec(4:5, background = "#D5F4E6") %>%
+  footnote(general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024.")
 ```
+
 
 ```{r tabla6_controles_prenatales, echo=FALSE}
 # TABLA 6: ESTADÍSTICAS DE CONTROLES PRENATALES
