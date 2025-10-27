@@ -1,0 +1,12 @@
+---
+title: "Untitled"
+author: "Joan Aguirre"
+date: "2025-10-27"
+output: 
+  rmdformats::readthedown
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
