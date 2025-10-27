@@ -1,0 +1,1737 @@
+---
+title: "DETERMINANTES DE LAS VENTAS EN MICRONEGOCIOS DE LA REGIÓN CARIBE: UN ANÁLISIS DE REGRESIÓN LINEAL MÚLTIPLE"
+author: "Melany Enriquez (2415897), Santiago Posada (2418914), Sofia Potosi (2417794), Valery Rivera (2417038)"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    theme: flatly
+    highlight: textmate
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+    toc_depth: 4
+    number_sections: true
+    code_folding: hide
+    code_download: true
+    fig_width: 10
+    fig_height: 6
+    df_print: paged
+---
+
+```{=html}
+<style>
+:root {
+  --primary-color: #006D6D;
+  --secondary-color: #008B8B;
+  --accent-color: #20B2AA;
+  --light-gray: #F8F9FA;
+  --medium-gray: #E9ECEF;
+  --dark-gray: #495057;
+  --white: #FFFFFF;
+  --shadow: 0 2px 8px rgba(0, 109, 109, 0.1);
+  --shadow-hover: 0 4px 16px rgba(0, 109, 109, 0.15);
+  --border-radius: 8px;
+  --transition: all 0.3s ease;
+}
+
+/* Estructura principal del documento */
+.main-container {
+  max-width: 1400px !important;
+  margin: 0 auto !important;
+  padding: 20px !important;
+  display: flex !important;
+  gap: 30px !important;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue', Arial, sans-serif !important;
+}
+
+/* Contenido principal */
+.main-content {
+  flex: 1 !important;
+  min-width: 0 !important;
+  background: var(--white) !important;
+  border-radius: var(--border-radius) !important;
+  box-shadow: var(--shadow) !important;
+  padding: 40px !important;
+  transition: var(--transition) !important;
+}
+
+.main-content:hover {
+  box-shadow: var(--shadow-hover) !important;
+}
+
+/* Tabla de contenidos sticky */
+#TOC {
+  position: sticky !important;
+  top: 20px !important;
+  width: 300px !important;
+  height: fit-content !important;
+  max-height: calc(100vh - 40px) !important;
+  overflow-y: auto !important;
+  background: var(--white) !important;
+  border: 1px solid var(--medium-gray) !important;
+  border-radius: var(--border-radius) !important;
+  box-shadow: var(--shadow) !important;
+  padding: 25px !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+  transition: var(--transition) !important;
+}
+
+#TOC:hover {
+  box-shadow: var(--shadow-hover) !important;
+}
+
+/* Estilo de listas del TOC */
+#TOC ul {
+  list-style: none !important;
+  padding-left: 0 !important;
+  margin: 0 !important;
+}
+
+#TOC > ul > li {
+  margin-bottom: 12px !important;
+  border-bottom: 1px solid var(--light-gray) !important;
+  padding-bottom: 8px !important;
+}
+
+#TOC li {
+  margin: 4px 0 !important;
+  position: relative !important;
+}
+
+#TOC li ul {
+  padding-left: 20px !important;
+  margin-top: 6px !important;
+}
+
+#TOC a {
+  text-decoration: none !important;
+  color: var(--dark-gray) !important;
+  display: block !important;
+  padding: 8px 12px !important;
+  border-radius: 4px !important;
+  transition: var(--transition) !important;
+  font-weight: 500 !important;
+  border-left: 3px solid transparent !important;
+}
+
+#TOC a:hover {
+  background: linear-gradient(90deg, var(--light-gray) 0%, var(--white) 100%) !important;
+  color: var(--primary-color) !important;
+  border-left: 3px solid var(--primary-color) !important;
+  transform: translateX(3px) !important;
+}
+
+/* Título principal */
+h1.title {
+  color: var(--primary-color) !important;
+  text-align: center !important;
+  font-weight: 700 !important;
+  font-size: 2.8rem !important;
+  margin-bottom: 30px !important;
+  padding-bottom: 20px !important;
+  border-bottom: 3px solid var(--primary-color) !important;
+  text-shadow: 0 2px 4px rgba(0, 109, 109, 0.1) !important;
+}
+
+/* Información del autor y fecha */
+h4.author, h4.date {
+  text-align: center !important;
+  color: var(--dark-gray) !important;
+  font-weight: 400 !important;
+  margin: 10px 0 !important;
+}
+
+/* Encabezados de secciones */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  color: var(--primary-color) !important;
+  font-weight: 600 !important;
+  margin-top: 40px !important;
+  margin-bottom: 20px !important;
+  line-height: 1.3 !important;
+}
+
+h1 {
+  font-size: 2.4rem !important;
+  border-bottom: 2px solid var(--accent-color) !important;
+  padding-bottom: 15px !important;
+}
+
+h2 {
+  font-size: 2rem !important;
+  border-left: 4px solid var(--primary-color) !important;
+  padding-left: 20px !important;
+  background: linear-gradient(90deg, var(--light-gray) 0%, var(--white) 100%) !important;
+  padding: 15px 20px !important;
+  border-radius: 0 var(--border-radius) var(--border-radius) 0 !important;
+}
+
+h3 {
+  font-size: 1.6rem !important;
+  color: var(--secondary-color) !important;
+}
+
+h4 {
+  font-size: 1.3rem !important;
+  color: var(--secondary-color) !important;
+}
+
+/* Párrafos y texto del cuerpo */
+p, li, td, th {
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  text-align: justify !important;
+  line-height: 1.75 !important;
+  color: var(--dark-gray) !important;
+  font-size: 16px !important;
+  margin-bottom: 16px !important;
+}
+
+/* Bloques de contenido especiales */
+.abstract {
+  background: var(--light-gray) !important;
+  border-left: 5px solid var(--primary-color) !important;
+  padding: 25px !important;
+  margin: 30px 0 !important;
+  border-radius: 0 var(--border-radius) var(--border-radius) 0 !important;
+  box-shadow: var(--shadow) !important;
+  font-style: italic !important;
+}
+
+.content-block {
+  background: var(--white) !important;
+  border: 1px solid var(--medium-gray) !important;
+  border-radius: var(--border-radius) !important;
+  padding: 25px !important;
+  margin: 20px 0 !important;
+  box-shadow: var(--shadow) !important;
+  transition: var(--transition) !important;
+}
+
+.content-block:hover {
+  box-shadow: var(--shadow-hover) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Tablas */
+table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  margin: 25px 0 !important;
+  font-size: 14px !important;
+  border-radius: var(--border-radius) !important;
+  overflow: hidden !important;
+  box-shadow: var(--shadow) !important;
+}
+
+thead th {
+  background: var(--primary-color) !important;
+  color: var(--white) !important;
+  font-weight: 600 !important;
+  padding: 15px 12px !important;
+  text-align: left !important;
+  font-size: 15px !important;
+}
+
+tbody td {
+  padding: 12px !important;
+  border-bottom: 1px solid var(--light-gray) !important;
+  transition: var(--transition) !important;
+}
+
+tbody tr:nth-child(even) {
+  background: var(--light-gray) !important;
+}
+
+tbody tr:hover {
+  background: linear-gradient(90deg, var(--accent-color), var(--secondary-color)) !important;
+  color: var(--white) !important;
+  transform: scale(1.01) !important;
+}
+
+/* Bloques de código */
+pre {
+  background: var(--light-gray) !important;
+  border: 1px solid var(--medium-gray) !important;
+  border-radius: var(--border-radius) !important;
+  padding: 20px !important;
+  overflow-x: auto !important;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+code {
+  background: var(--medium-gray) !important;
+  padding: 3px 6px !important;
+  border-radius: 3px !important;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
+  font-size: 14px !important;
+  color: var(--primary-color) !important;
+}
+
+/* Gráficos y figuras */
+.figure {
+  text-align: center !important;
+  margin: 30px 0 !important;
+  padding: 20px !important;
+  background: var(--white) !important;
+  border: 1px solid var(--medium-gray) !important;
+  border-radius: var(--border-radius) !important;
+  box-shadow: var(--shadow) !important;
+  transition: var(--transition) !important;
+}
+
+.figure:hover {
+  box-shadow: var(--shadow-hover) !important;
+}
+
+.figure img {
+  border-radius: var(--border-radius) !important;
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+/* Enlaces */
+a {
+  color: var(--primary-color) !important;
+  text-decoration: none !important;
+  font-weight: 500 !important;
+  transition: var(--transition) !important;
+  border-bottom: 1px solid transparent !important;
+}
+
+a:hover {
+  color: var(--secondary-color) !important;
+  border-bottom: 1px solid var(--secondary-color) !important;
+}
+
+/* Listas */
+ul, ol {
+  padding-left: 25px !important;
+  margin: 16px 0 !important;
+}
+
+ul li, ol li {
+  margin-bottom: 8px !important;
+  line-height: 1.6 !important;
+}
+
+/* Botones de código */
+.btn-code {
+  background: var(--primary-color) !important;
+  color: var(--white) !important;
+  border: none !important;
+  padding: 8px 16px !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  transition: var(--transition) !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+
+.btn-code:hover {
+  background: var(--secondary-color) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Diseño responsivo */
+@media (max-width: 1024px) {
+  .main-container {
+    flex-direction: column !important;
+    max-width: 100% !important;
+    padding: 15px !important;
+  }
+  
+  #TOC {
+    position: static !important;
+    width: 100% !important;
+    max-height: 300px !important;
+    margin-bottom: 20px !important;
+    order: -1 !important;
+  }
+  
+  .main-content {
+    padding: 20px !important;
+  }
+  
+  h1.title {
+    font-size: 2.2rem !important;
+  }
+  
+  h1 {
+    font-size: 1.8rem !important;
+  }
+  
+  h2 {
+    font-size: 1.5rem !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-container {
+    padding: 10px !important;
+  }
+  
+  .main-content {
+    padding: 15px !important;
+  }
+  
+  h1.title {
+    font-size: 1.8rem !important;
+  }
+  
+  h1 {
+    font-size: 1.5rem !important;
+  }
+  
+  h2 {
+    font-size: 1.3rem !important;
+    padding: 10px 15px !important;
+  }
+  
+  table {
+    font-size: 12px !important;
+  }
+  
+  thead th, tbody td {
+    padding: 8px 6px !important;
+  }
+}
+
+/* Animaciones personalizadas */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.content-section {
+  animation: fadeInUp 0.6s ease-out !important;
+}
+
+/* Mejoras adicionales de accesibilidad */
+:focus {
+  outline: 2px solid var(--accent-color) !important;
+  outline-offset: 2px !important;
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+  width: 8px !important;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--light-gray) !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-color) !important;
+  border-radius: 4px !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary-color) !important;
+}
+</style>
+```
+
+```{=html}
+<script>
+// Espera a que todo el contenido esté cargado
+document.addEventListener("DOMContentLoaded", function() {
+  // Selecciona todos los bloques de código
+  const codeBlocks = document.querySelectorAll("pre.sourceCode");
+
+  codeBlocks.forEach((block, i) => {
+    // Crea el botón
+    const btn = document.createElement("button");
+    btn.textContent = "Mostrar código";
+    btn.className = "btn-code";
+
+    // Inicialmente ocultar el bloque
+    block.style.display = "none";
+
+    // Agrega evento al botón
+    btn.addEventListener("click", () => {
+      const visible = block.style.display === "block";
+      block.style.display = visible ? "none" : "block";
+      btn.textContent = visible ? "Mostrar código" : "Ocultar código";
+    });
+
+    // Inserta el botón antes del bloque
+    block.parentNode.insertBefore(btn, block);
+  });
+});
+</script>
+```
+
+```{r setup, warning=FALSE,message=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  fig.align = 'center',
+  fig.width = 10,
+  fig.height = 6,
+  cache = FALSE
+)
+
+library(ggplot2)
+library(dplyr)
+library(plotly)
+library(kableExtra)
+library(corrplot)
+library(gridExtra)
+library(broom)
+library(car)
+library(lmtest)
+library(nortest)
+library(readr)
+
+theme_set(theme_minimal() +
+  theme(
+    text = element_text(family = "Arial", size = 12),
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5, color = "#006D6D"),
+    plot.subtitle = element_text(size = 14, hjust = 0.5, color = "#495057"),
+    axis.title = element_text(size = 12, face = "bold", color = "#495057"),
+    axis.text = element_text(size = 11, color = "#495057"),
+    legend.title = element_text(size = 12, face = "bold", color = "#495057"),
+    legend.text = element_text(size = 11, color = "#495057"),
+    panel.grid.major = element_line(color = "#E9ECEF", size = 0.5),
+    panel.grid.minor = element_line(color = "#F8F9FA", size = 0.3),
+    plot.background = element_rect(fill = "white", color = NA),
+    panel.background = element_rect(fill = "white", color = NA)
+  ))
+
+colores_analisis <- c("#006D6D", "#008B8B", "#20B2AA", "#48CAE4", "#90E0EF")
+
+```
+
+```{r librerias, include=FALSE}
+library(readr)
+library(dplyr)
+library(tidyverse)
+library(kableExtra)
+library(reactable)
+library(htmltools)
+library(ggplot2)
+```
+
+```{r cargar_datos, include=FALSE}
+# Configuración inicial - manteniendo tu código base
+BD_EEVV <- read_csv("BD-EEVV-Nacimientos-2024.csv") %>%
+  select(COD_DPTO, PESO_NAC, T_GES, TIPO_PARTO, NUMCONSUL, EDAD_MADRE, N_EMB, MES) %>%
+  rename(
+    Departamento = COD_DPTO,
+    Peso_delicado = PESO_NAC,
+    Tiempo_gestación = T_GES,
+    Tipo_parto = TIPO_PARTO,
+    Numero_control_prenatal = NUMCONSUL,
+    Edad_madre = EDAD_MADRE,
+    Numero_embarazos = N_EMB,
+    Mes = MES
+  ) %>%
+  mutate(
+    Numero_control_prenatal = as.numeric(Numero_control_prenatal),
+    Numero_embarazos = as.numeric(Numero_embarazos),
+    Tiempo_gestación = factor(Tiempo_gestación,
+                              levels = c(1, 2, 3, 4, 5),
+                              labels = c("22 o menos semanas", "22-27 semanas", "28-37 semanas",
+                                         "De 38-41 semanas", "42 o más semanas"))
+  ) %>%
+  mutate(
+    Peso_delicado = ifelse(Peso_delicado %in% c(5, 6, 7, 8, 9), "No", "Si"),
+    Peso_delicado = factor(Peso_delicado, levels = c("Si", "No"))
+  ) %>%
+  mutate(Mes = as.numeric(Mes)) %>%
+  filter(Mes %in% c(7, 8, 9, 10, 11, 12)) %>%
+  filter(Departamento == 11) %>%
+  mutate(Departamento = "Bogotá") %>%
+  na.omit()
+
+```
+
+```{r balanceo_datos, include=FALSE}
+# Balanceo
+set.seed(5)
+Si <- BD_EEVV %>% filter(Peso_delicado == "Si")
+No <- BD_EEVV %>% filter(Peso_delicado == "No") %>% sample_n(6000)
+
+# Base final
+Base_datos <- bind_rows(Si, No) %>%
+  select(Tiempo_gestación, Tipo_parto, Numero_control_prenatal,
+         Edad_madre, Numero_embarazos, Peso_delicado) %>%
+  mutate(
+    Tipo_parto = case_when(
+      Tipo_parto == 1 ~ "Espontaneo",
+      Tipo_parto == 2 ~ "Cesarea",
+      Tipo_parto == 3 ~ "Instrumentado"
+    ),
+    Edad_madre = case_when(
+      Edad_madre == 1 ~ "10-14 años",
+      Edad_madre == 2 ~ "15-19 años",
+      Edad_madre == 3 ~ "20-24 años",
+      Edad_madre == 4 ~ "25-29 años",
+      Edad_madre == 5 ~ "30-34 años",
+      Edad_madre == 6 ~ "35-39 años",
+      Edad_madre == 7 ~ "40-44 años",
+      Edad_madre == 8 ~ "45-49 años",
+      Edad_madre == 9 ~ "50-54 años"
+    ),
+    Tipo_parto = as.factor(Tipo_parto),
+    Edad_madre = as.factor(Edad_madre)
+  ) %>%
+  filter(complete.cases(.))
+
+```
+
+::: abstract
+**Resumen** : *Este estudio analiza los determinantes de las ventas en micronegocios de la región Caribe colombiana mediante regresión lineal múltiple. Se utilizaron datos de la Encuesta de Micronegocios (EMICRON) 2022 del DANE, con una muestra de 2.020 observaciones de siete departamentos caribeños.*
+
+*El modelo identifica como variables explicativas significativas los gastos operativos, valor agregado, inversión en activos y arrendamiento, además de efectos diferenciados por departamento. Los resultados muestran que los gastos operativos son el principal determinante de las ventas, seguido por el valor agregado generado.*
+
+*El modelo presenta un poder explicativo robusto y significancia estadística global. Los supuestos de regresión se cumplen de manera aceptable para datos económicos reales, con ligeras desviaciones que no comprometen la validez práctica del análisis.*
+
+*Las predicciones generadas permiten evaluar diferentes escenarios operativos y confirman que la eficiencia en el uso del capital de trabajo es más determinante que la capitalización en activos fijos para el éxito comercial de los micronegocios en la región estudiada.*
+:::
+
+# Introducción
+
+::: content-block
+El peso al nacer es uno de los determinantes más importantes del bienestar con el que un ser humano inicia su vida. Es un indicador de morbilidad y mortalidad pediátrica y neonatal, así como un antecedente clave en las diferencias del desarrollo cognitivo y de las enfermedades crónicas en etapas posteriores. Sin embargo, también representa una problemática multifactorial en la que intervienen diversas fallas sociales, como la desigualdad económica, el acceso a la salud, las condiciones de vida y la educación en salud materno-infantil. Todo esto genera brechas en las propiedades intelectuales y materiales durante una etapa tan vital y crítica como el desarrollo óptimo de los nacidos vivos del país, lo que produce impactos en los niveles de natalidad, el desarrollo de niños y adolescentes, y en las madres presentes y futuras.
+
+Un recién nacido con bajo peso y/o desnutrición no solo refleja una falta de responsabilidad materna hacia su hijo, sino también las brechas que impiden que las madres accedan a un seguimiento adecuado y controlado de su embarazo. Esto les dificulta vivir este proceso de manera tranquila y exitosa, y hace que sus hijos no inicien sus primeros momentos de vida de forma satisfactoria.
+
+Como se mencionó anteriormente, el desarrollo prenatal del bebé representa uno de los factores más influyentes desde el punto de vista social, ya que engloba y describe las condiciones del entorno en el que nace el individuo y en el que probablemente transitara las etapas futuras de su desarrollo. Lo anterior se resume en las particularidades del embarazo de las madres de los recién nacidos vivos. Estos aspectos se abordarán en el desarrollo de la presente investigación, puesto que desde el área de la ingeniería es posible realizar una prospectiva de la situación, facilitando la formulación de soluciones desde un enfoque social.
+
+A pesar de que los antecedentes corresponden a una problemática nacional, Bogotá, a pesar de ser la capital del país y contar con un mejor desarrollo regional, no está exenta de ella. Según datos del DANE, el 17% de los casos de desnutrición neonatal del segundo semestre del año 2024 corresponden a esta ciudad.
+
+El presente estudio emplea modelos de clasificación supervisada (regresión logística y KNN) utilizando los datos de nacimientos vivos en Bogotá, con el objetivo de analizar la relación entre la desnutrición neonatal y un conjunto de variables explicativas. Entre estas, se consideran el tiempo de gestación, el tipo de parto, el número de controles prenatales, la edad materna y el número de embarazos previos. La selección de estas variables se fundamenta tanto en la revisión de literatura científica relevante como en las características sociodemográficas y sanitarias propias del contexto bogotano, las cuales han sido identificadas en informes nacionales y estudios previos como factores determinantes en el estado nutricional al nacer.
+:::
+
+# Metodología y Datos
+
+:::: content-block
+**Base de datos:** Encuesta de estadísticas vitales - EEVV - 2024
+
+**Unidad de análisis:** Nacimiento
+
+**Período:** (2024)
+
+**Acceso:** [https://microdatos.dane.gov.co/index.php/catalog/878](https://microdatos.dane.gov.co/index.php/catalog/878/data-dictionary/F46?file_name=BD-EEVV-Nacimientos-2024){.uri}
+
+Los datos utilizados en esta investigación provienen de la Encuesta de Estadísticas Vitales (EEVV) 2024 del Departamento Administrativo Nacional de Estadística (DANE). Esta encuesta administra el registro administrativo de nacimientos en Colombia y recoge información detallada sobre características demográficas, sociales y clínicas relacionadas con el recién nacido y su madre.
+
+La metodología de esta investigación se basa en la aplicación de dos modelos de clasificación supervisada, K-Nearest Neighbors (KNN) y Regresión Logística, con el objetivo de identificar y analizar las fallas sociales y estructurales que inciden en la desnutrición neonatal en Bogotá durante el segundo semestre de 2024. Estos modelos permiten determinar la influencia de variables sociales, económicas y de salud en este problema de salud pública, tomando como indicador principal la desnutrición al nacer.
+
+La selección de variables incluye aspectos educativos, económicos y estructurales que reflejan el control social desde la concepción hasta el nacimiento, así como parámetros clínicos relevantes. Esto garantiza un análisis integral de los determinantes del estado nutricional neonatal.
+
+El estudio utiliza una base de datos representativa y actualizada proveniente de la Encuesta de Estadísticas Vitales (EEVV) 2024 del DANE, focalizando su análisis en la población nacida en Bogotá durante ese periodo. El proceso metodológico contempla etapas rigurosas de preprocesamiento de datos, incluyendo limpieza, manejo de valores faltantes y balance de clases, así como la partición de los datos en conjuntos de entrenamiento y prueba para validar los modelos.
+
+La muestra final se concentra en los siete departamentos del Caribe colombiano: Atlántico, Bolívar, Cesar, Córdoba, La Guajira, Magdalena y Sucre. Se aplicaron filtros estrictos para garantizar la calidad de los datos, incluyendo solo observaciones con valores positivos en todas las variables clave y sin datos faltantes.
+
+## Justificación de la selección de variables dependiente e independientes
+
+La selección de **Ventas del Mes Anterior** como variable dependiente se fundamenta en su carácter de indicador directo del desempeño comercial de los micronegocios. Las ventas representan el resultado final de la actividad económica y constituyen la principal fuente de ingresos para estas unidades productivas.
+
+La elección de las variables independientes se basa en fundamentos teóricos de los fundamentos de la economia. Cada variable seleccionada representa un aspecto fundamental de la operación de los micronegocios:
+
+1.  **Gastos mes anterior** funcionan como premisa del capital de trabajo utilizado en la generación de ventas. La teoría económica establece una relación directa entre la inversión en actividades operativas y la capacidad de generar ingresos. Esta variable captura tanto los costos variables directamente asociados a la producción como los gastos operativos necesarios para mantener la actividad comercial.
+
+2.  **Valor agregado** Representa la productividad y eficiencia de los procesos productivos del micronegocio. Esta variable es particularmente importante porque refleja la capacidad de la unidad económica para generar valor más allá del costo de los insumos utilizados. Micronegocios con mayor valor agregado deberían, en principio, generar mayores niveles de ventas.
+
+3.  **Inversión de activos** Es una herramienta que sirve como indicador de las diferentes modificaciones estructurales realizadas dentro de los micronegocios en pro de aumentar la productividad y competitividad.
+
+4.  **Arrendamiento** representa los costos fijos estructurales que enfrentan los micronegocios. Esta variable permite controlar por diferencias en la estructura de costos que pueden afectar la relación entre otras variables y las ventas.
+
+5.  **Departamento** es incluida como variable de comparación para capturar diferentes perspectivas con factores territoriales, demograficas y de acceso a mercados. Las diferencias entre departamentos pueden reflejar variaciones en infraestructura, características de los mercados y dinámicas económicas regionales.
+
+## Descripción del modelo de regresión lineal múltiple
+
+El modelo lineal busca encontrar dependencias con las variables independientes que incluyen factores geográficos, demográficos, de inversión y gastos. Este enfoque metodológico es particularmente apropiado para el análisis de micronegocios porque permite aislar el efecto específico de cada factor mientras se controla por la influencia de las demás variables.
+
+El modelo asume que existe una relación lineal entre las variables independientes y la variable dependiente, donde los efectos de las variables explicativas son aditivos. Esta especificación permite interpretar cada coeficiente como el cambio marginal en la variable dependiente ante un cambio unitario en la variable independiente correspondiente, manteniendo constantes las demás variables.
+
+Los supuestos fundamentales del modelo incluyen:
+
+-   **Linealidad**: La relación entre variables independientes y dependiente es lineal en los parámetros.
+
+-   **Independencia**: Las observaciones son independientes entre sí.
+
+-   **Homocedasticidad**: La varianza de los errores es constante para todas las observaciones.
+
+-   **Normalidad**: Los errores siguen una distribución normal.
+
+-   **No multicolinealidad**: Las variables independientes no están perfectamente correlacionadas entre sí.
+
+El método de estimación utilizado es mínimos cuadrados ordinarios (MCO), que minimiza la suma de los cuadrados de los residuos para obtener estimadores insesgados, consistentes y eficientes. La validez de las inferencias estadísticas depende del cumplimiento de los supuestos del modelo, los cuales son evaluados mediante pruebas de diagnóstico específicas.
+
+## Ecuación formal del modelo
+
+La regresión lineal múltiple se fundamenta en la premisa de que la variable dependiente puede expresarse como una función lineal en donde las pendinetes representan los efectos de las variables independientes sobre la unidad de la variable dependiente. Matemáticamente, el modelo se representa como:
+
+::: content-block
+$$Ventas_i = \beta_0 + \beta_1 \, Gastos_i + \beta_2 \, ValorAgregado_i + \beta_3 \, InversionActivos_i...$$ $$+\beta_4 \, Arrendamiento_i + \sum_{j=1}^{6} \gamma_j \, Departamento_{j,i} + \varepsilon_i$$
+
+Donde:
+
+-   $Ventas_i$ representa las ventas del mes anterior para el micronegocio $i$
+
+-   $β_0$ es el intercepto del modelo
+
+-   $β_1,β_2,β_3,β_4$ son los coeficientes de las variables cuantitativas
+
+-   $Y_j$ son lo son los coeficientes de las variables dummy departamentales (j = 1, ..., 6)
+
+-   $ε_i$ es el término de error aleatorio
+
+-   $i=1,...,ni=1,...,n$ indexa las observaciones individuales
+:::
+
+En forma matricial, el modelo se expresa como:
+
+$Y=Xβ+ε$
+
+Donde $Y$ es el vector de variables dependientes, $X$ es la matriz de variables independientes, $β$ es el vector de parámetros a estimar y $ε$ es el vector de errores aleatorios.
+::::
+
+# Resultados Descriptivos
+
+:::: content-block
+El análisis de regresión lineal múltiple constituye una herramienta fundamental en la investigación empresarial y el análisis de datos comerciales. En el contexto actual de mercados altamente competitivos, comprender los factores que influyen en las ventas se ha vuelto crucial para el éxito organizacional.
+
+Este estudio se enfoca en examinar las relaciones cuantitativas entre múltiples variables predictivas y el desempeño de ventas empresariales, utilizando técnicas estadísticas avanzadas para identificar patrones, tendencias y relaciones causales que puedan informar estrategias comerciales efectivas.
+
+## Estadísticas descriptivas de las variables
+
+::: content-block
+La selección de **Ventas del Mes Anterior** como variable dependiente se fundamenta en su carácter de indicador directo del desempeño comercial de los micronegocios. Las ventas representan el resultado final de la actividad económica y constituyen la principal fuente de ingresos para estas unidades productivas.
+
+La elección de las variables independientes se basa en fundamentos teóricos de los fundamentos de la economia. Cada variable seleccionada representa un aspecto fundamental de la operación de los micronegocios:
+
+### Ventas de los Micronegocios en la Región Caribe
+
+```{r estadisticas de y, echo=FALSE,Warning=FALSE}
+estadisticas <- BaseFinal %>%
+  group_by(Departamento) %>%
+  summarise(
+    n = n(),
+    "Media ventas" = round(mean(`Ventas mes anterior`), 2),
+    "Desviacion de las ventas" = round(sd(`Ventas mes anterior`), 2),
+    "Mediana del mes anterior" = round(median(`Ventas mes anterior`), 2),
+    Min = round(min(`Ventas mes anterior`), 2),
+    Max = round(max(`Ventas mes anterior`), 2))
+
+kable(estadisticas, 
+      align = c("l", "c", "r", "r", "r", "r", "r"),
+      format.args = list(big.mark = ",", decimal.mark = "."),
+      col.names = c("Departamento", "Numero de registros", "Media Ventas", "Desv. Est. venta", "Mediana", "Mínimo venta", "Máximo venta"),
+      caption = "TABLA 1. ESTADISTICA DESCRIPTIVA DE LAS VENTAS.") %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover"),
+    full_width = FALSE,
+    font_size = 12,
+    position = "center",
+    latex_options = "hold_position"
+  ) %>%
+  add_header_above(c(" " = 1, "Tamaño Muestral" = 1, "Estadísticas de Ventas ($)" = 5),
+                   background = "#2C3E50", color = "white") %>%
+  row_spec(0, background = "#34495E", color = "white", bold = TRUE) %>%
+  column_spec(1, bold = TRUE, width = "12em") %>%
+  column_spec(2, background = "#F4F6F6") %>%
+  column_spec(3:7, background = "#FBFCFC") %>%
+  pack_rows("", 1, nrow(estadisticas), 
+            label_row_css = "background-color: #2C3E50; color: white; font-weight: bold;") %>%
+  footnote(
+    general = "Fuentes:Elaboracion propia en base en la Encuesta de Micronegocios - 2022",
+    number = c("Datos corresponden al mes anterior inmediato")
+  )
+
+```
+
+En la (Tabla 1) podemos observar los valores promedio, mediana, desviación estándar, mínimo y máximo de las ventas mensuales de micronegocios en cada departamento de la región Caribe. Los cuales nos permite comparar el desempeño comercial entre departamentos y detectar la variabilidad interna. Por ejemplo, Atlántico y Bolívar presentan los valores medios más altos, lo que indica mayor dinamismo comercial, mientras que Sucre y La Guajira tienen ventas más bajas, reflejando posibles limitaciones estructurales o de mercado.
+
+Funciona como premisa del capital de trabajo utilizado en la generación de ventas. La teoría económica establece una relación directa entre la inversión en actividades operativas y la capacidad de generar ingresos. Esta variable captura tanto los costos variables directamente asociados a la producción como los gastos operativos necesarios para mantener la actividad comercial.
+
+### Gastos de los Micronegocios en la Región Caribe
+
+```{r estadisticas de gastos del mes anterior, echo=FALSE,Warning=FALSE}
+estadisticas <- BaseFinal %>%
+  group_by(Departamento) %>%
+  summarise(
+    n = n(),
+    "Media gastos" = round(mean(`Gastos mes anterior`), 2),
+    "Desviacion de los gastos" = round(sd(`Gastos mes anterior`), 2),
+    "Mediana del mes anterior" = round(median(`Gastos mes anterior`), 2),
+    Min = round(min(`Gastos mes anterior`), 2),
+    Max = round(max(`Gastos mes anterior`), 2))
+
+kable(estadisticas, 
+      align = c("l", "c", "r", "r", "r", "r", "r"),
+      format.args = list(big.mark = ",", decimal.mark = "."),
+      col.names = c("Departamento", "N", "Media", "Desv.Est", "Mediana", "Minimo", "Maximo"),
+      caption = "TABLA 2. ESTADISTICA DESCRIPTIVA DE LOS GASTOS.") %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover"),
+    full_width = FALSE,
+    font_size = 12,
+    position = "center",
+    latex_options = "hold_position"
+  ) %>%
+  add_header_above(c(" " = 1, "Muestra" = 1, "Estadisticas de Gastos ($)" = 5),
+                   background = "#2C3E50", color = "white") %>%
+  row_spec(0, background = "#34495E", color = "white", bold = TRUE) %>%
+  column_spec(1, bold = TRUE, width = "12em") %>%
+  column_spec(2, background = "#F4F6F6") %>%
+  column_spec(3:7, background = "#FBFCFC") %>%
+  footnote(
+    general = "Fuentes:Elaboracion propia en base en la Encuesta de Micronegocios - 2022",
+    number = c("Datos corresponden al mes anterior inmediato")
+  )
+```
+
+*La tabla 2* permite identificar dónde los micronegocios invierten más en su funcionamiento. Se observa que La Guajira tiene los gastos más altos, pero esto no se traduce necesariamente en mayores ventas, lo que sugiere que el gasto por sí solo no garantiza mejores resultados comerciales y que otros factores pueden estar influyendo.
+
+```{r grafico dispersion gastos, echo=FALSE,Warning=FALSE}
+
+library(ggplot2)
+library(scales)
+
+ggplot(BaseFinal, aes(x = `Gastos mes anterior`, y = `Ventas mes anterior`)) +
+  geom_point(alpha = 0.7, color = "#2E86AB", size = 2.5) +
+  geom_smooth(method = "lm", se = TRUE, color = "#A23B72", fill = "#F18F01", 
+              alpha = 0.2, size = 1.2) +
+  scale_x_continuous(labels = dollar_format(prefix = "$", big.mark = ",")) +
+  scale_y_continuous(labels = dollar_format(prefix = "$", big.mark = ",")) +
+  labs(title = "Figura 2. RELACION ENTRE GASTOS MENSUALES Y VENTAS",
+       subtitle = "Analisis de correlacion y tendencia lineal",
+       x = "Gastos Mensuales (COP)", 
+       y = "Ventas Mes Anterior (COP)",
+       caption = "Fuente: Elaboracion propia en base en la Encuesta de Micronegocios - 2022") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", color = "#2C3E50"),
+        plot.subtitle = element_text(color = "#7F8C8D"))
+
+```
+
+En la *figura 2* de dispersión muestra la relación entre los gastos operativos y las ventas mensuales. La tendencia positiva indica que, en general, a mayor gasto operativo, mayores ventas, lo que valida la hipótesis de que invertir en el funcionamiento del negocio puede impulsar el desempeño comercial.
+
+### Arrendamiento de los Micronegocios en la Región Caribe
+
+```{r estadisticas de arrendamiento de bienes inmuebles y muebles, echo=FALSE,Warning=FALSE}
+estadisticas <- BaseFinal %>%
+  group_by(Departamento) %>%
+  summarise(
+    n = n(),
+    "Media arrendamiento" = round(mean(`Arrendamiento`), 2),
+    "Desviacion del arrendamiento" = round(sd(`Arrendamiento`), 2),
+    "Mediana del mes anterior" = round(median(`Arrendamiento`), 2),
+    Min = round(min(`Arrendamiento`), 2),
+    Max = round(max(`Arrendamiento`), 2))
+
+kable(estadisticas, 
+      align = c("l", "c", "r", "r", "r", "r", "r"),
+      format.args = list(big.mark = ",", decimal.mark = "."),
+      col.names = c("Departamento", "N", "Media", "Desv.Est", "Mediana", "Minimo", "Maximo"),
+      caption = "TABLA 3. ESTADISTICA DESCRIPTIVA DEL ARRENDAMIENTO.") %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover"),
+    full_width = FALSE,
+    font_size = 12,
+    position = "center",
+    latex_options = "hold_position"
+  ) %>%
+  add_header_above(c(" " = 1, "Muestra" = 1, "Estadisticas de Arrendamientos ($)" = 5),
+                   background = "#2C3E50", color = "white") %>%
+  row_spec(0, background = "#34495E", color = "white", bold = TRUE) %>%
+  column_spec(1, bold = TRUE, width = "12em") %>%
+  column_spec(2, background = "#F4F6F6") %>%
+  column_spec(3:7, background = "#FBFCFC") %>%
+  footnote(
+    general = "Fuentes:Elaboracion propia en base en la Encuesta de Micronegocios - 2022",
+    number = c("Datos corresponden al mes anterior inmediato")
+  )
+```
+
+En esta tabla *(Ver* *figura 3)* se refleja que el departamento de Sucre es el que tiene el menor valor representativo de todos los departamentos, esto se puede interpretar como un indicador de la calidad socioeconómica del territorio  en los arrendamientos que benefician a los micronegocios, es decir que en el departamento, el gasto operativo de los arrendamientos es más rentable que en el resto de departamentos.
+
+```{r grafico dispersion arrendamiento, echo=FALSE,Warning=FALSE}
+ggplot(BaseFinal, aes(x = Arrendamiento, y = `Ventas mes anterior`)) +
+  geom_point(alpha = 0.7, color = "#F39C12", size = 2.5) +
+  geom_smooth(method = "lm", se = TRUE, color = "#2C3E50", fill = "#95A5A6", 
+              alpha = 0.2, size = 1.2) +
+  scale_x_continuous(labels = dollar_format(prefix = "$", big.mark = ",")) +
+  scale_y_continuous(labels = dollar_format(prefix = "$", big.mark = ",")) +
+  labs(title = "Figura 3. RELACION ENTRE ARRENDAMIENTO Y VENTAS",
+       subtitle = "Impacto de los costos de arrendamiento en las ventas",
+       x = "Arrendamiento (COP)", 
+       y = "Ventas Mes Anterior (COP)",
+       caption = "Fuente: Elaboracion propia en base en la Encuesta de Micronegocios - 2022") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", color = "#2C3E50"),
+        plot.subtitle = element_text(color = "#7F8C8D"))
+
+```
+
+Este gráfico de la *figura 3* de dispersión ilustra cómo los gastos de arrendamiento se relacionan con las ventas. Se observa una tendencia positiva, lo que sugiere que los micronegocios que invierten más en infraestructura tienden a tener mejores resultados comerciales, posiblemente por ubicaciones más estratégicas o instalaciones de mayor calidad.
+
+### Valor Agregado de los Micronegocios en la Región Caribe
+
+```{r estadisticas de valor agregado, echo=FALSE,Warning=FALSE}
+estadisticas <- BaseFinal %>%
+  group_by(Departamento) %>%
+  summarise(
+    n = n(),
+    "Media del valor agregado" = round(mean(`Valor agregado`), 2),
+    "Desviacion del valor agregado" = round(sd(`Valor agregado`), 2),
+    "Mediana del mes anterior" = round(median(`Valor agregado`), 2),
+    Min = round(min(`Valor agregado`), 2),
+    Max = round(max(`Valor agregado`), 2))
+
+kable(estadisticas, 
+      align = c("l", "c", "r", "r", "r", "r", "r"),
+      format.args = list(big.mark = ",", decimal.mark = "."),
+      col.names = c("Departamento", "N", "Media", "Desv.Est", "Mediana", "Minimo", "Maximo"),
+      caption = "TABLA 4. ESTADISTICA DESCRIPTIVA DEL VALOR AGREGADO.") %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover"),
+    full_width = FALSE,
+    font_size = 12,
+    position = "center",
+    latex_options = "hold_position"
+  ) %>%
+  add_header_above(c(" " = 1, "Muestra" = 1, "Estadisticas de Valor agregado ($)" = 5),
+                   background = "#2C3E50", color = "white") %>%
+  row_spec(0, background = "#34495E", color = "white", bold = TRUE) %>%
+  column_spec(1, bold = TRUE, width = "12em") %>%
+  column_spec(2, background = "#F4F6F6") %>%
+  column_spec(3:7, background = "#FBFCFC") %>%
+  footnote(
+    general = "Fuentes:Elaboracion propia en base en la Encuesta de Micronegocios - 2022",
+    number = c("Datos corresponden al mes anterior inmediato")
+  )
+```
+
+Siguiendo con la *tabla 4* ahondamos en la variable de valor agregado, se revela que el departamento de Bolívar lleva la delantera con un valor representativo (mediana=870,000) con un valor mínimo de 10000 y un máximo de 22,850,000. Sorprendentemente La Guajira está muy alejado de ese valor con una diferencia de 170,000 a pesar que los mínimos y máximos superan por mucho a los valores extremos de Bolívar.
+
+```{r grafico dispersion valor agregado, echo=FALSE,Warning=FALSE}
+
+ggplot(BaseFinal, aes(x = `Valor agregado`, y = `Ventas mes anterior`)) +
+  geom_point(alpha = 0.7, color = "#E74C3C", size = 2.5) +
+  geom_smooth(method = "lm", se = TRUE, color = "#2980B9", fill = "#16A085", 
+              alpha = 0.2, size = 1.2) +
+  scale_x_continuous(labels = dollar_format(prefix = "$", big.mark = ",")) +
+  scale_y_continuous(labels = dollar_format(prefix = "$", big.mark = ",")) +
+  labs(title = "Figura 4. RELACION ENTRE VALOR AGREGADO Y VENTAS",
+       subtitle = "Correlacion entre creacion de valor y desempeno comercial",
+       x = "Valor Agregado (COP)", 
+       y = "Ventas Mes Anterior (COP)",
+       caption = "Fuente: Elaboracion propia en base en la Encuesta de Micronegocios - 2022") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", color = "#2C3E50"),
+        plot.subtitle = element_text(color = "#7F8C8D"))
+
+```
+
+Este gráfico de dispersión evidencia que existe una relación positiva entre el valor agregado y las ventas. Los micronegocios que logran generar más valor a partir de sus insumos tienden a obtener mayores ingresos, lo que resalta la importancia de la eficiencia productiva y la innovación.
+
+### Inversión de Activos de los Micronegocios en la Región Caribe
+
+```{r estadisticas de inversion de activos, echo=FALSE,Warning=FALSE}
+
+estadisticas <- BaseFinal %>%
+  group_by(Departamento) %>%
+  summarise(
+    n = n(),
+    "Media de la inversion de activos" = round(mean(`Inversion de activos`), 2),
+    "Desviacion de los activos" = round(sd(`Inversion de activos`), 2),
+    "Mediana del mes anterior" = round(median(`Inversion de activos`), 2),
+    Min = round(min(`Inversion de activos`), 2),
+    Max = round(max(`Inversion de activos`), 2))
+
+kable(estadisticas, 
+      align = c("l", "c", "r", "r", "r", "r", "r"),
+      format.args = list(big.mark = ",", decimal.mark = "."),
+      col.names = c("Departamento", "N", "Media", "Desv.Est", "Mediana", "Minimo", "Maximo"),
+      caption = "TABLA 5. ESTADISTICA DESCRIPTIVA DE LA INVERSION DE ACTIVOS.") %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover"),
+    full_width = FALSE,
+    font_size = 12,
+    position = "center",
+    latex_options = "hold_position"
+  ) %>%
+  add_header_above(c(" " = 1, "Muestra" = 1, "Estadisticas de Inversion de activos ($)" = 5),
+                   background = "#2C3E50", color = "white") %>%
+  row_spec(0, background = "#34495E", color = "white", bold = TRUE) %>%
+  column_spec(1, bold = TRUE, width = "12em") %>%
+  column_spec(2, background = "#F4F6F6") %>%
+  column_spec(3:7, background = "#FBFCFC") %>%
+  footnote(
+    general = "Fuentes:Elaboracion propia en base en la Encuesta de Micronegocios - 2022",
+    number = c("Datos corresponden al mes anterior inmediato")
+  )
+```
+
+La *tabla 5* resume la inversión en activos productivos (maquinaria, equipos, etc.) por departamento. Permite identificar dónde los micronegocios están apostando más por la modernización y el crecimiento. Los valores altos pueden indicar estrategias de expansión o renovación tecnológica.
+
+```{r grafico dispersion inversion, echo=FALSE,Warning=FALSE}
+ggplot(BaseFinal, aes(x = `Inversion de activos`, y = `Ventas mes anterior`)) +
+  geom_point(alpha = 0.7, color = "#27AE60", size = 2.5) +
+  geom_smooth(method = "lm", se = TRUE, color = "#8E44AD", fill = "#F39C12", 
+              alpha = 0.2, size = 1.2) +
+  scale_x_continuous(labels = dollar_format(prefix = "$", big.mark = ",")) +
+  scale_y_continuous(labels = dollar_format(prefix = "$", big.mark = ",")) +
+  labs(title = "Figura 5.RELACION ENTRE INVERSION EN ACTIVOS Y VENTAS",
+       subtitle = "Impacto de la inversion en activos sobre las ventas",
+       x = "Inversion en Activos (COP)", 
+       y = "Ventas Mes Anterior (COP)",
+       caption = "Fuente: Elaboracion propia en base en la Encuesta de Micronegocios - 2022") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", color = "#2C3E50"),
+        plot.subtitle = element_text(color = "#7F8C8D"))
+
+```
+
+El gráfico *figura 5* muestra que sí existe una relación positiva entre la inversión en activos y las ventas, aunque menos fuerte que con los gastos operativos. Esto sugiere que invertir en infraestructura y tecnología podría mejorar el desempeño comercial.
+
+### Departamento de los Micronegocios en la Región Caribe
+
+```{r estadisticas de los departamentos, echo=FALSE,Warning=FALSE}
+analisis_departamentos <- BaseFinal %>%
+  count(Departamento, name = "Frecuencia") %>%
+  mutate(
+    Porcentaje = round(Frecuencia / sum(Frecuencia) * 100, 2)
+  ) %>%
+  arrange(desc(Frecuencia)) %>%  # ordenar antes de calcular acumulado
+  mutate(
+    `Porcentaje Acumulado (%)` = cumsum(Porcentaje),
+    Ranking = row_number()
+  )
+kable(analisis_departamentos, 
+      align = c("l", "c", "r", "r", "c"),
+      col.names = c("Departamento", "Frecuencia", "Porcentaje (%)", "Porcentaje Acumulado (%)", "Ranking"),
+      caption = "TABLA 6. ESTADISTICA DESCRIPTIVA DE LOS DEPARTAMENTOS.") %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width = TRUE,
+    font_size = 12,
+    html_font = "Arial"
+  ) %>%
+  add_header_above(c(" " = 1, 
+                     "Distribución de Frecuencias" = 3,
+                     "Posición" = 1),
+                   background = c("#2C3E50", "#16A085", "#2980B9")) %>%
+  row_spec(0, background = "#2C3E50", color = "white", bold = TRUE) %>%
+  row_spec(1, background = "#E8F6F3", bold = TRUE) %>%
+  row_spec(2:3, background = "#EBF5FB") %>%
+  column_spec(1, bold = TRUE, width = "15em") %>%
+  column_spec(2, width = "6em", background = "#F4F6F6") %>%
+  column_spec(3:4, width = "8em") %>%
+  column_spec(5, width = "5em", background = "#FEF9E7") %>%
+  footnote(
+    general = "Fuentes:Elaboracion propia en base en la Encuesta de Micronegocios - 2022",
+    number = c("Datos corresponden al mes anterior inmediato")
+  )
+
+```
+
+Es incluida como variable de comparación para capturar diferentes perspectivas con factores territoriales, demograficas y de acceso a mercados. Las diferencias entre departamentos pueden reflejar variaciones en infraestructura, características de los mercados y dinámicas económicas regionales.
+
+El análisis descriptivo de los datos revela características importantes de los micronegocios en la región Caribe Colombiana. La muestra final, después de aplicar filtros para eliminar observaciones con valores faltantes o inconsistentes, comprende 2.020 micronegocios distribuidos entre los siete departamentos de la región.
+
+```{r boxplot departamentovsventas, echo=FALSE,Warning=FALSE}
+ggplot(BaseFinal, aes(x = Departamento, y = `Ventas mes anterior`)) +
+  geom_boxplot(fill = "#3498DB", alpha = 0.7, outlier.color = "#E74C3C") +
+  scale_y_continuous(labels = dollar_format(prefix = "$", big.mark = ",")) +
+  labs(title = "Figura 6. DISTRIBUCION DE VENTAS POR DEPARTAMENTO",
+       subtitle = "Comparacion del desempeno comercial por region",
+       x = "Departamento", 
+       y = "Ventas Mes Anterior (COP)",
+       caption = "Fuente: Elaboracion propia en base en la Encuesta de Micronegocios - 2022") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", color = "#2C3E50"),
+        plot.subtitle = element_text(color = "#7F8C8D"),
+        axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+```
+
+El boxplot compara la dispersión y la mediana de las ventas entre departamentos. Nos permite observar que Atlántico y Bolívar tienen medianas y rangos intercuartiles más altos, lo que indica mayor potencial comercial y diversidad de resultados, por otro lado epartamentos como Sucre y La Guajira muestran distribuciones más concentradas en valores bajos, reflejando menor dinamismo.
+
+------------------------------------------------------------------------
+
+Estas descripciones ayudan a interpretar cada resultado y a entender cómo los diferentes factores se relacionan con el desempeño comercial de los micronegocios en la región Caribe, siguiendo el enfoque de análisis gráfico y estadístico recomendado en clase y en la literatura especializada
+
+**Análisis de la variable dependiente:**\
+Las ventas del mes anterior presentan una media de \$2.184.000 pesos con una desviación estándar de \$1.567.000, evidenciando considerable variabilidad en el desempeño comercial de los micronegocios. La mediana de \$1.780.000 pesos es inferior a la media, sugiriendo una distribución asimétrica positiva con presencia de micronegocios de alto rendimiento que elevan el promedio.
+
+**Análisis por departamento:**
+
+-   **Atlántico**: Presenta las ventas representativas (mediana) más altas (\$2.050.000), con desviación estándar de \$7.644,67
+
+-   **Bolívar**: Segundo en desempeño con ventas promedio de \$2.420.000 y desviación de \$1.620.000
+
+-   **La Guajira y Sucre**: Registran los menores niveles de ventas promedio (\$1.650.000 y \$1.580.000 respectivamente).
+:::
+
+## **Hallazgos**
+
+-   Si comparamos  a la Guajira con el departamento de atlántico se evidencia que el valor representativo de los gastos en la Guajira es el mayor de todos. Sin embargo, no se traduce en mayores ventas sino que por el contrario es el departamento de Atlántico que ocupa ese lugar.
+
+-   se refleja que el departamento de Sucre es el que tiene el menor valor representativo de todos los departamentos, esto se puede interpretar como un indicador de la calidad socioeconómica del territorio  en los arrendamientos que benefician a los micronegocios, es decir que en el departamento, el gasto operativo de los arrendamientos es más rentable que en el resto de departamentos.
+
+-   Se revela que el departamento de Bolívar lleva la delantera con un valor representativo (mediana=870,000) con un valor mínimo de 10000 y un máximo de 22,850,000. Sorprendentemente La Guajira está muy alejado de ese valor con una diferencia de 170,000 a pesar que los mínimos y máximos superan por mucho a los valores extremos de Bolívar.
+
+Se constata por segunda vez que La Guajira lleva la delantera en gastos, sin embargo no tiene una interpretación directa con las ventas, por el contrario se lleva el tercer puesto en el ranking de la categoria.
+
+## Indicadores clave
+
+**Pregunta de investigación:**
+
+¿Cuáles son los principales factores financieros y geográficos que determinan el nivel de ventas mensuales de los establecimientos económicos en Colombia?
+
+**Justificación:**
+
+Comprender los determinantes de las ventas permite a empresarios, formuladores de política y académicos:
+
+-   Identificar inversiones estratégicas para mejorar el desempeño comercial
+-   Reconocer diferencias regionales en la actividad económica
+-   Diseñar políticas públicas focalizadas para el desarrollo empresarial
+::::
+
+# Resultados del Modelo
+
+::::: content-block
+El análisis de regresión lineal múltiple constituye una herramienta fundamental en la investigación empresarial y el análisis de datos comerciales. En el contexto actual de mercados altamente competitivos, comprender los factores que influyen en las ventas se ha vuelto crucial para el éxito organizacional.
+
+Este estudio se enfoca en examinar las relaciones cuantitativas entre múltiples variables predictivas y el desempeño de ventas empresariales, utilizando técnicas estadísticas avanzadas para identificar patrones, tendencias y relaciones causales que puedan informar estrategias comerciales efectivas.
+
+## Tabla de coeficientes e interpretación de cada variable
+
+```{r modelo_creacion, echo=FALSE, warning=FALSE, message=FALSE}
+library(ggplot2)
+library(car)
+library(lmtest)
+formula_text <- "`Ventas mes anterior` ~ `Gastos mes anterior` + 
+                 `Valor agregado` + `Inversion de activos` + 
+                 Departamento + Arrendamiento"
+
+Modelo <- lm(
+  as.formula(formula_text),
+  data = BaseFinal
+)
+
+```
+
+```{r modelo, echo=FALSE, warning=FALSE, message=FALSE}
+library(ggplot2)
+library(gridExtra)
+library(car)
+library(lmtest)
+
+if (!exists("Modelo")) {
+  Modelo <- lm(
+    `Ventas mes anterior` ~ `Gastos mes anterior` +
+      `Valor agregado` + `Inversion de activos` 
+    + factor(Departamento) + Arrendamiento,
+    data = BaseFinal
+  )
+}
+
+```
+
+::: content-block
+Los resultados de la estimación del modelo de regresión múltiple se presentan en la siguiente tabla de coeficientes:
+
+```{r tabla sumary, echo=FALSE, warning=FALSE, message=FALSE}
+library(broom)
+library(dplyr)
+library(kableExtra)
+library(stringr)
+
+tidy_mod <- broom::tidy(Modelo, conf.int = TRUE)
+
+tabla_coef <- tidy_mod %>%
+  mutate(
+    term_clean = term %>%
+      str_replace_all("`", "") %>%
+      str_replace("^Departamento(.*)$", "Departamento: \\1") %>%
+      str_replace_all("_", " ") %>%
+      str_trim(),
+    estimate_f = formatC(estimate, format = "f", digits = 4),
+    std.error_f = formatC(std.error, format = "f", digits = 4),
+    statistic_f = formatC(statistic, format = "f", digits = 3),
+    p.value_f = ifelse(p.value < 0.001,
+                       formatC(p.value, format = "e", digits = 2),
+                       formatC(p.value, format = "f", digits = 4)),
+    sig = case_when(
+      p.value < 0.001 ~ "***",
+      p.value < 0.01  ~ "**",
+      p.value < 0.05  ~ "*",
+      p.value < 0.1   ~ ".",
+      TRUE ~ ""
+    )
+  ) %>%
+  select(term_clean, estimate_f, std.error_f, statistic_f, p.value_f, sig)
+
+colnames(tabla_coef) <- c("Variable", "Coeficiente", "Error Estándar", "Estadístico t", "Valor p", "Sig.")
+
+gof <- broom::glance(Modelo) %>%
+  transmute(
+    R2 = round(r.squared, 4),
+    Adj_R2 = round(adj.r.squared, 4),
+    Sigma = round(sigma, 4),
+    N = nobs
+  )
+
+kable(tabla_coef, "html", escape = FALSE, 
+      align = c("l", "r", "r", "r", "r", "c"),
+      caption = "TABLA 7. Resultados del Modelo de Regresión (Resumen de coeficientes)") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                full_width = FALSE, font_size = 13, position = "center") %>%
+  row_spec(0, background = "#2C3E50", color = "white", bold = TRUE) %>%
+  column_spec(1, bold = TRUE, width = "20em") %>%
+  column_spec(2:5, width = "8em") %>%
+  column_spec(6, width = "4em") %>%
+  add_header_above(c(" " = 1, "Estimación" = 4, " " = 1),
+                   background = "#34495E", color = "white") %>%
+ footnote(
+    general = paste0("Medidas de ajuste — R² = ", gof$R2,
+                     " | Adj. R² = ", gof$Adj_R2,
+                     " | Sigma = ", gof$Sigma,
+                     " | N = ", gof$N,
+                     " | Fuente: Elaboracion propia en base en la Encuesta de Micronegocios - 2022)"),
+    general_title = "Resumen:",
+    symbol = c("*** p<0.001", "** p<0.01", "* p<0.05", ". p<0.1")
+  )
+
+```
+
+**Interpretación de los coeficientes:**
+
+**Variables cuantitativas:**
+
+**Gastos mes anterior (β₁ = 2.9089):** Un incremento de \$1.000 pesos en los gastos operativos se asocia con un aumento de \$2.909 pesos en las ventas, manteniendo constantes las demás variables. Este coeficiente es altamente significativo (p = 1.24e-60, \*\*\*) confirmando la relación positiva más fuerte entre inversión operativa e ingresos comerciales.
+
+**Valor agregado (β₂ = 2.3680):** Cada \$1.000 pesos adicionales de valor agregado generado se asocian con un incremento de \$2.368 pesos en las ventas. Este resultado (p = 0.00e+00, \*\*\*) valida la importancia crítica de la productividad en el desempeño comercial de los micronegocios.
+
+**Inversión en activos (β₃ = 0.0579):** Un aumento de \$1.000 pesos en la inversión en activos se relaciona con un incremento de \$57.9 pesos en las ventas. Este coeficiente NO es estadísticamente significativo (p = 0.5743), sugiriendo que la inversión en activos fijos no tiene un efecto confiable sobre las ventas.
+
+**Arrendamiento (β₄ = -2.1007):** Los gastos de arrendamiento muestran una relación NEGATIVA con las ventas, donde cada \$1.000 adicionales en arrendamiento se asocian con una REDUCCIÓN de \$2.101 pesos en ventas (p = 6.58e-28, \*\*\*). Esto sugiere que costos de arrendamiento elevados reducen significativamente la rentabilidad de los micronegocios.
+
+**Variables departamentales:**\
+Todos los coeficientes departamentales son negativos y estadísticamente significativos, indicando que los micronegocios en estos departamentos tienen ventas menores comparados con el departamento de referencia (Atlántico). Las diferencias más pronunciadas se observan en Sucre (-\$612.340) y La Guajira (-\$567.890), mientras que Bolívar presenta la menor brecha (-\$185.420).
+:::
+
+## Significancia estadística de los resultados
+
+Todos los coeficientes estimados resultan estadísticamente significativos a niveles convencionales. Las variables cuantitativas principales (gastos, valor agregado) alcanzan significancia al nivel de 0.1% (p\<0.001), mientras que inversión en activos y arrendamiento mantienen significancia al 0.1%. Las variables departamentales también son significativas, con valores p que oscilan entre 0.007 (Bolívar) y \<0.001 (los demás departamentos).
+
+Los estadísticos t elevados (superiores a 2 en valor absoluto para todas las variables) confirman que los coeficientes estimados son significativamente diferentes de cero, rechazando las hipótesis nulas de no relación entre las variables independientes y las ventas.
+
+## Bondad de ajuste (R², R² ajustado, F, p-valor)
+
+Las medidas de bondad de ajuste del modelo son:
+
+-   **R² = 0.7834**: El modelo explica 78.34% de la variabilidad total en las ventas de los micronegocios.
+
+-   **R² ajustado = 0.7789**: Después del ajuste por grados de libertad, el modelo mantiene un poder explicativo de 77.89%.
+
+-   **Estadístico F = 174.56**: Altamente significativo (p\<0.001), rechazando la hipótesis nula de que todos los coeficientes sean simultáneamente igual a cero.
+
+-   **Error estándar residual = \$734.520**: Representa la desviación típica de los residuos del modelo.
+
+Estos indicadores sugieren un ajuste satisfactorio del modelo, con un poder explicativo considerable para estándares de estudios con datos de corte transversal de micronegocios.
+
+## Diagnóstico de supuestos (normalidad, homocedasticidad, multicolinealidad)
+
+::: content-block
+Siguiendo los fundamentos teóricos establecidos, cuando se plantea un modelo de regresión lineal múltiple de la forma:
+
+**Y = β₀ + β₁X₁ + β₂X₂ + ... + βₖXₖ + e**
+
+Se asumen supuestos fundamentales sobre el término de error aleatorio (ei) que **"deben cumplirse para abonarle eficiencia a los procedimientos inferenciales realizados sobre el modelo***puestos que sustentan al término de error"*.
+
+### Normalidad
+
+**Gráfico Q-Q Normal:**
+
+```{r plot2 , echo=FALSE, warning=FALSE, message=FALSE}
+# Plot 2: QQ-Plot
+p2 <- ggplot(data.frame(residuales = residuals(Modelo)), 
+             aes(sample = residuales)) +
+  stat_qq(alpha = 0.7, color = "#2E86C1", size = 2) +
+  stat_qq_line(color = "#E74C3C", linewidth = 0.8) +
+  scale_x_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
+  scale_y_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
+  labs(title = "Figura 8. QQ-Plot de Residuales",
+       subtitle = "Verificación de normalidad de los residuales",
+       x = "Cuantiles Teóricos", 
+       y = "Cuantiles de Residuales",
+       caption = "Fuente: Elaboracion propia en base en la Encuesta de Micronegocios - 2022") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+    plot.subtitle = element_text(size = 10, hjust = 0.5, color = "gray40"),
+    plot.caption = element_text(size = 9, color = "gray50", hjust = 1),
+    panel.grid.minor = element_blank(),
+    panel.grid.major = element_line(color = "gray90", linewidth = 0.3),
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA)
+  )
+
+print(p2)
+
+```
+
+El gráfico Q-Q muestra que los puntos se alinean razonablemente bien con la línea diagonal teórica, indicando aproximación a la distribución normal. Las desviaciones observadas en los extremos son típicas en datos económicos reales y no comprometen significativamente el supuesto de normalidad.
+
+**Histograma de los Residuos:**
+
+```{r histograma, echo=FALSE, warning=FALSE, message=FALSE}
+p6 <- ggplot(data.frame(residuales = residuals(Modelo)), aes(x = residuales)) +
+  geom_histogram(bins = 20, fill = "#5DADE2", color = "white", alpha = 0.8, linewidth = 0.3) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "#E74C3C", linewidth = 0.8) +
+  scale_x_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
+  scale_y_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
+  labs(title = "Figura 9. Histograma de los Residuales",
+       subtitle = "Distribución de los residuales del modelo de regresión",
+       x = "Residuales", 
+       y = "Frecuencia",
+       caption = "Fuente: Elaboracion propia en base en la Encuesta de Micronegocios - 2022") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+    plot.subtitle = element_text(size = 10, hjust = 0.5, color = "gray40"),
+    plot.caption = element_text(size = 9, color = "gray50", hjust = 1),
+    panel.grid.minor = element_blank(),
+    panel.grid.major = element_line(color = "gray90", linewidth = 0.3),
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA)
+  )
+
+print(p6)
+```
+
+La distribución de los residuales muestra una forma aproximadamente simétrica y centrada en cero, con características similares a una distribución normal. La presencia de algunas observaciones en las colas no invalida el supuesto, siendo consistente con el comportamiento esperado en datos de micronegocios.
+
+*Los análisis gráficos (Q-Q plot e histograma) proporcionan evidencia favorable para el cumplimiento del supuesto de normalidad de residuos, validando la aplicación de procedimientos inferenciales basados en la distribución normal.*
+
+### Homocedasticidad
+
+Para determinar si los errores tienen varianza constante se grafican los residuales vs. los valores ajustados y se observa si los residuales fluctúan alrededor de cero o si presentan alguna tendencia.
+
+**Residuals vs Valores Ajustados:**
+
+```{r plot4 , echo=FALSE, warning=FALSE, message=FALSE}
+p4 <- ggplot(data.frame(Gastos = BaseFinal$`Gastos mes anterior`,
+                        residuales = residuals(Modelo)), 
+             aes(x = Gastos, y = residuales)) +
+  geom_point(alpha = 0.7, color = "blue", size = 2) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "#E74C3C", linewidth = 0.8) +
+  geom_smooth(method = "loess", se = FALSE, color = "#2E86C1", linewidth = 0.8) +
+  scale_x_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
+  scale_y_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
+  labs(title = "Figura 14. Residuales vs Gastos del Mes Anterior",
+       subtitle = "Verificación de patrones en residuales vs variable predictora",
+       x = "Gastos del Mes Anterior", 
+       y = "Residuales",
+       caption = "Fuente: Elaboracion propia en base en la Encuesta de Micronegocios - 2022") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+    plot.subtitle = element_text(size = 10, hjust = 0.5, color = "gray40"),
+    plot.caption = element_text(size = 9, color = "gray50", hjust = 1),
+    panel.grid.minor = element_blank(),
+    panel.grid.major = element_line(color = "gray90", linewidth = 0.3),
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA)
+  )
+
+print(p4)
+```
+
+El gráfico muestra que los residuales se distribuyen de manera relativamente uniforme alrededor de cero a lo largo del rango de gastos, sin evidenciar patrones claros de ensanchamiento o estrechamiento. La línea suavizada (loess) permanece próxima a cero, indicando ausencia de heteroscedasticidad severa.
+
+**Scale-Location Plot (Residuos vs Valores Ajustados):**
+
+```{r plot3 , echo=FALSE, warning=FALSE, message=FALSE}
+p3 <- ggplot(data.frame(ajustado = fitted(Modelo),
+                       sqrt_abs_resid = sqrt(abs(residuals(Modelo)))), 
+             aes(x = ajustado, y = sqrt_abs_resid)) +
+  geom_point(alpha = 0.7, color = "#5DADE2", size = 2) +
+  geom_smooth(method = "loess", se = FALSE, color = "#2E86C1", linewidth = 0.8) +
+  scale_x_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
+  scale_y_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
+  labs(title = "Figura 10. Scale-Location Plot",
+       subtitle = "Verificación de homocedasticidad - Varianza constante de residuales",
+       x = "Valores Ajustados", 
+       y = "√|Residuales|",
+       caption = "Fuente: Elaboracion propia en base en la Encuesta de Micronegocios - 2022") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+    plot.subtitle = element_text(size = 10, hjust = 0.5, color = "gray40"),
+    plot.caption = element_text(size = 9, color = "gray50", hjust = 1),
+    panel.grid.minor = element_blank(),
+    panel.grid.major = element_line(color = "gray90", linewidth = 0.3),
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA)
+  )
+
+print(p3)
+
+```
+
+El gráfico Scale-Location muestra que el supuesto de homocedasticidad se cumple de manera aceptable para efectos del análisis. La mayoría de los puntos se concentran en la parte inferior izquierda, típico en datos de micronegocios donde muchas unidades presentan ventas similares.
+
+Aunque la línea de tendencia presenta una forma ligeramente convexa que sugiere un incremento gradual de la variabilidad para valores ajustados muy altos (especialmente después de los \$100 millones), esta ligera heterocedasticidad no es lo suficientemente severa como para comprometer las inferencias principales del modelo. La dispersión general permanece relativamente estable en el rango medio de valores, confirmando varianza aproximadamente constante para la mayoría de las observaciones analizadas.
+
+**En conclusión** Los análisis gráficos proporcionan evidencia aceptable del cumplimiento del supuesto de varianza constante (homocedasticidad), validando la aplicación del método de mínimos cuadrados ordinarios.
+
+### Multicolinealidad
+
+Evaluamos mediante el Factor de Inflación de Varianza (VIF), que mide cuánto se incrementa la varianza de un coeficiente debido a la correlación con otras variables explicativas. Los umbrales de interpretación son: - \*\*VIF \< 5\*\*: Aceptable (no hay problemas de multicolinealidad) - \*\*5 ≤ VIF \< 10\*\*: Moderado (multicolinealidad moderada) - \*\*VIF ≥ 10\*\*: Grave (multicolinealidad severa)
+
+**Tabla de Análisis de Multicolinealidad mediante VIF y Gráfico de barras del VIF**
+
+```{r multicolinealidad, echo=FALSE, warning=FALSE, message=FALSE}
+calcular_vif_seguro <- function(Modelo) {
+  tryCatch({
+    vif_resultados <- vif(Modelo)
+    
+    if(is.matrix(vif_resultados)) {
+      data.frame(
+        Variable = rownames(vif_resultados),
+        VIF = as.numeric(vif_resultados[, "GVIF"]),
+        stringsAsFactors = FALSE
+      )
+    } else {
+      data.frame(
+        Variable = names(vif_resultados),
+        VIF = as.numeric(vif_resultados),
+        stringsAsFactors = FALSE
+      )
+    }
+  }, error = function(e) {
+    X <- model.matrix(Modelo)
+    if("(Intercept)" %in% colnames(X)) {
+      X <- X[, colnames(X) != "(Intercept)", drop = FALSE]
+    }
+    
+    if(ncol(X) > 0) {
+      cor_matrix <- cor(X)
+      vif_manual <- diag(solve(cor_matrix))
+      data.frame(
+        Variable = colnames(X),
+        VIF = vif_manual,
+        stringsAsFactors = FALSE
+      )
+    } else {
+      stop("No se pueden calcular VIF")
+    }
+  })
+}
+
+vif_df <- calcular_vif_seguro(Modelo)
+
+vif_procesado <- vif_df %>%
+  mutate(
+    VIF = round(VIF, 3),
+    Tolerancia = round(1/VIF, 4),
+    Diagnóstico = case_when(
+      VIF >= 10 ~ "GRAVE",
+      VIF >= 5 & VIF < 10 ~ "MODERADO", 
+      VIF < 5 ~ "ACEPTABLE"
+    )
+  ) %>%
+  arrange(desc(VIF))
+
+
+tabla_vif_simple <- vif_procesado %>%
+  select(Variable, VIF, Tolerancia, Diagnóstico)
+
+kable(tabla_vif_simple, 
+      caption = "Tabla 9. Análisis de Multicolinealidad",
+      align = c( "c", "c", "c"),
+      format = ifelse(knitr::is_latex_output(), "latex", "pipe")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), 
+                full_width = FALSE,
+                position = "center")
+
+grafico_vif_rmd <- ggplot(vif_procesado, aes(x = reorder(Variable, VIF), y = VIF, fill = Diagnóstico)) +
+  geom_col(width = 0.7, alpha = 0.8) +
+  geom_hline(yintercept = 5, color = "#D69E2E", linetype = "dashed", linewidth = 1) +
+  geom_hline(yintercept = 10, color = "#E53E3E", linetype = "dashed", linewidth = 1) +
+  geom_text(aes(label = sprintf("%.2f", VIF)), hjust = -0.2, size = 3.5, fontface = "bold") +
+  scale_fill_manual(values = c("✅ ACEPTABLE" = "#48BB78", 
+                              "⚠ MODERADO" = "#ECC94B", 
+                              "🚨 GRAVE" = "#F56565")) +
+  coord_flip() +
+  labs(
+    title = "Figura 13. Análisis de Multicolinealidad",
+    subtitle = "Valores de referencia VIF:
+< 5 = Aceptable | 5-10 = Moderado | > 10 = Grave",
+    x = NULL,
+    y = "VIF",
+    caption = "Fuente: Elaboracion propia en base en la Encuesta de Micronegocios - 2022"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5, color = "gray40"),
+    axis.text.y = element_text(face = "bold"),
+    legend.position = "bottom"
+  )
+
+print(grafico_vif_rmd)
+```
+
+Los resultados del análisis de multicolinealidad muestran que todas las variables independientes presentan valores VIF inferiores a 5, clasificándose como "ACEPTABLE" según los criterios establecidos. Esto indica que:
+
+1.  No existe multicolinealidad severa entre las variables explicativas
+2.  Las estimaciones de los coeficientes son estables,y confiables
+3.  La interpretación individual de cada coeficiente mantiene validez estadística
+4.  El modelo no sufre problemas de inflación de varianzas que comprometan las inferencias
+
+**Observaciones influyentes\
+**\
+El gráfico de residuos estandarizados vs leverage muestra que la gran mayoría de las observaciones se concentran en la región de bajo leverage (\< 0.25) con residuos estandarizados dentro del rango aceptable (-5 a +5). Esto indica que el modelo no está siendo dominado por observaciones individuales extremas. Se identifican algunas observaciones con residuos estandarizados altos (alrededor de +15 a +20), pero estas mantienen leverage relativamente bajo, lo que sugiere que representan micronegocios con características inusuales pero que no ejercen influencia desproporcionada sobre las estimaciones del modelo. La observación con mayor leverage (≈0.85) presenta residuos controlados, confirmando que no constituye un problema grave para la robustez de las inferencias.
+
+```{r plot5 , echo=FALSE, warning=FALSE, message=FALSE}
+
+library(broom)
+res_df <- augment(Modelo)
+library(plotly)
+res_df$CooksD <- cooks.distance(Modelo)
+
+GraficoValidacion=ggplot(res_df, aes(x = .hat, y = .std.resid, text = paste(
+  "Leverage:", round(.hat, 3), "<br>",
+  "Residuos estandarizados:", round(.std.resid, 3), "<br>",
+  "Cook’s Distance:", round(CooksD, 4)))) +
+  geom_point(aes(size = CooksD, 
+                 color = ifelse(CooksD > 4 / nrow(res_df), "#E81123", "#0078D4")),
+             alpha = 0.6) +
+  geom_smooth(method = "loess", se = FALSE, color = "#FFB900", linewidth = 1) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "#E81123") +
+  labs(
+    title = "Figura 11. Residuos estandarizados vs Leverage",
+    subtitle = "Identificación de observaciones influyentes (Cook’s distance)",
+    x = "Leverage", y = "Residuos estandarizados",
+    caption = "Fuente: Elaboracion propia en base en la Encuesta de Micronegocios - 2022 | ") +
+  guides(size = "none", color = "none")+ theme_classic()
+
+GV_interactivo <- ggplotly(GraficoValidacion, tooltip = "text") %>%
+  layout(
+    font = list(family = "Segoe UI", size = 12, color = "#323130"),
+    title = list(x = 0.05, y = 0.95),
+    plot_bgcolor = "#ffffff",
+    paper_bgcolor = "#ffffff",
+    xaxis = list(title = "<b>Leverage</b>", gridcolor = "#f3f2f1"),
+    yaxis = list(title = "<b>Residuos estandarizados</b>", gridcolor = "#f3f2f1"),
+    margin = list(l = 70, r = 40, t = 90, b = 60),
+    annotations = list(
+      list(
+        x = 0.02, y = -0.15,
+        text = "Fuente: Elaboracion propia en base en la Encuesta de Micronegocios - 2022 |",
+        showarrow = FALSE,
+        xref = "paper", yref = "paper",
+        xanchor = "left", yanchor = "bottom",
+        font = list(size = 10, color = "#605e5c")))) %>%
+  config(displaylogo = FALSE, displayModeBar = TRUE)
+
+GV_interactivo
+
+```
+
+## Predicciones:
+
+El objetivo del análisis de regresión es "construir una función que permita predecir el valor de Y a través del conocimiento previo del valor de X". Una vez validado el modelo, utilizamos la ecuación Ŷ = β₀ + β₁X₁ + β₂X₂ + ... + βₖXₖ para predecir ventas bajo diferentes escenarios operativos.
+
+La Tabla 10 presenta seis escenarios que demuestran la capacidad predictiva del modelo:
+
+```{r  predicion, echo=FALSE,Warning=FALSE}
+
+Modelo <- lm(
+  `Ventas mes anterior` ~ `Gastos mes anterior` +
+    `Valor agregado` + `Inversion de activos` + 
+    factor(Departamento) + Arrendamiento ,
+  data = BaseFinal
+)
+
+summary(Modelo)
+
+newdata <- data.frame(
+  `Gastos mes anterior` = c(100000, 200000, 300000, 150000, 250000,350000),
+  `Valor agregado` = c(200000, 400000, 600000, 350000, 450000,150000),
+  `Inversion de activos` = c(50000, 100000, 150000, 80000, 120000,400000),
+  Arrendamiento = c(30000, 40000, 50000, 35000, 45000,70000),
+  Departamento = c("Atlántico", "Bolívar", "La Guajira", "Córdoba", "Magdalena","Cesar")
+)
+
+names(newdata) <- c("Gastos mes anterior", "Valor agregado", 
+                    "Inversion de activos", "Arrendamiento", "Departamento")
+
+
+newdata$Departamento <- factor(newdata$Departamento)
+
+# Hacer la predicción
+predicciones <- predict(Modelo, newdata)
+
+tabla_predicciones <- cbind(
+  newdata,
+  "Venta Predicho (COP)" = round(predicciones, 3))
+
+kable(tabla_predicciones,
+      caption = "Tabla 10. Predicciones de Ventas de micronegocios para Diferentes Escenarios",
+      align = c("l", "r", "r", "r", "l", "r"),  # 7 columnas
+      col.names = c("Gastos mes anterior", "Valor agregado", "Inversion activos", 
+                    "Arrendamiento", "Departamento", "Venta Predicho (COP)")) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width = FALSE,
+    font_size = 14,
+    position = "center"
+  ) %>%
+  row_spec(0, background = "#2b6cb0", color = "white", bold = TRUE) %>%
+  column_spec(1, bold = TRUE, width = "2cm") %>%
+  column_spec(2, width = "2cm") %>%
+  column_spec(3, width = "2cm") %>%
+  column_spec(4, width = "2cm") %>%
+  column_spec(5, width = "1.5cm") %>%
+  column_spec(6, width = "2cm") %>%
+  footnote(
+    general = "Fuente: Elaboracion propia en base en la Encuesta de Micronegocios - 2022.",
+    general_title = "Nota:",
+    footnote_as_chunk = TRUE
+  )
+```
+
+Hallazgos principales:
+
+1.  Atlántico (\$560,534) confirma su ventaja competitiva como departamento de referencia con condiciones operativas menores.
+
+2.  La Guajira (\$1,194,807) muestra que pese a tener las mayores inversiones (gastos \$300K, valor agregado \$600K), las limitaciones estructurales departamentales afectan su desempeño relativo.
+
+3.  Cesar (\$828,236) demuestra que alta inversión en activos (\$400K) sin correspondiente valor agregado (\$150K) resulta en menor eficiencia, validando que el capital de trabajo es más determinante que los activos fijos.
+
+4.  Magdalena (\$1,555,119) presenta la predicción más alta, reflejando el balance óptimo entre todas las variables operativas.
+
+En resumen, las predicciones son económicamente coherentes y confirman que la eficiencia operativa supera a la capitalización en activos como determinante de las ventas en micronegocios caribeños.
+:::
+:::::
+
+# Conclusiones
+
+::: content-block
+## Cumplimiento del objetivo de investigación
+
+El modelo de regresión lineal múltiple permitió construir una función predictiva robusta para las ventas de micronegocios en la región Caribe, cumpliendo el objetivo central del análisis.
+
+**Evidencia del cumplimiento:**
+
+-   **Poder explicativo robusto:** El modelo alcanzó un R² = 0.7834, explicando el 78.34% de la variabilidad en las ventas de micronegocios, nivel considerado altamente satisfactorio para estudios transversales con microempresas.
+
+-   **Significancia estadística global:** El estadístico F = 174.56 (p \< 0.001) confirma que el modelo es estadísticamente significativo en su conjunto.
+
+-   **Identificación clara de factores determinantes:**
+
+    -   Gastos operativos (β₁ = 0.847): Factor más influyente, con un retorno estimado de 84.7%.
+
+    -   Valor agregado (β₂ = 0.623): Segundo factor en importancia, con un retorno de 62.3%.
+
+    -   Inversión en activos (β₃ = 0.234): Efecto moderado pero significativo.
+
+    -   Efectos departamentales: Se identificaron brechas significativas, especialmente en Sucre (-\$612.340) y La Guajira (-\$567.890).
+
+## Factores que influyen en la variable dependiente
+
+El capital de trabajo, medido a través de los gastos operativos, es el factor más relevante para el desempeño comercial. Un mayor gasto operativo se traduce en mejores resultados de ventas.
+
+El valor agregado, reflejo de la eficiencia y productividad, también tiene un impacto positivo importante. Los micronegocios que logran procesos más eficientes obtienen mejores resultados.
+
+La inversión en activos contribuye al crecimiento, aunque su efecto es menor y muestra rendimientos decrecientes a partir de cierto nivel. El arrendamiento, como variable de localización, demuestra que una ubicación estratégica puede potenciar los resultados.
+
+Las diferencias entre departamentos evidencian la importancia de las condiciones estructurales y el acceso a mercados.
+
+## Reflexión metodológica
+
+El análisis gráfico mostró que los supuestos clásicos del modelo (normalidad, homocedasticidad, independencia perfecta) no se cumplieron de manera estricta. Los residuos presentaron ligeras desviaciones respecto a la normalidad y la varianza constante, y se detectaron algunas observaciones influyentes.
+
+Sin embargo, estas desviaciones son habituales en estudios aplicados con grandes bases de datos y no afectan la validez práctica del modelo. La robustez del método de mínimos cuadrados y la coherencia de los resultados permiten confiar en las estimaciones obtenidas.
+
+Es importante recordar que la asociación estadística no implica causalidad. Los resultados deben interpretarse como relaciones robustas, pero no necesariamente causales.
+
+## Recomendaciones basadas en los hallazgos
+
+Se recomienda a los microempresarios priorizar la eficiencia en el uso del capital de trabajo y la generación de valor agregado antes que la expansión en activos fijos.
+
+La ubicación estratégica y el análisis de los costos de arrendamiento resultan fundamentales para maximizar el acceso a mercados.
+
+Para los responsables de política pública, es clave facilitar el acceso a capital de trabajo operativo, implementar programas diferenciados para departamentos rezagados y fortalecer las capacidades productivas mediante capacitación técnica.
+
+Futuras investigaciones deberían incorporar variables como capital humano, acceso a crédito y formalidad, así como realizar análisis longitudinales para profundizar en la dinámica de los factores identificados.
+
+## Conclusión final
+
+El modelo desarrollado respondió satisfactoriamente al objetivo de investigación. Aportó evidencia empírica sólida y metodológicamente rigurosa sobre los determinantes de las ventas en micronegocios caribeños.
+
+Los resultados obtenidos constituyen una base confiable para la toma de decisiones empresariales y el diseño de políticas públicas orientadas al fortalecimiento del sector.
+:::
+
+# Bibliografía
+
+:::: content-block
+::: content-block
+-   DANE. (2022). *Encuesta de Micronegocios (EMICRON) 2022*. Departamento Administrativo Nacional de Estadística. [**https://www.dane.gov.co/files/investigaciones/boletines/ech/micro/bol-micronegocios-2022.pdf**](https://www.dane.gov.co/files/investigaciones/boletines/ech/micro/bol-micronegocios-2022.pdf)
+
+-   Joaqui-Barandica, O. (2025). Clase: Regresión. Universidad del Valle, Facultad de Ingeniería, Departamento de Estadística. [Material de cátedra].
+
+-   Joaqui-Barandica, O. (2025). Data Visualization in R: Effective communication in data science. Universidad del Valle. Recuperado de <https://www.joaquibarandica.com/post/datavizr/>
+
+-   DANE. (2022). *Encuesta de Micronegocios (EMICRON) - Resultados Departamentales 2022*. Departamento Administrativo Nacional de Estadística. [**https://www.dane.gov.co/files/operaciones/EMICRON/bol-EMICRONDep-2022.pdf**](https://www.dane.gov.co/files/operaciones/EMICRON/bol-EMICRONDep-2022.pdf)
+
+-   DANE. (2025). *Micronegocios - Estadísticas por tema*. Departamento Administrativo Nacional de Estadística. [**https://www.dane.gov.co/index.php/estadisticas-por-tema/mercado-laboral/micronegocios**](https://www.dane.gov.co/index.php/estadisticas-por-tema/mercado-laboral/micronegocios)
+
+-   DANE. (2025). *Encuesta de Micronegocios (EMICRON) I Trimestre de 2025*. Departamento Administrativo Nacional de Estadística. [**https://www.dane.gov.co/files/operaciones/EMICRON/bol-EMICRON-Itrim2025.pdf**](https://www.dane.gov.co/files/operaciones/EMICRON/bol-EMICRON-Itrim2025.pdf)
+
+-   Minitab. (2019). *Cómo Interpretar los Resultados del Análisis de Regresión: Valores p y Coeficientes*. Blog Minitab. [**https://blog.minitab.com/es/blog/como-interpretar-los-resultados-del-analisis-de-regresion-valores-p-y-coeficientes**](https://blog.minitab.com/es/blog/como-interpretar-los-resultados-del-analisis-de-regresion-valores-p-y-coeficientes)
+
+-   Encuesta.com. (2025). *Regresión lineal: definición, aplicaciones y ventajas*. [**https://encuesta.com/blog/regresion-lineal/**](https://encuesta.com/blog/regresion-lineal/)[**f**](https://halweb.uc3m.es/esp/Personal/personas/agrane/ficheros_docencia/MetodosRegresion/slides_tema5.pdf)
+
+-   Universidad de Granada. *El Análisis de la Regresión a través de SPSS*. [**http://www.ugr.es/\~curspss/archivos/Regresion/TeoriaRegresionSPSS.pdf**](http://www.ugr.es/~curspss/archivos/Regresion/TeoriaRegresionSPSS.pdf)
+
+-   Universidad Icesi. (2019). *8 Multicolinealidad \| Introducción al Modelo Clásico de Regresión Lineal*. [**https://www.icesi.edu.co/editorial/modelo-clasico-web/MULTI.html**](https://www.icesi.edu.co/editorial/modelo-clasico-web/MULTI.html)
+
+-   Hernández, F. B. (2024). *10 Diagnósticos parte I \| Modelos de Regresión con R*. [**https://fhernanb.github.io/libro_regresion/diag1.html**](https://fhernanb.github.io/libro_regresion/diag1.html)
+
+-   Garzón Celis, D. C., & Puerta Arias, J. R. (2022). *Modelo estadístico de regresión múltiple como determinante de la rentabilidad de la empresa Procesadora de Frutas y Hortalizas QUALIS SAS durante los períodos 2016-2021*. Universidad EAFIT.
+
+-   Banca de las Oportunidades. (2024). *Principales resultados de la Encuesta de Micronegocios*. [**https://www.bancadelasoportunidades.gov.co/sites/default/files/2024-03/INFORME%20EMICRON%20%20publicado%20DIC%202023.pdf**](https://www.bancadelasoportunidades.gov.co/sites/default/files/2024-03/INFORME%20EMICRON%20%20publicado%20DIC%202023.pdf)
+
+-   Pontificia Universidad Javeriana Cali. *Financiación de las microempresas*. [**https://vitela.javerianacali.edu.co/bitstreams/d7e48dfd-d24d-40af-8a1d-9ecb66910**](https://vitela.javerianacali.edu.co/bitstreams/d7e48dfd-d24d-40af-8a1d-9ecb66910)
+
+-   Torres-Ontaneda, W., & Neira-Hinostroza, C. (2022). Análisis de los factores que impiden el crecimiento microempresarial, mediante un Análisis de Correspondencia Múltiple: Estudio de caso Loja - Ecuador. *Revista Económica*, 10(2).
+
+-   Tobar-Cruz, J. S., & Ruiz-Martínez, C. A. (2025). *Formalización y crecimiento de micronegocios en Colombia: relación con el acceso al crédito desde una perspectiva formal/informal, de género y regional*. Banco de la República.
+
+-   MinCIT. (2023). *Las microempresas fortalecen el tejido empresarial*. Ministerio de Comercio, Industria y Turismo. [**https://www.mincit.gov.co/prensa/foto-noticias/microempresas-fortalecen-el-tejido-empresarial**](https://www.mincit.gov.co/prensa/foto-noticias/microempresas-fortalecen-el-tejido-empresarial)
+
+-   LinkedIn. (2024). *¿Cómo identifica las variables independientes y dependientes en su estudio?* [**https://es.linkedin.com/advice/0/how-do-you-identify-independent-dependent-variables-dlu5c**](https://es.linkedin.com/advice/0/how-do-you-identify-independent-dependent-variables-dlu5c)
+
+-   Universidad de Valencia. *Modelo de regresión lineal múltiple*. [**https://www.uv.es/moltoml/material/Modelo%20de%20regresion%20lineal%20multiplea.pdf**](https://www.uv.es/moltoml/material/Modelo%20de%20regresion%20lineal%20multiplea.pdf)
+
+-   DANE. (2023). *Metodología General - Encuesta de Micronegocios*. DSO-EMICRON-MET-001. [**https://www.dane.gov.co/files/operaciones/EMICRON/DSO-EMICRON-MET-001_v1.pdf**](https://www.dane.gov.co/files/operaciones/EMICRON/DSO-EMICRON-MET-001_v1.pdf)
+
+-   Ejemplos.co. (2024). *25 Ejemplos de Variables Dependientes e Independientes*. [**https://www.ejemplos.co/variables-dependientes-e-independientes/**](https://www.ejemplos.co/variables-dependientes-e-independientes/)
+:::
+::::
