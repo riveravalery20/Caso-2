@@ -2,6 +2,8 @@ library(tidyverse)
 library(caret)
 library(pROC)
 
+set.seed(200)
+
 index_muestra <- sample(11873,11873)
 
 index_entrena <- sample(11873,8904)
@@ -19,8 +21,8 @@ BD_entrena_output <- BD_entrena[, 6]
 BD_test_input <- BD_test[, -6]
 BD_test_output <- BD_test[, 6]
 
-BD_entrena$Peso <- factor(BD_entrena$Peso_delicado, levels = c("No", "Si"))
-BD_test$Peso <- factor(BD_test$Peso_delicado, levels = c("No", "Si"))
+BD_entrena$Peso_delicado <- factor(BD_entrena$Peso_delicado, levels = c("No", "Si"))
+BD_test$Peso_delicado <- factor(BD_test$Peso_delicado, levels = c("No", "Si"))
 
 fit_logit <- glm(Peso_delicado ~ Tiempo_gestación 
                  + Tipo_parto + Numero_control_prenatal 
