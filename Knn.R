@@ -6,9 +6,10 @@ library(caret)
 library(ISLR)
 library(kableExtra)
 library(pROC)
+library(class)
 
 # KNN COMPLETO
-set.seed(28)
+set.seed(200)
 
 # División de datos
 index_muestra <- sample(11873, 11873)
@@ -25,12 +26,26 @@ BD_test <- Base_datos[index_test, ] %>%
 BD_entrena$Peso_delicado <- factor(BD_entrena$Peso_delicado, levels = c("Si", "No"))
 BD_test$Peso_delicado <- factor(BD_test$Peso_delicado, levels = c("Si", "No"))
 
+BD_entrena_input <- Base_datos[, 1:5]
+BD_entrena_output <- Base_datos[, 6]
+
+BD_test_input <- Base_datos[, -6]
+BD_test_output <- Base_datos[, 6]
+
 # Entrenar k-NN
 BD_knnEntrenado <- train(Peso_delicado ~ ., 
                          data = BD_entrena, 
                          method = "knn",  
                          tuneLength = 200
 )
+#Numero optimo
+
+BD_test_output_kNN <- knn(train = BD_entrena_input, 
+                            cl = BD_entrena_output, 
+                            test = BD_test_input, 
+                            k = 43)
+
+
 
 # Resultados del modelo
 BD_knnEntrenado
