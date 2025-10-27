@@ -87,6 +87,7 @@ Base_datos <- bind_rows(Si, No) %>%
 ```
 
 #TABLA DE VARIABLES
+
 ```{r tabla_variables, echo=FALSE}
 # TABLA DE VARIABLES DEL MODELO
 variables_modelo <- data.frame(
@@ -111,7 +112,8 @@ variables_modelo <- data.frame(
 
 kable(variables_modelo, 
       caption = "Tabla 1: Variables del Modelo",
-      align = c("l", "l", "l", "l")) %>%
+      align = c("l", "l", "l", "l"),
+      col.names = c("Variable", "Descripción", "Tipo de Variable", "Notas")) %>%
   kable_styling(bootstrap_options = c("striped", "hover"),
                 full_width = FALSE,
                 font_size = 12) %>%
@@ -119,7 +121,6 @@ kable(variables_modelo,
   column_spec(1, bold = TRUE, width = "12em") %>%
   footnote(general = "Fuente: Elaboración propia en base a la Base de Datos de Nacimientos - 2024",
            number = c("Datos corresponden al segundo semestre del año 2024"))
-
 ```
 
 #BASE DE DATOS
@@ -232,6 +233,7 @@ tags$div(
 #Y1 PESO DELICADO
 
 # TABLA 1: ESTADÍSTICAS DESCRIPTIVAS POR GRUPO DE PESO
+
 # tablas separadas
 
 ```{r tabla1_1_tamano_muestral, echo=FALSE}
@@ -360,7 +362,7 @@ kable(tabla_tiempo_gestacion,
     general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024."
   )
 ```
- 
+
 ```{r grafico2_tiempo_vs_peso, echo=FALSE, fig.width=10, fig.height=6}
 # GRÁFICO 2: RELACIÓN TIEMPO DE GESTACIÓN VS PESO DELICADO (BARRAS APILADAS)
 tabla_tiempo_peso <- Base_datos %>%
@@ -418,7 +420,6 @@ plot_ly(
   )
 ```
 
-
 #X2 TIPO DE PARTO
 
 ```{r tabla3_tipo_parto, echo=FALSE}
@@ -449,8 +450,6 @@ kable(tabla_tipo_parto,
     general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024."
   )
 ```
-
-
 
 ```{r grafica3s, echo=FALSE}
 # GRÁFICO 3: DISTRIBUCIÓN DEL TIPO DE PARTO (SUNBURST)
@@ -534,15 +533,23 @@ plot_ly(
 ```
 
 #X3 EDAD MADRE
+
 ```{r tabla4_edad_madre, echo=FALSE}
 # TABLA 4: DISTRIBUCIÓN POR GRUPOS DE EDAD DE LA MADRE
 tabla_edad_madre <- Base_datos %>%
   count(Edad_madre) %>%
   mutate(
-    Porcentaje = round(100 * n / sum(n), 1),
-    Porcentaje_Acumulado = cumsum(Porcentaje)
+    Porcentaje = round(100 * n / sum(n), 1)
   ) %>%
-  arrange(desc(n))  # Ordenar por frecuencia descendente
+  # Extraer el número inicial del rango de edad para ordenar correctamente
+  mutate(
+    Edad_inicial = as.numeric(gsub("(\\d+)-.*", "\\1", Edad_madre))
+  ) %>%
+  arrange(Edad_inicial) %>%  # Ordenar por edad de menor a mayor
+  mutate(
+    Porcentaje_Acumulado = cumsum(Porcentaje)  # Recalcular después de ordenar
+  ) %>%
+  select(-Edad_inicial)  # Eliminar columna auxiliar
 
 kable(tabla_edad_madre, 
       align = c("l", "c", "r", "r"),
@@ -636,6 +643,7 @@ plot_ly(
 ```
 
 #X4 NUMERO CONTROLES PRENATALES
+
 ```{r tabla5_controles_prenatales, echo=FALSE}
 # TABLA 5: ESTADÍSTICAS DE CONTROLES PRENATALES
 tabla_controles <- Base_datos %>%
@@ -663,8 +671,188 @@ kable(tabla_controles,
   column_spec(1, bold = TRUE, width = "12em") %>%
   footnote(general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024.")
 ```
- 
- #grafico 5
+
+#grafico 5
+```{r grafico5_controles_prenatales, echo=FALSE, fig.width=12, fig.height=7}
+# GRÁFICO 5 INTERACTIVO: DISTRIBUCIÓN DE CONTROLES PRENATALES CON ZONAS DE RIESGO
+library(plotly)
+library(dplyr)
+
+# Calcular estadísticas
+stats_controles <- Base_datos %>%
+  summarise(
+    Media = round(mean(Numero_control_prenatal, na.rm = TRUE), 1),
+    Mediana = median(Numero_control_prenatal, na.rm = TRUE),
+    DE = round(sd(Numero_control_prenatal, na.rm = TRUE), 1),
+    Q1 = quantile(Numero_control_prenatal, 0.25, na.rm = TRUE),
+    Q3 = quantile(Numero_control_prenatal, 0.75, na.rm = TRUE),
+    Min = min(Numero_control_prenatal, na.rm = TRUE),
+    Max = max(Numero_control_prenatal, na.rm = TRUE)
+  )
+
+# Crear datos de frecuencia
+freq_data <- Base_datos %>%
+  count(Numero_control_prenatal) %>%
+  mutate(
+    Zona = case_when(
+      Numero_control_prenatal < 4 ~ "Crítico (<4)",
+      Numero_control_prenatal < 8 ~ "Insuficiente (4-7)",
+      TRUE ~ "Adecuado (≥8)"
+    )
+  )
+
+# Crear gráfico interactivo
+fig <- plot_ly() %>%
+  # Barras coloreadas por zona de riesgo
+  add_bars(
+    data = freq_data,
+    x = ~Numero_control_prenatal,
+    y = ~n,
+    color = ~Zona,
+    colors = c("Crítico (<4)" = "#e74c3c", 
+               "Insuficiente (4-7)" = "#f39c12", 
+               "Adecuado (≥8)" = "#27ae60"),
+    text = ~n,
+    textposition = "outside",
+    textfont = list(size = 11, color = "#2C3E50", family = "Arial"),
+    hovertemplate = paste(
+      "<b>%{x} controles</b><br>",
+      "Frecuencia: %{y}<br>",
+      "Zona: %{fullData.name}<br>",
+      "<extra></extra>"
+    )
+  ) %>%
+  # Línea vertical para la media
+  add_segments(
+    x = stats_controles$Media,
+    xend = stats_controles$Media,
+    y = 0,
+    yend = max(freq_data$n) * 1.1,
+    line = list(color = "#e67e22", width = 3, dash = "dash"),
+    showlegend = FALSE,
+    hoverinfo = "skip"
+  ) %>%
+  # Línea vertical para la mediana
+  add_segments(
+    x = stats_controles$Mediana,
+    xend = stats_controles$Mediana,
+    y = 0,
+    yend = max(freq_data$n) * 1.1,
+    line = list(color = "#2C3E50", width = 3, dash = "dot"),
+    showlegend = FALSE,
+    hoverinfo = "skip"
+  ) %>%
+  # Línea vertical para recomendación OMS (8 controles)
+  add_segments(
+    x = 8,
+    xend = 8,
+    y = 0,
+    yend = max(freq_data$n) * 1.1,
+    line = list(color = "#8e44ad", width = 3, dash = "solid"),
+    showlegend = FALSE,
+    hoverinfo = "skip"
+  ) %>%
+  layout(
+    title = list(
+      text = "<b>FIGURA 5. Distribución de Controles Prenatales y Zonas de Riesgo</b><br><sub>Clasificación según recomendaciones de la OMS</sub>",
+      font = list(size = 16, family = "Arial, sans-serif"),
+      x = 0
+    ),
+    xaxis = list(
+      title = "<b>Número de Controles Prenatales</b>",
+      titlefont = list(size = 14, family = "Arial, sans-serif"),
+      tickfont = list(size = 12),
+      dtick = 1,
+      gridcolor = "#ecf0f1"
+    ),
+    yaxis = list(
+      title = "<b>Frecuencia Absoluta</b>",
+      titlefont = list(size = 14, family = "Arial, sans-serif"),
+      tickfont = list(size = 12),
+      gridcolor = "#ecf0f1"
+    ),
+    plot_bgcolor = "white",
+    paper_bgcolor = "white",
+    hovermode = "closest",
+    showlegend = TRUE,
+    legend = list(
+      title = list(text = "<b>Zona de Riesgo</b>", font = list(size = 12)),
+      x = 0.02,
+      y = 0.98,
+      bgcolor = "rgba(255, 255, 255, 0.95)",
+      bordercolor = "#2C3E50",
+      borderwidth = 1,
+      font = list(size = 11, family = "Arial, sans-serif")
+    ),
+    margin = list(t = 120, b = 120, l = 80, r = 80),
+    annotations = list(
+      # Recomendacion OMS
+      list(
+        x = 0.98,
+        y = 0.98,
+        xref = "paper",
+        yref = "paper",
+          text = "<b>Recomendación OMS: ≥8</b>",
+        showarrow = FALSE,
+        font = list(size = 11, color = "#8e44ad", family = "Arial"),
+        bgcolor = "rgba(142, 68, 173, 0.1)",
+        bordercolor = "#8e44ad",
+        borderwidth = 2,
+        borderpad = 6
+      ),
+      # Etiqueta Media
+      list(
+        x = stats_controles$Media,
+        y = max(freq_data$n) * 1.12,
+        text = paste0("Media: ", stats_controles$Media),
+        showarrow = FALSE,
+        font = list(size = 10, color = "#e67e22", family = "Arial"),
+        bgcolor = "rgba(255, 255, 255, 0.8)",
+        bordercolor = "#e67e22",
+        borderwidth = 1,
+        borderpad = 4
+      ),
+      # Etiqueta Mediana
+      list(
+        x = stats_controles$Mediana,
+        y = max(freq_data$n) * 1.18,
+        text = paste0("Mediana: ", stats_controles$Mediana),
+        showarrow = FALSE,
+        font = list(size = 10, color = "#2C3E50", family = "Arial"),
+        bgcolor = "rgba(255, 255, 255, 0.8)",
+        bordercolor = "#2C3E50",
+        borderwidth = 1,
+        borderpad = 4
+      ),
+      # Caption
+      list(
+        x = 0,
+        y = -0.18,
+        xref = "paper",
+        yref = "paper",
+        text = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024.<br>Línea naranja: media | Línea gris: mediana | Línea morada: recomendación OMS (≥8 controles)",
+        showarrow = FALSE,
+        xanchor = "left",
+        font = list(size = 9, color = "#7f8c8d", family = "Arial, sans-serif")
+      )
+    ),
+    barmode = "overlay"
+  ) %>%
+  config(
+    displayModeBar = TRUE,
+    modeBarButtonsToRemove = c("lasso2d", "select2d"),
+    displaylogo = FALSE,
+    toImageButtonOptions = list(
+      format = "png",
+      filename = "figura5_controles_prenatales",
+      height = 600,
+      width = 1000
+    )
+  )
+
+fig
+```
+
 
 # X5 NUMEROS DE EMBARAZOS
 
@@ -696,9 +884,96 @@ kable(tabla_embarazos,
   footnote(general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024.")
 ```
 
-#grafico 6
+```{r grafico6_numero_embarazos_boxplot,echo=FALSE}
+# GRÁFICO 6: BOXPLOT COMPARATIVO - NÚMERO DE EMBARAZOS POR PESO DELICADO
+
+# Primero calculamos las estadísticas para las anotaciones
+stats_embarazos <- Base_datos %>%
+  group_by(Peso_delicado) %>%
+  summarise(
+    Media = round(mean(Numero_embarazos, na.rm = TRUE), 2),
+    Mediana = median(Numero_embarazos, na.rm = TRUE),
+    Q1 = quantile(Numero_embarazos, 0.25, na.rm = TRUE),
+    Q3 = quantile(Numero_embarazos, 0.75, na.rm = TRUE),
+    Min = min(Numero_embarazos, na.rm = TRUE),
+    Max = max(Numero_embarazos, na.rm = TRUE),
+    n = n()
+  )
+
+g6_boxplot <- ggplot(Base_datos, aes(x = Peso_delicado, y = Numero_embarazos, fill = Peso_delicado)) +
+  # Boxplot principal
+  geom_boxplot(alpha = 0.7, outlier.shape = 21, outlier.size = 2, 
+               outlier.fill = "white", outlier.color = "#e74c3c", width = 0.6) +
+  # Marcar la media con un rombo
+  stat_summary(fun = mean, geom = "point", shape = 23, size = 4, 
+               color = "#e67e22", fill = "#e67e22", stroke = 1.5) +
+  # Colores personalizados
+  scale_fill_manual(values = c("No" = "#3498db", "Sí" = "#e74c3c"),
+                    name = "Peso Delicado") +
+  # Etiquetas y títulos
+  labs(
+    title = "FIGURA 6. Distribución del Número de Embarazos según Peso Delicado",
+    subtitle = "Comparación de medidas de tendencia central y dispersión",
+    x = "Peso Delicado",
+    y = "Número de Embarazos",
+    caption = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024.\nRombo naranja: media | Línea central: mediana | Caja: Q1-Q3 | Bigotes: rango | Puntos rojos: valores atípicos"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold", size = 14, hjust = 0, margin = margin(b = 5)),
+    plot.subtitle = element_text(size = 10, color = "#7f8c8d", margin = margin(b = 15)),
+    plot.caption = element_text(size = 8, hjust = 0, color = "#7f8c8d", 
+                                margin = margin(t = 15), lineheight = 1.2),
+    legend.position = "none",
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.y = element_line(color = "#ecf0f1", linewidth = 0.5),
+    axis.title = element_text(face = "bold", size = 11),
+    axis.text = element_text(size = 10),
+    axis.text.x = element_text(size = 11, face = "bold"),
+    plot.margin = margin(20, 20, 20, 20)
+  ) +
+  scale_y_continuous(breaks = seq(0, max(Base_datos$Numero_embarazos, na.rm = TRUE), by = 1))
+
+# Añadir tabla de estadísticas al lado del gráfico
+g6_con_stats <- g6_boxplot +
+  # Cuadro con estadísticas para "No"
+  annotate("rect",
+           xmin = 0.55, xmax = 1.45,
+           ymin = max(Base_datos$Numero_embarazos, na.rm = TRUE) * 0.82,
+           ymax = max(Base_datos$Numero_embarazos, na.rm = TRUE) * 1.0,
+           fill = "white", color = "#3498db", linewidth = 1.2, alpha = 0.95) +
+  annotate("text",
+           x = 1,
+           y = max(Base_datos$Numero_embarazos, na.rm = TRUE) * 0.91,
+           label = paste0("Peso NO Delicado\n",
+                         "Media: ", stats_embarazos$Media[stats_embarazos$Peso_delicado == "No"], "\n",
+                         "Mediana: ", stats_embarazos$Mediana[stats_embarazos$Peso_delicado == "No"], "\n",
+                         "Q1: ", stats_embarazos$Q1[stats_embarazos$Peso_delicado == "No"],
+                         " | Q3: ", stats_embarazos$Q3[stats_embarazos$Peso_delicado == "No"]),
+           size = 3, fontface = "bold", color = "#2C3E50", lineheight = 0.9) +
+  # Cuadro con estadísticas para "Sí"
+  annotate("rect",
+           xmin = 1.55, xmax = 2.45,
+           ymin = max(Base_datos$Numero_embarazos, na.rm = TRUE) * 0.82,
+           ymax = max(Base_datos$Numero_embarazos, na.rm = TRUE) * 1.0,
+           fill = "white", color = "#e74c3c", linewidth = 1.2, alpha = 0.95) +
+  annotate("text",
+           x = 2,
+           y = max(Base_datos$Numero_embarazos, na.rm = TRUE) * 0.91,
+           label = paste0("Peso Delicado\n",
+                         "Media: ", stats_embarazos$Media[stats_embarazos$Peso_delicado == "Sí"], "\n",
+                         "Mediana: ", stats_embarazos$Mediana[stats_embarazos$Peso_delicado == "Sí"], "\n",
+                         "Q1: ", stats_embarazos$Q1[stats_embarazos$Peso_delicado == "Sí"],
+                         " | Q3: ", stats_embarazos$Q3[stats_embarazos$Peso_delicado == "Sí"]),
+           size = 3, fontface = "bold", color = "#2C3E50", lineheight = 0.9)
+
+print(g6_con_stats)
+
+```
 
 #TABLAS FINALES
+
 ```{r tabla7_resumen, echo=FALSE}
 # TABLA 7: RESUMEN GENERAL DE OBSERVACIONES
 tabla_resumen <- Base_datos %>%
@@ -706,14 +981,14 @@ tabla_resumen <- Base_datos %>%
   mutate(
     Porcentaje = round(100 * n / sum(n), 1),
     `Porcentaje Acumulado` = cumsum(Porcentaje),
-    Categoria = ifelse(Peso_delicado == "Si", "Peso Delicado", "Peso Moderado")
+    Categoria = ifelse(Peso_delicado == "Si", "Si", "No")
   ) %>%
   select(Categoria, n, Porcentaje, `Porcentaje Acumulado`)
 
 kable(tabla_resumen, 
       align = c("l", "c", "r", "r"),
-      col.names = c("Categoría de Peso", "Frecuencia", "Porcentaje (%)", "Porcentaje Acumulado (%)"),
-      caption = "TABLA 7. RESUMEN GENERAL DE OBSERVACIONES POR CATEGORÍA DE PESO") %>%
+      col.names = c("Peso delicado", "Frecuencia", "Porcentaje (%)", "Porcentaje Acumulado (%)"),
+      caption = "TABLA 7. RESUMEN GENERAL DE OBSERVACIONES POR PESO DELICADO (SI/NO)") %>%
   kable_styling(
     bootstrap_options = c("striped", "hover", "condensed"),
     full_width = FALSE,
@@ -733,5 +1008,3 @@ kable(tabla_resumen,
     general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024."
   )
 ```
-
-
