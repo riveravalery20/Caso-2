@@ -20,11 +20,10 @@ BD_EEVV <- read_csv("BD-EEVV-Nacimientos-2024.csv") %>%
   mutate(
     Numero_control_prenatal = as.numeric(Numero_control_prenatal),
     Numero_embarazos = as.numeric(Numero_embarazos),
-    # Convertimos Tiempo_gestación a factor con etiquetas claras
     Tiempo_gestación = factor(Tiempo_gestación,
                               levels = c(1, 2, 3, 4, 5),
                               labels = c("22 o menos semanas", "22-27 semanas", "28-37 semanas",
-                                         "De 38-41 semanas", "42 o más semanas"))
+                                         "38-41 semanas", "42 o más semanas"))
   ) %>%
   mutate(
     Peso_delicado = ifelse(Peso_delicado %in% c(5, 6, 7, 8, 9), "No", "Si"),

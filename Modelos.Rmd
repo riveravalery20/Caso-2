@@ -1,0 +1,180 @@
+---
+title: "Modelo R Markdown"
+author: "Yo"
+date: "2025-10-27"
+output: html_document
+---
+
+```{r}
+library(readr)
+library(dplyr)
+library(tidyverse)
+library(caret)
+library(ISLR)
+library(kableExtra)
+```
+
+
+```{r probabilidades}
+prob_knnPrediccion %>%
+  head(10) %>%
+  mutate(
+    Observación = 1:10,
+    .before = Si
+  ) %>%
+  rename(
+    `P(Desnutrición)` = Si,
+    `P(No Desnutrición)` = No
+  ) %>%
+  kable(digits = 4, align = "c", caption = "Probabilidades de Predicción - Primeras 10 Observaciones") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), 
+                full_width = FALSE, position = "center") %>%
+  row_spec(0, background = "#2E86AB", color = "white", bold = TRUE)
+```
+
+```{r tabla comparativa}
+tabla_comparativa <- data.frame(
+  Observación = 1:20,
+  Real = BD_test$Peso[1:20],
+  Predicho = BD_knnPrediccion[1:20],
+  `P(Desnutrición)` = round(prob_knnPrediccion$Si[1:20], 3),
+  `P(No Desnutrición)` = round(prob_knnPrediccion$No[1:20], 3),
+  Resultado = ifelse(BD_test$Peso[1:20] == BD_knnPrediccion[1:20], 
+                     "✅ Correcto", "❌ Incorrecto")
+)
+
+tabla_comparativa %>%
+  kable(align = "c", caption = "Comparación: Valores Reales vs Predicciones") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), 
+                full_width = FALSE) %>%
+  column_spec(6, color = ifelse(tabla_comparativa$Resultado == "✅ Correcto", 
+                               "green", "red")) %>%
+  row_spec(0, background = "#A23B72", color = "white", bold = TRUE)
+```
+
+```{r  Curva ROC}
+# Curva ROC mejorada
+roc_obj <- roc(BD_test$Peso, prob_knnPrediccion$Si)
+auc_val <- auc(roc_obj)
+
+# Crear dataframe para ggplot
+roc_data <- data.frame(
+  FPR = 1 - roc_obj$specificities,
+  TPR = roc_obj$sensitivities
+)
+
+ggplot(roc_data, aes(x = FPR, y = TPR)) +
+  geom_line(color = "#2E86AB", size = 1.5) +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "red", alpha = 0.7) +
+  geom_polygon(aes(x = FPR, y = TPR), fill = "#2E86AB", alpha = 0.3) +
+  labs(
+    title = "Curva ROC - Modelo k-NN para Detección de Desnutrición",
+    subtitle = sprintf("Área bajo la curva (AUC) = %.3f", auc_val),
+    x = "Tasa de Falsos Positivos (1 - Especificidad)",
+    y = "Tasa de Verdaderos Positivos (Sensibilidad)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+    plot.subtitle = element_text(size = 12, hjust = 0.5, color = "darkblue"),
+    panel.grid.minor = element_blank(),
+    legend.position = "none"
+  ) +
+  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
+  annotate("text", x = 0.7, y = 0.2, 
+           label = paste("AUC =", round(auc_val, 3)), 
+           size = 5, color = "darkblue", fontface = "bold")
+```
+
+```{r matriz de confusion}
+# Matriz de confusión visual mejorada
+conf_matrix <- confusionMatrix(BD_knnPrediccion, BD_test$Peso, positive = "Si")
+
+# Crear dataframe para la matriz
+conf_df <- as.data.frame(conf_matrix$table)
+conf_df$Porcentaje <- round(conf_df$Freq / sum(conf_df$Freq) * 100, 1)
+
+ggplot(conf_df, aes(x = Reference, y = Prediction, fill = Freq)) +
+  geom_tile(color = "white", alpha = 0.8) +
+  geom_text(aes(label = paste(Freq, "\n(", Porcentaje, "%)", sep = "")), 
+            color = "white", size = 5, fontface = "bold") +
+  scale_fill_gradient(low = "#F18F01", high = "#C73E1D", name = "Frecuencia") +
+  labs(
+    title = "Matriz de Confusión - Modelo k-NN",
+    subtitle = "Desnutrición Neonatal",
+    x = "Valor Real",
+    y = "Predicción del Modelo"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+    plot.subtitle = element_text(size = 12, hjust = 0.5),
+    axis.text = element_text(size = 11),
+    axis.title = element_text(face = "bold", size = 12)
+  ) +
+  coord_fixed()
+```
+
+```{r summary}
+# Tabla resumen de métricas
+metricas <- data.frame(
+  Métrica = c("Accuracy", "Sensibilidad", "Especificidad", 
+              "Valor Predictivo Positivo", "Valor Predictivo Negativo",
+              "Prevalencia", "AUC"),
+  Valor = c(
+    round(conf_matrix$overall["Accuracy"], 4),
+    round(conf_matrix$byClass["Sensitivity"], 4),
+    round(conf_matrix$byClass["Specificity"], 4),
+    round(conf_matrix$byClass["Pos Pred Value"], 4),
+    round(conf_matrix$byClass["Neg Pred Value"], 4),
+    round(conf_matrix$byClass["Prevalence"], 4),
+    round(auc_val, 4)
+  ),
+  Interpretación = c(
+    "Proporción total de predicciones correctas",
+    "Capacidad de detectar desnutrición real",
+    "Capacidad de identificar correctamente casos sin desnutrición",
+    "Precisión cuando predice desnutrición",
+    "Precisión cuando predice no desnutrición", 
+    "Proporción real de desnutrición en los datos",
+    "Capacidad general de discriminación del modelo"
+  )
+)
+
+metricas %>%
+  kable(align = "lcc", caption = "Métricas de Rendimiento del Modelo k-NN") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), 
+                full_width = FALSE) %>%
+  row_spec(0, background = "#2E86AB", color = "white", bold = TRUE) %>%
+  column_spec(1, bold = TRUE) %>%
+  column_spec(2, color = "darkblue", bold = TRUE)
+```
+
+```{r distribucion probabilidades}
+# Gráfico adicional: Distribución de probabilidades por clase real
+prob_df <- data.frame(
+  Probabilidad = prob_knnPrediccion$Si,
+  Clase_Real = BD_test$Peso
+)
+
+ggplot(prob_df, aes(x = Probabilidad, fill = Clase_Real)) +
+  geom_density(alpha = 0.6) +
+  scale_fill_manual(values = c("Si" = "#C73E1D", "No" = "#2E86AB")) +
+  labs(
+    title = "Distribución de Probabilidades por Clase Real",
+    subtitle = "Separación entre casos con y sin desnutrición",
+    x = "Probabilidad de Desnutrición (P(Si))",
+    y = "Densidad",
+    fill = "Clase Real"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+    plot.subtitle = element_text(size = 11, hjust = 0.5),
+    legend.position = "top"
+  ) +
+  geom_vline(xintercept = 0.5, linetype = "dashed", color = "red")
+```
+
+
