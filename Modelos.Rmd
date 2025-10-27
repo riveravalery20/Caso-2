@@ -183,4 +183,11 @@ ggplot(prob_df, aes(x = Probabilidad, fill = Clase_Real)) +
   geom_vline(xintercept = 0.5, linetype = "dashed", color = "red")
 ```
 
+```{r}
+#LOGIT
+```
+
+```{r}
+
+```
 
