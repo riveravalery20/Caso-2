@@ -6,12 +6,17 @@ output: html_document
 ---
 
 ```{r}
+# Modelo KNN
+```
+
+```{r}
 library(readr)
 library(dplyr)
 library(tidyverse)
 library(caret)
 library(ISLR)
 library(kableExtra)
+library(pROC)
 ```
 
 
@@ -35,26 +40,27 @@ prob_knnPrediccion %>%
 ```{r tabla comparativa}
 tabla_comparativa <- data.frame(
   Observación = 1:20,
-  Real = BD_test$Peso[1:20],
+  Real = BD_test$Peso_delicado[1:20],
   Predicho = BD_knnPrediccion[1:20],
   `P(Desnutrición)` = round(prob_knnPrediccion$Si[1:20], 3),
   `P(No Desnutrición)` = round(prob_knnPrediccion$No[1:20], 3),
-  Resultado = ifelse(BD_test$Peso[1:20] == BD_knnPrediccion[1:20], 
-                     "✅ Correcto", "❌ Incorrecto")
+  Resultado = ifelse(BD_test$Peso_delicado[1:20] == BD_knnPrediccion[1:20], 
+                     "Correcto", "Incorrecto")
 )
 
 tabla_comparativa %>%
   kable(align = "c", caption = "Comparación: Valores Reales vs Predicciones") %>%
   kable_styling(bootstrap_options = c("striped", "hover"), 
                 full_width = FALSE) %>%
-  column_spec(6, color = ifelse(tabla_comparativa$Resultado == "✅ Correcto", 
-                               "green", "red")) %>%
-  row_spec(0, background = "#A23B72", color = "white", bold = TRUE)
+  column_spec(6, color = ifelse(tabla_comparativa$Resultado == "Correcto", 
+                                "green", "red")) %>%
+  row_spec(0, background = "#2E86AB", color = "white", bold = TRUE)
 ```
 
 ```{r  Curva ROC}
+library(pROC)
 # Curva ROC mejorada
-roc_obj <- roc(BD_test$Peso, prob_knnPrediccion$Si)
+roc_obj <- roc(BD_test$Peso_delicado, prob_knnPrediccion$Si)
 auc_val <- auc(roc_obj)
 
 # Crear dataframe para ggplot
@@ -88,8 +94,7 @@ ggplot(roc_data, aes(x = FPR, y = TPR)) +
 ```
 
 ```{r matriz de confusion}
-# Matriz de confusión visual mejorada
-conf_matrix <- confusionMatrix(BD_knnPrediccion, BD_test$Peso, positive = "Si")
+conf_matrix <- confusionMatrix(BD_knnPrediccion, BD_test$Peso_delicado, positive = "Si")
 
 # Crear dataframe para la matriz
 conf_df <- as.data.frame(conf_matrix$table)
@@ -99,7 +104,7 @@ ggplot(conf_df, aes(x = Reference, y = Prediction, fill = Freq)) +
   geom_tile(color = "white", alpha = 0.8) +
   geom_text(aes(label = paste(Freq, "\n(", Porcentaje, "%)", sep = "")), 
             color = "white", size = 5, fontface = "bold") +
-  scale_fill_gradient(low = "#F18F01", high = "#C73E1D", name = "Frecuencia") +
+  scale_fill_gradient(low = "#87CEEB", high = "#1E3F66", name = "Frecuencia") +
   labs(
     title = "Matriz de Confusión - Modelo k-NN",
     subtitle = "Desnutrición Neonatal",
@@ -118,6 +123,7 @@ ggplot(conf_df, aes(x = Reference, y = Prediction, fill = Freq)) +
 
 ```{r summary}
 # Tabla resumen de métricas
+confusionMatrix(BD_knnPrediccion, BD_test$Peso_delicado, positive = "Si")
 metricas <- data.frame(
   Métrica = c("Accuracy", "Sensibilidad", "Especificidad", 
               "Valor Predictivo Positivo", "Valor Predictivo Negativo",
@@ -155,7 +161,7 @@ metricas %>%
 # Gráfico adicional: Distribución de probabilidades por clase real
 prob_df <- data.frame(
   Probabilidad = prob_knnPrediccion$Si,
-  Clase_Real = BD_test$Peso
+  Clase_Real = BD_test$Peso_delicado
 )
 
 ggplot(prob_df, aes(x = Probabilidad, fill = Clase_Real)) +
