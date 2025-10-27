@@ -86,141 +86,215 @@ Base_datos <- bind_rows(Si, No) %>%
   filter(complete.cases(.))
 ```
 
-```{r tabla_variables, echo=FALSE}
-# TABLA DE VARIABLES DEL MODELO
-variables_modelo <- data.frame(
-  Variable = c("Peso", "Tiempo_gestación", "Tipo_parto", 
-               "Numero_control_prenatal", "Edad_madre", "Numero_embarazos"),
-  Descripción = c("Clasificación del peso al nacer (Normal/Delicado)",
-                 "Semanas de gestación", 
-                 "Tipo de parto registrado",
-                 "Número de controles prenatales realizados",
-                 "Grupo etario de la madre",
-                 "Número de embarazos previos"),
-  Tipo_Variable = c("Categórica (binaria)", "Categórica ordinal", 
-                   "Categórica nominal", "Cuantitativa discreta",
-                   "Categórica ordinal", "Cuantitativa discreta"),
-  Notas = c("Variable dependiente - Peso normal: ≥2500g", 
-           "Considerar <37 semanas como prematurez",
-           "Espontáneo/Cesárea/Instrumentado",
-           "Indicador de acceso a salud prenatal",
-           "Rangos definidos por ENSIN",
-           "Incluye embarazo actual")
+
+#BASE DE DATOS
+
+```{r tabla_interactiva, echo=FALSE}
+# TABLA INTERACTIVA FINAL
+library(htmltools)
+reactable(
+  Base_datos,
+  defaultPageSize = 15,
+  showPageSizeOptions = TRUE,
+  pageSizeOptions = c(10, 15, 25, 50, 100),
+  filterable = TRUE,
+  searchable = TRUE,
+  sortable = TRUE,
+  resizable = TRUE,
+  striped = TRUE,
+  highlight = TRUE,
+  bordered = FALSE,
+  wrap = FALSE,
+  showSortable = TRUE,
+  defaultColDef = colDef(
+    header = function(value) {
+      name <- gsub("_", " ", value)
+      name <- gsub("([a-z])([A-Z])", "\\1 \\2", name)
+      tools::toTitleCase(tolower(name))
+    },
+    cell = function(value) {
+      if (is.numeric(value)) {
+        if (value == round(value)) {
+          format(value, big.mark = ",", scientific = FALSE)
+        } else {
+          format(round(value, 2), nsmall = 2, big.mark = ",", scientific = FALSE)
+        }
+      } else {
+        as.character(value)
+      }
+    },
+    align = "center",
+    minWidth = 100,
+    headerStyle = list(
+      background = "#2C3E50",
+      color = "white",
+      fontWeight = "600",
+      borderBottom = "2px solid #dee2e6",
+      fontSize = "13px"
+    ),
+    style = list(
+      fontSize = "12px",
+      fontFamily = "Arial, sans-serif"
+    )
+  ),
+  style = list(
+    fontFamily = "Arial, sans-serif",
+    fontSize = "13px"
+  ),
+  theme = reactableTheme(
+    stripedColor = "#f8f9fa",
+    highlightColor = "#e9ecef",
+    cellPadding = "8px 12px",
+    backgroundColor = "#ffffff",
+    borderColor = "#dee2e6",
+    style = list(
+      fontFamily = "Arial, -apple-system, BlinkMacSystemFont, sans-serif"
+    ),
+    searchInputStyle = list(
+      width = "100%",
+      padding = "8px 12px",
+      border = "1px solid #ced4da",
+      borderRadius = "4px",
+      fontSize = "14px",
+      marginBottom = "10px"
+    ),
+    headerStyle = list(
+      borderBottom = "2px solid #495057",
+      fontSize = "14px",
+      backgroundColor = "#2C3E50",
+      color = "white"
+    )
+  ),
+  columns = list(
+    Tiempo_gestación = colDef(
+      name = "Tiempo Gestación",
+      minWidth = 180,
+      filterable = TRUE,
+      align = "left"
+    ),
+    Edad_madre = colDef(
+      name = "Edad Madre", 
+      minWidth = 120,
+      filterable = TRUE
+    ),
+    Peso_delicado = colDef(
+      name = "Peso Delicado",
+      style = function(value) {
+        color <- ifelse(value == "Si", "#E74C3C", "#27AE60")
+        list(fontWeight = "bold", color = color)
+      }
+    )
+  )
 )
 
-kable(variables_modelo, 
-      caption = "Tabla 1: Variables del Modelo",
-      align = c("l", "l", "l", "l")) %>%
-  kable_styling(bootstrap_options = c("striped", "hover"),
-                full_width = FALSE,
-                font_size = 12) %>%
-  row_spec(0, background = "#2C3E50", color = "white", bold = TRUE) %>%
-  column_spec(1, bold = TRUE, width = "12em") %>%
-  footnote(general = "Fuente: Elaboración propia en base a la Base de Datos de Nacimientos - 2024",
-           number = c("Datos corresponden al segundo semestre del año 2024"))
+# Fuente de la tabla interactiva
+tags$div(
+  style = "margin-top: 20px; font-size: 12px; color: #666; font-style: italic; text-align: center;",
+  "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024"
+)
 ```
 
 #Y1 PESO DELICADO
 
 ```{r tabla1_descriptiva, echo=FALSE}
-# TABLA 1: ESTADÍSTICAS DESCRIPTIVAS POR GRUPO DE PESO
-tabla_descriptiva <- Base_datos %>%
-  group_by(Peso_delicado) %>%
-  summarise(
-    n = n(),
-    Porcentaje = round(100 * n() / nrow(Base_datos), 1),
-    Promedio_CP = round(mean(Numero_control_prenatal, na.rm = TRUE), 1),
-    DE_CP = round(sd(Numero_control_prenatal, na.rm = TRUE), 1),
-    Min_CP = min(Numero_control_prenatal, na.rm = TRUE),
-    Max_CP = max(Numero_control_prenatal, na.rm = TRUE),
-    Promedio_NE = round(mean(Numero_embarazos, na.rm = TRUE), 1),
-    DE_NE = round(sd(Numero_embarazos, na.rm = TRUE), 1),
-    Min_NE = min(Numero_embarazos, na.rm = TRUE),
-    Max_NE = max(Numero_embarazos, na.rm = TRUE)
-  ) %>%
-  mutate(Grupo_Peso = ifelse(Peso_delicado == "Si", "Delicado", "Moderado")) %>%
-  select(Grupo_Peso, everything(), -Peso_delicado)
+# GRÁFICO 1: DISTRIBUCIÓN DEL PESO DELICADO - Barras Horizontales Profesionales
+library(plotly)
+library(dplyr)
 
-# Total de columnas: Grupo_Peso(1) + n(1) + %(1) + 4 CP + 4 NE = 11 columnas
-kable(tabla_descriptiva, 
-      align = c("l", "c", "r", "r", "r", "r", "r", "r", "r", "r", "r"),
-      format.args = list(big.mark = ",", decimal.mark = "."),
-      col.names = c("Grupo de Peso", "N", "%", "Media", "DE", "Mín", "Máx", "Media", "DE", "Mín", "Máx"),
-      caption = "TABLA 1. ESTADÍSTICAS DESCRIPTIVAS POR GRUPO DE PESO AL NACER") %>%
-  kable_styling(
-    bootstrap_options = c("striped", "hover"),
-    full_width = FALSE,
-    font_size = 12,
-    position = "center",
-    latex_options = "hold_position"
-  ) %>%
-  add_header_above(c(" " = 1, "Tamaño Muestral" = 2, 
-                     "Controles Prenatales" = 4, 
-                     "Número de Embarazos" = 4),
-                   background = "#2C3E50", color = "white") %>%
-  row_spec(0, background = "#34495E", color = "white", bold = TRUE) %>%
-  column_spec(1, bold = TRUE, width = "10em") %>%
-  column_spec(2:3, background = "#F4F6F6") %>%
-  column_spec(4:11, background = "#FBFCFC") %>%
-  footnote(
-    general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024.",
-    number = c("Datos corresponden a nacimientos en Bogotá (julio-diciembre 2024)")
-  )
-```
-
-```{r grafico1_peso_pie, echo=FALSE, fig.width=10, fig.height=6}
-# GRÁFICO 1: DISTRIBUCIÓN DEL PESO DELICADO (PIE CHART)
+# Preparar datos
 tabla_peso <- Base_datos %>%
   count(Peso_delicado) %>%
-  mutate(Porcentaje = round(100 * n / sum(n), 1))
+  mutate(
+    Porcentaje = round(100 * n / sum(n), 1),
+    Etiqueta = case_when(
+      Peso_delicado == "No" ~ "Peso Normal",
+      Peso_delicado == "Si" ~ "Peso Delicado"
+    ),
+    total = sum(n)
+  ) %>%
+  arrange(desc(n))
 
-plot_ly(
+colores <- c('#27AE60', '#E74C3C')
+
+fig1 <- plot_ly(
   tabla_peso,
-  labels = ~Peso_delicado,
-  values = ~n,
-  type = 'pie',
-  textposition = 'inside',
-  textinfo = 'label+percent',
-  insidetextorientation = 'radial',
+  y = ~Etiqueta,
+  x = ~n,
+  type = 'bar',
+  orientation = 'h',
   marker = list(
-    colors = c('#27AE60', '#E74C3C'),  # Verde para No, Rojo para Si
-    line = list(color = '#FFFFFF', width = 2)
+    color = colores,
+    line = list(color = 'white', width = 2)
   ),
+  text = ~paste0("<b>", n, " casos</b><br>", Porcentaje, "%"),
+  textposition = 'outside',
+  textfont = list(color = 'black', size = 14, family = 'Arial Black'),
   hovertemplate = paste(
-    '<b>Peso Delicado: %{label}</b><br>',
-    'Frecuencia: %{value}<br>',
-    'Porcentaje: %{percent}<br>',
+    '<b>%{y}</b><br>',
+    'Frecuencia: %{x} casos<br>',
+    'Porcentaje: %{text}<br>',
     '<extra></extra>'
   )
 ) %>%
-  plotly::layout(
+  layout(
     title = list(
-      text = "<b>Gráfico 1. Distribución del Peso Delicado del Recién Nacido</b><br><sub>Bogotá - Segundo Semestre 2024</sub>",
+      text = "<b>GRÁFICO 1: Distribución del Peso al Nacer</b><br><sub>Clasificación de Peso Delicado - Bogotá 2024</sub>",
       x = 0.5,
-      font = list(size = 16)
+      font = list(size = 18, family = 'Arial')
     ),
-    legend = list(
-      orientation = "h",
-      x = 0.3,
-      y = -0.1,
-      font = list(size = 12)
+    xaxis = list(
+      title = "<b>Número de Casos</b>",
+      gridcolor = '#E8E8E8',
+      showline = TRUE,
+      linecolor = '#2C3E50',
+      linewidth = 2,
+      range = c(0, max(tabla_peso$n) * 1.15)
     ),
+    yaxis = list(
+      title = "",
+      tickfont = list(size = 14, family = 'Arial Black', color = '#2C3E50'),
+      categoryorder = "total ascending"
+    ),
+    plot_bgcolor = '#FAFAFA',
+    paper_bgcolor = 'white',
+    showlegend = FALSE,
     annotations = list(
+      # Fuente
       list(
-        text = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024",
+        text = "Fuente: Elaboración propia - DANE 2024",
         xref = "paper",
         yref = "paper",
         x = 0.5,
-        y = -0.2,
+        y = -0.20,
         showarrow = FALSE,
-        font = list(size = 10, color = "#666666"),
+        font = list(size = 11, color = "gray"),
         xanchor = "center"
+      ),
+      # Total
+      list(
+        text = paste0("<b>Total de Nacimientos: ", tabla_peso$total[1], "</b>"),
+        xref = "paper",
+        yref = "paper",
+        x = 0.5,
+        y = 1.08,
+        showarrow = FALSE,
+        font = list(size = 13, color = "#2C3E50", family = 'Arial Black'),
+        bgcolor = 'rgba(52, 152, 219, 0.1)',
+        bordercolor = '#3498DB',
+        borderwidth = 2,
+        borderpad = 6
       )
     ),
-    margin = list(b = 100)
+    margin = list(l = 150, r = 100, t = 120, b = 100)
+  ) %>%
+  config(
+    displayModeBar = TRUE,
+    displaylogo = FALSE
   )
-```
 
+fig1
+
+```
 
 #X1 TIEMPO DE GESTACION
 
@@ -365,6 +439,10 @@ plot_ly(
     'Frecuencia: %{value}<br>',
     'Porcentaje: %{percent}<br>',
     '<extra></extra>'
+  ),  # ← ¡IMPORTANTE: Esta coma estaba faltando!
+  domain = list(
+    x = c(0.1, 0.9),  # Ajusta horizontal (0-1)
+    y = c(0.1, 0.9)   # Ajusta vertical (0-1)
   )
 ) %>%
   plotly::layout(
@@ -585,29 +663,8 @@ kable(tabla_controles,
   column_spec(1, bold = TRUE, width = "12em") %>%
   footnote(general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024.")
 ```
-
-```{r grafico_controles, echo=FALSE, fig.width=10, fig.height=6}
-# GRÁFICO 5: DISTRIBUCIÓN DE CONTROLES PRENATALES
-library(ggplot2)
-
-ggplot(Base_datos, aes(x = Numero_control_prenatal)) +
-  geom_histogram(aes(y = after_stat(density)), bins = 30, fill = "#3498DB", 
-                 color = "white", alpha = 0.7) +
-  geom_density(color = "#E74C3C", linewidth = 1.2) +
-  geom_vline(aes(xintercept = mean(Numero_control_prenatal)), 
-             color = "#27AE60", linetype = "dashed", linewidth = 1) +
-  labs(title = "GRÁFICO 5:Distribución del Número de Controles Prenatales",
-       subtitle = "Bogotá - Segundo Semestre 2024",
-       x = "Número de Controles Prenatales",
-       y = "Densidad",
-       caption = "Fuente: Elaboración propia - DANE 2024") +
-  theme_minimal() +
-  theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16),
-        plot.subtitle = element_text(hjust = 0.5, size = 12),
-        axis.title = element_text(face = "bold"),
-        panel.grid.minor = element_blank())
-```
-
+ 
+ #grafico 5
 
 # X5 NUMEROS DE EMBARAZOS
 
@@ -639,25 +696,8 @@ kable(tabla_embarazos,
   footnote(general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024.")
 ```
 
-```{r grafico_embarazos, echo=FALSE, fig.width=10, fig.height=6}
-# GRÁFICO 6: DISTRIBUCIÓN DE NÚMERO DE EMBARAZOS
-ggplot(Base_datos, aes(x = Numero_embarazos)) +
-  geom_histogram(aes(y = after_stat(density)), bins = 20, fill = "#9B59B6", 
-                 color = "white", alpha = 0.7) +
-  geom_density(color = "#E74C3C", linewidth = 1.2) +
-  geom_vline(aes(xintercept = mean(Numero_embarazos)), 
-             color = "#27AE60", linetype = "dashed", linewidth = 1) +
-  labs(title = "GRÁFICO 6: Distribución del Número de Embarazos",
-       subtitle = "Bogotá - Segundo Semestre 2024",
-       x = "Número de Embarazos",
-       y = "Densidad",
-       caption = "Fuente: Elaboración propia - DANE 2024") +
-  theme_minimal() +
-  theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16),
-        plot.subtitle = element_text(hjust = 0.5, size = 12),
-        axis.title = element_text(face = "bold"),
-        panel.grid.minor = element_blank())
-```
+#grafico 6
+
 #TABLAS FINALES
 ```{r tabla7_resumen, echo=FALSE}
 # TABLA 7: RESUMEN GENERAL DE OBSERVACIONES
@@ -697,112 +737,5 @@ kable(tabla_resumen,
   )
 ```
 
-
-#BASE DE DATOS
-```{r tabla_interactiva, echo=FALSE}
-# TABLA INTERACTIVA FINAL
-reactable(
-  Base_datos,
-  defaultPageSize = 15,
-  showPageSizeOptions = TRUE,
-  pageSizeOptions = c(10, 15, 25, 50, 100),
-  filterable = TRUE,
-  searchable = TRUE,
-  sortable = TRUE,
-  resizable = TRUE,
-  striped = TRUE,
-  highlight = TRUE,
-  bordered = FALSE,
-  wrap = FALSE,
-  showSortable = TRUE,
-  defaultColDef = colDef(
-    header = function(value) {
-      name <- gsub("_", " ", value)
-      name <- gsub("([a-z])([A-Z])", "\\1 \\2", name)
-      tools::toTitleCase(tolower(name))
-    },
-    cell = function(value) {
-      if (is.numeric(value)) {
-        if (value == round(value)) {
-          format(value, big.mark = ",", scientific = FALSE)
-        } else {
-          format(round(value, 2), nsmall = 2, big.mark = ",", scientific = FALSE)
-        }
-      } else {
-        as.character(value)
-      }
-    },
-    align = "center",
-    minWidth = 100,
-    headerStyle = list(
-      background = "#2C3E50",
-      color = "white",
-      fontWeight = "600",
-      borderBottom = "2px solid #dee2e6",
-      fontSize = "13px"
-    ),
-    style = list(
-      fontSize = "12px",
-      fontFamily = "Arial, sans-serif"
-    )
-  ),
-  style = list(
-    fontFamily = "Arial, sans-serif",
-    fontSize = "13px"
-  ),
-  theme = reactableTheme(
-    stripedColor = "#f8f9fa",
-    highlightColor = "#e9ecef",
-    cellPadding = "8px 12px",
-    backgroundColor = "#ffffff",
-    borderColor = "#dee2e6",
-    style = list(
-      fontFamily = "Arial, -apple-system, BlinkMacSystemFont, sans-serif"
-    ),
-    searchInputStyle = list(
-      width = "100%",
-      padding = "8px 12px",
-      border = "1px solid #ced4da",
-      borderRadius = "4px",
-      fontSize = "14px",
-      marginBottom = "10px"
-    ),
-    headerStyle = list(
-      borderBottom = "2px solid #495057",
-      fontSize = "14px",
-      backgroundColor = "#2C3E50",
-      color = "white"
-    )
-  ),
-  columns = list(
-    Tiempo_gestación = colDef(
-      name = "Tiempo Gestación",
-      minWidth = 180,
-      filterable = TRUE,
-      align = "left"
-    ),
-    Edad_madre = colDef(
-      name = "Edad Madre", 
-      minWidth = 120,
-      filterable = TRUE
-    ),
-    Peso_delicado = colDef(
-      name = "Peso Delicado",
-      style = function(value) {
-        color <- ifelse(value == "Si", "#E74C3C", "#27AE60")
-        list(fontWeight = "bold", color = color)
-      }
-    )
-  )
-)
-
-# Fuente de la tabla interactiva
-tags$div(
-  style = "margin-top: 20px; font-size: 12px; color: #666; font-style: italic; text-align: center;",
-  "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024"
-)
-```
-
-
-
+--
 
