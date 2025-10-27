@@ -36,7 +36,7 @@ BD_EEVV <- read_csv("BD-EEVV-Nacimientos-2024.csv") %>%
   na.omit()
 
 # Balanceo
-set.seed(5)
+set.seed(200)
 
 Si <- BD_EEVV %>% filter(Peso_delicado == "Si")
 No <- BD_EEVV %>% filter(Peso_delicado == "No") %>%
