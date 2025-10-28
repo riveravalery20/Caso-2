@@ -182,12 +182,266 @@ ggplot(prob_df, aes(x = Probabilidad, fill = Clase_Real)) +
   ) +
   geom_vline(xintercept = 0.5, linetype = "dashed", color = "red")
 ```
+```{r optimizacion}
+library(ggplot2)
+library(scales)
+
+# Crear el gráfico profesional CORREGIDO
+ggplot(BD_knnEntrenado$results, aes(x = k, y = Accuracy)) +
+  geom_line(color = "#2980b9", linewidth = 1.5, alpha = 0.8) +  # Corregido: linewidth en lugar de size
+  geom_point(color = "#1a5276", size = 2.5, shape = 19) +
+  geom_vline(xintercept = BD_knnEntrenado$bestTune$k, 
+             linetype = "dashed", color = "#e74c3c", linewidth = 1.2, alpha = 0.7) +  # Corregido
+  geom_point(aes(x = BD_knnEntrenado$bestTune$k, 
+                 y = max(BD_knnEntrenado$results$Accuracy)), 
+             color = "#e74c3c", size = 5, shape = 18) +
+  annotate("text", 
+           x = BD_knnEntrenado$bestTune$k, 
+           y = max(BD_knnEntrenado$results$Accuracy) - 0.002,
+           label = paste("k Óptimo =", BD_knnEntrenado$bestTune$k),
+           color = "#e74c3c", fontface = "bold", size = 5,
+           vjust = 1.5, hjust = 0.5) +
+  labs(
+    title = "OPTIMIZACIÓN DEL PARÁMETRO k - MODELO k-NN",
+    subtitle = "Precisión del Modelo en Función del Número de Vecinos",
+    x = "Número de Vecinos (k)",
+    y = "Precisión (Accuracy)",
+    caption = paste("Máxima precisión:", round(max(BD_knnEntrenado$results$Accuracy), 4),
+                   "| k óptimo:", BD_knnEntrenado$bestTune$k)
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(face = "bold", size = 18, hjust = 0.5, color = "#2c3e50",
+                              margin = margin(b = 10)),
+    plot.subtitle = element_text(size = 14, hjust = 0.5, color = "#34495e",
+                                 margin = margin(b = 15)),
+    plot.caption = element_text(size = 11, color = "#7f8c8d", hjust = 0.5,
+                                face = "italic", margin = margin(t = 15)),
+    axis.title = element_text(face = "bold", color = "#2c3e50", size = 12),
+    axis.title.x = element_text(margin = margin(t = 10)),
+    axis.title.y = element_text(margin = margin(r = 10)),
+    axis.text = element_text(color = "#2c3e50", size = 10),
+    panel.grid.major = element_line(color = "#ecf0f1", linewidth = 0.6),  # Corregido
+    panel.grid.minor = element_line(color = "#f8f9f9", linewidth = 0.3),  # Corregido
+    plot.background = element_rect(fill = "white", color = NA),
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.margin = margin(20, 20, 20, 20)
+  ) +
+  scale_y_continuous(
+    labels = percent_format(accuracy = 0.1),
+    limits = c(min(BD_knnEntrenado$results$Accuracy) - 0.001, 
+               max(BD_knnEntrenado$results$Accuracy) + 0.001),
+    breaks = pretty_breaks(n = 8)
+  ) +
+  scale_x_continuous(
+    breaks = pretty_breaks(n = 10)
+  )
+```
+
+
 
 ```{r}
 #LOGIT
 ```
 
-```{r}
+```{r matrix de confusion}
+conf_matrix_logit <- confusionMatrix(pred_clase, BD_test$Peso_delicado, positive = "Si")
 
+# Crear dataframe para la matriz
+conf_df_logit <- as.data.frame(conf_matrix_logit$table)
+conf_df_logit$Porcentaje <- round(conf_df_logit$Freq / sum(conf_df_logit$Freq) * 100, 1)
+
+ggplot(conf_df_logit, aes(x = Reference, y = Prediction, fill = Freq)) +
+  geom_tile(color = "white", alpha = 0.8) +
+  geom_text(aes(label = paste(Freq, "\n(", Porcentaje, "%)", sep = "")), 
+            color = "white", size = 5, fontface = "bold") +
+  scale_fill_gradient(low = "#87CEEB", high = "#1E3F66", name = "Frecuencia") +
+  labs(
+    title = "Matriz de Confusión - Modelo Logit",
+    subtitle = "Desnutrición Neonatal",
+    x = "Valor Real",
+    y = "Predicción del Modelo"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+    plot.subtitle = element_text(size = 12, hjust = 0.5),
+    axis.text = element_text(size = 11),
+    axis.title = element_text(face = "bold", size = 12)
+  ) +
+  coord_fixed()
+```
+
+```{r curva roc}
+# Crear dataframe para ggplot
+roc_data_logit <- data.frame(
+  FPR = 1 - roc_o$specificities,
+  TPR = roc_o$sensitivities
+)
+
+roc_data_logit <- roc_data_logit[order(roc_data_logit$FPR, roc_data_logit$TPR),]
+
+ggplot(roc_data_logit, aes(x = FPR, y = TPR)) +
+  geom_segment(aes(x = 0, y = 0, xend = 1, yend = 1), 
+               linetype = "dashed", color = "#95a5a6", alpha = 0.8, linewidth = 0.6) +
+  geom_ribbon(aes(ymin = 0, ymax = TPR), fill = "#3498db", alpha = 0.15) +
+  geom_line(color = "#2980b9", linewidth = 1.5) +
+  labs(
+    title = "Curva ROC - Modelo Logit",
+    subtitle = "Detección de Desnutrición Neonatal",
+    x = "Tasa de Falsos Positivos (1 - Especificidad)",
+    y = "Tasa de Verdaderos Positivos (Sensibilidad)",
+    caption = paste("Área bajo la curva (AUC) =", round(auc_val, 4))
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(face = "bold", size = 16, hjust = 0.5, color = "black",
+                              margin = margin(b = 10)),
+    plot.subtitle = element_text(size = 12, hjust = 0.5, color = "black",
+                                 margin = margin(b = 15)),
+    plot.caption = element_text(size = 10, hjust = 0.5, color = "black",
+                                margin = margin(t = 10)),
+    axis.title = element_text(color = "black", size = 11),
+    axis.title.x = element_text(margin = margin(t = 8)),
+    axis.title.y = element_text(margin = margin(r = 8)),
+    axis.text = element_text(color = "black"),
+    panel.grid.major = element_line(color = "#ecf0f1", linewidth = 0.4),
+    panel.grid.minor = element_blank(),
+    plot.margin = margin(15, 15, 15, 15)
+  ) +
+  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2), 
+                     expand = expansion(mult = c(0.02, 0.02))) +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2), 
+                     expand = expansion(mult = c(0.02, 0.02))) +
+  annotate("text", x = 0.65, y = 0.25, 
+           label = paste("AUC =", round(auc_val, 4)), 
+           size = 5, color = "#2c3e50", fontface = "bold")
+```
+
+```{r accuracy}
+library(kableExtra)
+# Tabla resumen de métricas
+metricas_logit <- data.frame(
+  Métrica = c("Accuracy", "Sensibilidad", "Especificidad", 
+              "Valor Predictivo Positivo", "Valor Predictivo Negativo",
+              "Prevalencia", "AUC"),
+  Valor = c(
+    round(conf_matrix_logit$overall["Accuracy"], 4),
+    round(conf_matrix_logit$byClass["Sensitivity"], 4),
+    round(conf_matrix_logit$byClass["Specificity"], 4),
+    round(conf_matrix_logit$byClass["Pos Pred Value"], 4),
+    round(conf_matrix_logit$byClass["Neg Pred Value"], 4),
+    round(conf_matrix_logit$byClass["Prevalence"], 4),
+    round(auc_val, 4)
+  ),
+  Interpretación = c(
+    "Proporción total de predicciones correctas",
+    "Capacidad de detectar desnutrición real",
+    "Capacidad de identificar correctamente casos sin desnutrición",
+    "Precisión cuando predice desnutrición",
+    "Precisión cuando predice no desnutrición", 
+    "Proporción real de desnutrición en los datos",
+    "Capacidad general de discriminación del modelo"
+  )
+)
+
+metricas_logit %>%
+  kable(align = "lcc", caption = "Métricas de Rendimiento del Modelo Logit") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), 
+                full_width = FALSE) %>%
+  row_spec(0, background = "#2E86AB", color = "white", bold = TRUE) %>%
+  column_spec(1, bold = TRUE) %>%
+  column_spec(2, color = "darkblue", bold = TRUE)
+```
+
+```{r distribucion de probabilidades}
+prob_df_logit <- data.frame(
+  Probabilidad = p_hat,
+  Real = BD_test$Peso_delicado
+)
+
+ggplot(prob_df_logit, aes(x = Probabilidad, fill = Real)) +
+  geom_density(alpha = 0.6) +
+  scale_fill_manual(values = c("Si" = "#e74c3c", "No" = "#3498db")) +
+  labs(
+    title = "Distribución de Probabilidades Predichas",
+    subtitle = "Modelo Logit - Desnutrición Neonatal",
+    x = "Probabilidad Predicha de Desnutrición",
+    y = "Densidad",
+    fill = "Estado Real"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+    plot.subtitle = element_text(size = 12, hjust = 0.5),
+    legend.position = "top"
+  ) +
+  geom_vline(xintercept = umbral, linetype = "dashed", color = "#2c3e50", linewidth = 1) +
+  annotate("text", x = umbral, y = 0, label = paste("Umbral =", round(umbral, 3)), 
+           vjust = -1, hjust = -0.1, color = "#2c3e50", fontface = "bold")
+```
+
+```{r summary}
+# Tabla completa del summary con significancia
+summary_logit <- summary(fit_logit)
+coef_table <- as.data.frame(summary_logit$coefficients)
+coef_table$Variable <- rownames(coef_table)
+rownames(coef_table) <- NULL
+
+# Limpiar nombres y agregar significancia
+coef_table_completa <- coef_table %>%
+  mutate(
+    Variable = gsub("_", " ", Variable),
+    Variable = gsub("Tiempo gestación", "Tiempo gestación:", Variable),
+    Variable = gsub("Tipo parto", "Tipo parto:", Variable),
+    Variable = gsub("Edad madre", "Edad madre:", Variable),
+    Significancia = ifelse(`Pr(>|z|)` < 0.001, "***",
+                          ifelse(`Pr(>|z|)` < 0.01, "**",
+                                ifelse(`Pr(>|z|)` < 0.05, "*", "")))
+  ) %>%
+  rename(
+    Estimación = Estimate,
+    `Error Estándar` = `Std. Error`,
+    `Valor z` = `z value`,
+    `Valor p` = `Pr(>|z|)`
+  ) %>%
+  select(Variable, Estimación, `Error Estándar`, `Valor z`, `Valor p`, Significancia)
+
+# Tabla con el mismo formato que tus métricas
+coef_table_completa %>%
+  kable(align = "lccccc", 
+        caption = "Resumen del Modelo de Regresión Logística") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), 
+                full_width = FALSE) %>%
+  row_spec(0, background = "#2E86AB", color = "white", bold = TRUE) %>%
+  column_spec(1, bold = TRUE) %>%
+  column_spec(2, color = "darkblue", bold = TRUE) %>%
+  column_spec(6, bold = TRUE) %>%
+  footnote(
+    general = "*** p < 0.001, ** p < 0.01, * p < 0.05",
+    general_title = "Niveles de significancia:"
+  )
+```
+
+
+```{r comparacion}
+# Crear tabla comparativa para el modelo logit
+tabla_comparativa_logit <- data.frame(
+  Observación = 1:20,
+  Real = BD_test$Peso_delicado[1:20],
+  Predicho = pred_clase[1:20],
+  `P(Desnutrición)` = round(p_hat[1:20], 3),
+  `P(No Desnutrición)` = round(1 - p_hat[1:20], 3),
+  Resultado = ifelse(BD_test$Peso_delicado[1:20] == pred_clase[1:20], 
+                     "Correcto", "Incorrecto")
+)
+
+tabla_comparativa_logit %>%
+  kable(align = "c", caption = "Comparación: Valores Reales vs Predicciones - Modelo Logit") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), 
+                full_width = FALSE) %>%
+  column_spec(6, color = ifelse(tabla_comparativa_logit$Resultado == "Correcto", 
+                                "green", "red")) %>%
+  row_spec(0, background = "#2E86AB", color = "white", bold = TRUE)
 ```
 
