@@ -1,0 +1,2007 @@
+---
+title: "Análisis Profesional"
+author: "Melany Enriquez (2415897)
+Santiago Posada (2418914)
+Sofía Potosí (2417794)
+Valery Rivera (2417038)"
+date: "2025-10-27"
+output:
+  rmdformats::readthedown:
+    css: Valery-styles.css
+    self_contained: true
+    thumbnails: false
+    gallery: false
+    number_sections: false
+    toc_depth: 3
+    use_bookdown: false
+---
+
+```{r librerias, warning=FALSE,message=FALSE}
+library(kableExtra)
+library(readr)
+library(dplyr)
+library(tidyverse)
+library(kableExtra)
+library(reactable)
+library(plotly)
+library(htmltools)
+library(ggplot2)
+```
+
+```{r tema 5, echo=FALSE}
+Valery_css =
+"  
+/* PALETA ACADÉMICA MARINA PROFESIONAL */
+:root {
+  --deep-ocean: #2C5F7A;         /* Azul marino profundo */
+  --ocean-teal: #3A8E96;         /* Verde azulado principal */
+  --sea-glass: #4FB0A8;          /* Turquesa suave */
+  --seafoam: #8FD4C1;            /* Espuma de mar */
+  --mist: #F8FCFB;               /* Blanco académico con tono marino suave */
+  --parchment: #FDFDF6;          /* Color pergamino académico */
+  --coral: #D94E4E;              /* Acento coral sobrio */
+  --dark-ink: #2C3E50;           /* Color tinta para texto */
+  --light-ink: #4A6572;          /* Texto secundario */
+  --border-light: #E1F0ED;       /* Bordes sutiles */
+  --accent-gold: #C4A747;        /* Dorado académico */
+}
+
+/* IMPORTAR FUENTES ACADÉMICAS */
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Source+Serif+Pro:wght@300;400;600&family=Lato:wght@300;400;700&display=swap');
+
+/* ESTILOS BASE ACADÉMICOS */
+body {
+  font-family: 'Source Serif Pro', 'Georgia', 'Times New Roman', serif;
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--dark-ink);
+  background-color: var(--parchment);
+  font-size: 17px;
+  text-align: justify;
+}
+
+.main-content {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 3rem;
+  background: var(--mist);
+  box-shadow: 
+    0 5px 30px rgba(42, 95, 122, 0.08),
+    0 1px 3px rgba(0,0,0,0.03);
+  border-radius: 4px;
+  border: 1px solid var(--border-light);
+  position: relative;
+}
+
+/* ENCABEZADOS ACADÉMICOS */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Merriweather', 'Georgia', 'Times New Roman', serif;
+  color: var(--deep-ocean) !important;
+  margin-top: 2.5rem;
+  margin-bottom: 1.2rem;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: left;
+}
+
+h1 {
+  font-size: 2.6rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.2rem;
+  border-bottom: 3px double var(--sea-glass);
+  color: var(--deep-ocean) !important;
+  background: none;
+  -webkit-text-fill-color: var(--deep-ocean);
+  letter-spacing: -0.5px;
+}
+
+h2 {
+  font-size: 2rem;
+  border-left: 4px solid var(--ocean-teal);
+  padding-left: 1.2rem;
+  margin-top: 3rem;
+  background: linear-gradient(90deg, rgba(79, 176, 168, 0.08) 0%, transparent 100%);
+  padding: 0.8rem 1.2rem;
+  border-radius: 0;
+  position: relative;
+  font-weight: 600;
+}
+
+h3 {
+  font-size: 1.5rem;
+  color: var(--ocean-teal) !important;
+  border-bottom: 1px solid var(--border-light);
+  padding-bottom: 0.5rem;
+  margin-top: 2.2rem;
+  font-weight: 600;
+}
+
+h4 {
+  font-size: 1.3rem;
+  color: var(--sea-glass) !important;
+  margin-top: 1.8rem;
+  font-style: italic;
+}
+
+h5 {
+  font-size: 1.1rem;
+  color: var(--light-ink) !important;
+  margin-top: 1.5rem;
+}
+
+/* TOC Y SIDEBAR - ARREGLO COMPLETO PARA R MARKDOWN */
+
+/* Sidebar principal */
+.sidebar, #sidebar, .col-sm-3, .tocify {
+  background: linear-gradient(135deg, var(--mist) 0%, #F0F9F7 100%) !important;
+  border-right: 2px solid var(--border-light) !important;
+  padding: 1.5rem !important;
+}
+
+/* Contenedor del TOC */
+#TOC, .tocify, .list-group {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100% !important;
+}
+
+/* Items del TOC - TODOS LOS NIVELES */
+#TOC ul, 
+#TOC li, 
+.tocify ul, 
+.tocify li, 
+.list-group-item {
+  background: transparent !important;
+  border: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+  display: block !important;
+  width: 100% !important;
+}
+
+/* Enlaces del TOC - NIVEL 1 */
+#TOC > ul > li > a,
+.tocify-header > a,
+.list-group-item > a {
+  color: var(--deep-ocean) !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0.8rem 1rem !important;
+  margin: 0.2rem 0 !important;
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+  border-left: 3px solid transparent !important;
+  transition: all 0.3s ease !important;
+  display: block !important;
+  text-decoration: none !important;
+}
+
+/* Enlaces del TOC - NIVEL 2 */
+#TOC ul ul li a,
+.tocify-subheader a,
+.list-group .list-group-item a {
+  color: var(--light-ink) !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0.6rem 1rem 0.6rem 1.8rem !important;
+  margin: 0.1rem 0 !important;
+  font-weight: 400 !important;
+  font-size: 0.95rem !important;
+  border-left: 2px solid transparent !important;
+  transition: all 0.3s ease !important;
+  display: block !important;
+  text-decoration: none !important;
+}
+
+/* Enlaces del TOC - NIVEL 3 */
+#TOC ul ul ul li a,
+.tocify-subheader .tocify-subheader a {
+  color: var(--light-ink) !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0.5rem 1rem 0.5rem 2.6rem !important;
+  margin: 0.1rem 0 !important;
+  font-weight: 300 !important;
+  font-size: 0.9rem !important;
+  border-left: 1px solid transparent !important;
+  transition: all 0.3s ease !important;
+  display: block !important;
+  text-decoration: none !important;
+}
+
+/* Hover para todos los niveles */
+#TOC a:hover,
+.tocify a:hover,
+.list-group-item a:hover {
+  color: var(--deep-ocean) !important;
+  background: rgba(79, 176, 168, 0.08) !important;
+  border-left: 3px solid var(--sea-glass) !important;
+  transform: translateX(2px);
+}
+
+/* Active state */
+#TOC a:active,
+#TOC a:focus,
+.tocify a:active,
+.tocify a:focus,
+.list-group-item.active a {
+  color: var(--deep-ocean) !important;
+  background: rgba(79, 176, 168, 0.12) !important;
+  border-left: 3px solid var(--ocean-teal) !important;
+  font-weight: 600 !important;
+}
+
+/* Listas anidadas */
+#TOC ul ul,
+.tocify-subheader,
+.list-group .list-group {
+  padding-left: 0.5rem !important;
+  margin: 0 !important;
+  border-left: 1px solid var(--border-light) !important;
+}
+
+/* Título del TOC */
+#TOC .toc-title,
+.tocify-header:first-child {
+  font-family: 'Merriweather', serif !important;
+  font-size: 1.3rem !important;
+  font-weight: 700 !important;
+  color: var(--deep-ocean) !important;
+  margin-bottom: 1rem !important;
+  padding-bottom: 0.5rem !important;
+  border-bottom: 2px solid var(--sea-glass) !important;
+  text-align: center !important;
+  background: transparent !important;
+  border: none !important;
+}
+/* CONTENEDOR PRINCIPAL */
+.container-fluid {
+  background: linear-gradient(135deg, #F5FBFA 0%, var(--parchment) 100%);
+  min-height: 100vh;
+  padding: 1.5rem;
+}
+
+/* HEADER ACADÉMICO */
+.page-header {
+  background: linear-gradient(135deg, var(--deep-ocean) 0%, var(--ocean-teal) 100%) !important;
+  color: white;
+  padding: 3.5rem 2rem !important;
+  text-align: center;
+  margin-bottom: 2.5rem !important;
+  border-radius: 0;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 4px solid var(--sea-glass);
+}
+
+.page-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 60%);
+}
+
+.page-header h1 {
+  color: white !important;
+  font-size: 2.8rem;
+  font-weight: 700;
+  border: none;
+  background: none;
+  -webkit-text-fill-color: white;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  position: relative;
+  z-index: 2;
+  margin-bottom: 0.5rem;
+}
+
+.page-header h2 {
+  color: rgba(255,255,255,0.95) !important;
+  font-size: 1.4rem;
+  font-weight: 300;
+  border: none;
+  background: none;
+  font-family: 'Source Serif Pro', serif;
+  position: relative;
+  z-index: 2;
+  margin-top: 0.5rem;
+}
+
+/* BLOQUES DE CÓDIGO ACADÉMICOS */
+pre {
+  background: #f8f9fa !important;
+  color: var(--dark-ink) !important;
+  padding: 1.2rem !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: 4px !important;
+  border-left: 4px solid var(--ocean-teal) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
+  font-size: 0.85em;
+  line-height: 1.5;
+  margin: 1.2rem 0;
+}
+
+code {
+  background: rgba(79, 176, 168, 0.1) !important;
+  color: var(--ocean-teal) !important;
+  padding: 0.15rem 0.4rem !important;
+  border-radius: 3px;
+  font-family: 'Consolas', 'Monaco', monospace !important;
+  font-size: 0.8em;
+  border: 1px solid rgba(79, 176, 168, 0.2);
+}
+
+/* TABLAS ACADÉMICAS */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.8rem 0;
+  box-shadow: 0 1px 4px rgba(42, 95, 122, 0.08);
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  overflow: hidden;
+  font-family: 'Lato', sans-serif;
+}
+
+th {
+  background: linear-gradient(135deg, var(--ocean-teal), var(--deep-ocean)) !important;
+  color: white !important;
+  font-weight: 600;
+  padding: 0.9rem !important;
+  text-align: left;
+  border: none !important;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.9rem;
+}
+
+td {
+  padding: 0.8rem !important;
+  border: none !important;
+  border-bottom: 1px solid var(--border-light) !important;
+  font-size: 0.9rem;
+}
+
+tr:nth-child(even) {
+  background: rgba(143, 212, 193, 0.05) !important;
+}
+
+tr:hover {
+  background: rgba(79, 176, 168, 0.08) !important;
+}
+
+/* GRÁFICOS ACADÉMICOS */
+.plotly.html-widget {
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(42, 95, 122, 0.1);
+  padding: 0.8rem;
+  background: white;
+  border: 1px solid var(--border-light);
+  margin: 1.5rem 0;
+}
+
+/* BOTONES ACADÉMICOS */
+.btn {
+  background: linear-gradient(135deg, var(--ocean-teal), var(--sea-glass)) !important;
+  color: white !important;
+  border: none !important;
+  padding: 0.6rem 1.2rem !important;
+  border-radius: 4px !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 1px 4px rgba(58, 142, 150, 0.3) !important;
+  font-family: 'Lato', sans-serif !important;
+}
+
+.btn:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 8px rgba(58, 142, 150, 0.4) !important;
+}
+
+/* FOOTER ACADÉMICO */
+.academic-footer {
+  text-align: center;
+  color: var(--ocean-teal);
+  margin-top: 4rem;
+  padding: 2.5rem 2rem;
+  border-top: 2px solid var(--border-light);
+  background: var(--mist);
+  font-family: 'Merriweather', serif;
+  font-size: 0.9rem;
+}
+
+/* CITAS Y BLOCKQUOTES */
+blockquote {
+  border-left: 4px solid var(--sea-glass);
+  background: rgba(143, 212, 193, 0.05);
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+  font-style: italic;
+  color: var(--light-ink);
+  border-radius: 0 4px 4px 0;
+}
+
+/* LISTAS ACADÉMICAS */
+ul, ol {
+  padding-left: 1.8rem;
+  margin: 1.2rem 0;
+}
+
+li {
+  margin: 0.5rem 0;
+  line-height: 1.6;
+}
+
+/* RESPONSIVE DESIGN ACADÉMICO */
+@media (max-width: 768px) {
+  .main-content {
+    padding: 1.5rem;
+    margin: 1rem;
+    border-radius: 0;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+  
+  h2 {
+    font-size: 1.6rem;
+    padding: 0.6rem 1rem;
+  }
+  
+  .page-header {
+    padding: 2.5rem 1rem !important;
+  }
+  
+  .page-header h1 {
+    font-size: 2rem;
+  }
+  
+  #TOC {
+    padding: 1.5rem 1rem !important;
+    margin: 1.5rem 0 !important;
+  }
+}
+
+/* ENLACES ACADÉMICOS */
+a {
+  color: var(--ocean-teal);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+a:hover {
+  color: var(--deep-ocean);
+  border-bottom-color: var(--sea-glass);
+}
+
+/* SCROLLBAR DISCRETO */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--mist);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--sea-glass);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ocean-teal);
+}
+
+/* CONTROLES DE CÓDIGO ACADÉMICOS */
+.code-toggle-container {
+  text-align: center;
+  margin: 3rem 0 2rem 0;
+  padding: 2rem;
+  background: linear-gradient(135deg, var(--mist) 0%, #F0F9F7 100%);
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  box-shadow: 0 2px 12px rgba(42, 95, 122, 0.08);
+  border-left: 4px solid var(--ocean-teal);
+}
+
+.code-toggle-container h4 {
+  margin-top: 0 !important;
+  color: var(--deep-ocean) !important;
+  font-family: 'Merriweather', serif !important;
+  font-size: 1.3rem !important;
+  border: none !important;
+  background: none !important;
+  padding: 0 !important;
+}
+
+.code-toggle-container p {
+  color: var(--light-ink) !important;
+  margin-bottom: 1.5rem !important;
+  font-family: 'Source Serif Pro', serif !important;
+  font-size: 0.95rem !important;
+}
+
+.code-toggle-btn {
+  background: linear-gradient(135deg, var(--ocean-teal), var(--sea-glass));
+  color: white !important;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 6px;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(58, 142, 150, 0.3);
+  margin: 0 0.5rem 0.5rem 0;
+}
+
+.code-toggle-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(58, 142, 150, 0.4);
+  background: linear-gradient(135deg, var(--sea-glass), var(--ocean-teal));
+}
+
+.code-toggle-btn.secondary {
+  background: linear-gradient(135deg, var(--seafoam), var(--sea-glass));
+  color: var(--dark-ink) !important;
+}
+
+.code-toggle-btn.secondary:hover {
+  background: linear-gradient(135deg, var(--sea-glass), var(--seafoam));
+}
+
+/* BOTÓN FLOTANTE GLOBAL */
+.global-code-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  background: linear-gradient(135deg, var(--ocean-teal), var(--deep-ocean));
+  color: white;
+  border: none;
+  padding: 0.8rem 1.2rem;
+  border-radius: 25px;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(42, 95, 122, 0.4);
+  transition: all 0.3s ease;
+}
+
+.global-code-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(42, 95, 122, 0.6);
+}
+
+/* CONTENEDORES DE CÓDIGO CON TOGGLE */
+.code-chunk {
+  margin: 2rem 0;
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(42, 95, 122, 0.08);
+  transition: all 0.3s ease;
+}
+
+.code-chunk:hover {
+  box-shadow: 0 4px 15px rgba(42, 95, 122, 0.12);
+}
+
+.code-header {
+  background: linear-gradient(135deg, var(--ocean-teal), var(--deep-ocean));
+  color: white;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Lato', sans-serif;
+}
+
+.code-header:hover {
+  background: linear-gradient(135deg, var(--deep-ocean), var(--ocean-teal));
+}
+
+.chunk-title {
+  font-family: 'Lato', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.toggle-icon {
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: transform 0.3s ease;
+}
+
+.toggle-icon.rotated {
+  transform: rotate(180deg);
+}
+
+.code-content {
+  background: #f8f9fa;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.code-content.collapsed {
+  max-height: 0;
+  opacity: 0;
+  padding: 0;
+}
+
+.code-content.expanded {
+  max-height: 5000px;
+  opacity: 1;
+  padding: 1rem;
+}
+
+/* INDICADOR DE ESTADO */
+.code-status {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.code-status.visible {
+  background: #4CAF50;
+  box-shadow: 0 0 5px #4CAF50;
+}
+
+.code-status.hidden {
+  background: #FF9800;
+  box-shadow: 0 0 5px #FF9800;
+}
+
+/* SMOOTH SCROLL Y NAVEGACIÓN */
+html {
+  scroll-behavior: smooth;
+}
+"
+
+writeLines(Valery_css, "Valery-styles.css")
+
+```
+
+```{js, echo=FALSE}
+document.addEventListener('DOMContentLoaded', function() {
+  // ELIMINADO: Smooth scroll que bloqueaba el TOC
+  // El TOC de readthedown ya tiene su propio sistema de navegación
+  
+  // Variable para controlar estado global
+  let allCodeVisible = true;
+
+  // Función para crear controles individuales
+  function initializeCodeToggles() {
+    const codeChunks = document.querySelectorAll("pre.r, pre.python, pre.sourceCode");
+    
+    codeChunks.forEach((chunk, index) => {
+      // Crear contenedor
+      const container = document.createElement("div");
+      container.className = "code-chunk";
+      
+      // Crear header
+      const header = document.createElement("div");
+      header.className = "code-header";
+      
+      // Obtener el lenguaje del código
+      const language = chunk.className.includes("r") ? "R" : 
+                      chunk.className.includes("python") ? "Python" : "Código";
+      
+      header.innerHTML = `
+        <div class="chunk-title">
+          <span class="code-status visible"></span>
+          ${language} - Chunk ${index + 1}
+        </div>
+        <div class="toggle-icon">▼</div>
+      `;
+      
+      // Crear contenido
+      const content = document.createElement("div");
+      content.className = "code-content expanded";
+      content.appendChild(chunk.cloneNode(true));
+      
+      // Reemplazar el chunk original
+      chunk.parentNode.replaceChild(container, chunk);
+      container.appendChild(header);
+      container.appendChild(content);
+      
+      // Agregar evento de click
+      header.addEventListener("click", function() {
+        const isExpanded = content.classList.contains("expanded");
+        const icon = this.querySelector(".toggle-icon");
+        const status = this.querySelector(".code-status");
+        
+        if (isExpanded) {
+          content.classList.remove("expanded");
+          content.classList.add("collapsed");
+          icon.classList.add("rotated");
+          status.classList.remove("visible");
+          status.classList.add("hidden");
+        } else {
+          content.classList.remove("collapsed");
+          content.classList.add("expanded");
+          icon.classList.remove("rotated");
+          status.classList.remove("hidden");
+          status.classList.add("visible");
+        }
+      });
+    });
+  }
+
+  // Función para toggle global
+  function toggleAllCode() {
+    const codeContents = document.querySelectorAll(".code-content");
+    const headers = document.querySelectorAll(".code-header");
+    const globalToggle = document.querySelector(".global-code-toggle");
+    
+    if (allCodeVisible) {
+      // Ocultar todo
+      codeContents.forEach(content => {
+        content.classList.remove("expanded");
+        content.classList.add("collapsed");
+      });
+      headers.forEach(header => {
+        const icon = header.querySelector(".toggle-icon");
+        const status = header.querySelector(".code-status");
+        if (icon) icon.classList.add("rotated");
+        if (status) {
+          status.classList.remove("visible");
+          status.classList.add("hidden");
+        }
+      });
+      if (globalToggle) globalToggle.innerHTML = "🔧 Mostrar Código";
+      allCodeVisible = false;
+    } else {
+      // Mostrar todo
+      codeContents.forEach(content => {
+        content.classList.remove("collapsed");
+        content.classList.add("expanded");
+      });
+      headers.forEach(header => {
+        const icon = header.querySelector(".toggle-icon");
+        const status = header.querySelector(".code-status");
+        if (icon) icon.classList.remove("rotated");
+        if (status) {
+          status.classList.remove("hidden");
+          status.classList.add("visible");
+        }
+      });
+      if (globalToggle) globalToggle.innerHTML = "🔧 Ocultar Código";
+      allCodeVisible = true;
+    }
+  }
+
+  // Inicializar toggles individuales
+  initializeCodeToggles();
+
+  // Crear botón flotante (no interfiere con el TOC)
+  const globalToggle = document.createElement("button");
+  globalToggle.className = "global-code-toggle";
+  globalToggle.innerHTML = "🔧 Ocultar Código";
+  document.body.appendChild(globalToggle);
+  
+  // Evento para el botón global
+  globalToggle.addEventListener("click", toggleAllCode);
+
+  // Funciones globales para uso externo si se necesitan
+  window.toggleAllCode = toggleAllCode;
+  
+  window.expandAllCode = function() {
+    const codeContents = document.querySelectorAll(".code-content");
+    const headers = document.querySelectorAll(".code-header");
+    const globalToggle = document.querySelector(".global-code-toggle");
+    
+    codeContents.forEach(content => {
+      content.classList.remove("collapsed");
+      content.classList.add("expanded");
+    });
+    headers.forEach(header => {
+      const icon = header.querySelector(".toggle-icon");
+      const status = header.querySelector(".code-status");
+      if (icon) icon.classList.remove("rotated");
+      if (status) {
+        status.classList.remove("hidden");
+        status.classList.add("visible");
+      }
+    });
+    if (globalToggle) globalToggle.innerHTML = "🔧 Ocultar Código";
+    allCodeVisible = true;
+  };
+
+  window.collapseAllCode = function() {
+    const codeContents = document.querySelectorAll(".code-content");
+    const headers = document.querySelectorAll(".code-header");
+    const globalToggle = document.querySelector(".global-code-toggle");
+    
+    codeContents.forEach(content => {
+      content.classList.remove("expanded");
+      content.classList.add("collapsed");
+    });
+    headers.forEach(header => {
+      const icon = header.querySelector(".toggle-icon");
+      const status = header.querySelector(".code-status");
+      if (icon) icon.classList.add("rotated");
+      if (status) {
+        status.classList.remove("visible");
+        status.classList.add("hidden");
+      }
+    });
+    if (globalToggle) globalToggle.innerHTML = "🔧 Mostrar Código";
+    allCodeVisible = false;
+  };
+});
+```
+
+::: abstract
+**Resumen** : *Este estudio analiza los determinantes de las ventas en micronegocios de la región Caribe colombiana mediante regresión lineal múltiple. Se utilizaron datos de la Encuesta de Micronegocios (EMICRON) 2022 del DANE, con una muestra de 2.020 observaciones de siete departamentos caribeños.*
+
+*El modelo identifica como variables explicativas significativas los gastos operativos, valor agregado, inversión en activos y arrendamiento, además de efectos diferenciados por departamento. Los resultados muestran que los gastos operativos son el principal determinante de las ventas, seguido por el valor agregado generado.*
+
+*El modelo presenta un poder explicativo robusto y significancia estadística global. Los supuestos de regresión se cumplen de manera aceptable para datos económicos reales, con ligeras desviaciones que no comprometen la validez práctica del análisis.*
+
+*Las predicciones generadas permiten evaluar diferentes escenarios operativos y confirman que la eficiencia en el uso del capital de trabajo es más determinante que la capitalización en activos fijos para el éxito comercial de los micronegocios en la región estudiada.*
+
+:::
+
+# Introducción
+
+::: content-block
+El peso al nacer es uno de los determinantes más importantes del bienestar con el que un ser humano inicia su vida. Es un indicador de morbilidad y mortalidad pediátrica y neonatal, así como un antecedente clave en las diferencias del desarrollo cognitivo y de las enfermedades crónicas en etapas posteriores. Sin embargo, también representa una problemática multifactorial en la que intervienen diversas fallas sociales, como la desigualdad económica, el acceso a la salud, las condiciones de vida y la educación en salud materno-infantil. Todo esto genera brechas en las propiedades intelectuales y materiales durante una etapa tan vital y crítica como el desarrollo óptimo de los nacidos vivos del país, lo que produce impactos en los niveles de natalidad, el desarrollo de niños y adolescentes, y en las madres presentes y futuras.
+
+Un recién nacido con bajo peso y/o desnutrición no solo refleja una falta de responsabilidad materna hacia su hijo, sino también las brechas que impiden que las madres accedan a un seguimiento adecuado y controlado de su embarazo. Esto les dificulta vivir este proceso de manera tranquila y exitosa, y hace que sus hijos no inicien sus primeros momentos de vida de forma satisfactoria.
+
+Como se mencionó anteriormente, el desarrollo prenatal del bebé representa uno de los factores más influyentes desde el punto de vista social, ya que engloba y describe las condiciones del entorno en el que nace el individuo y en el que probablemente transitara las etapas futuras de su desarrollo. Lo anterior se resume en las particularidades del embarazo de las madres de los recién nacidos vivos. Estos aspectos se abordarán en el desarrollo de la presente investigación, puesto que desde el área de la ingeniería es posible realizar una prospectiva de la situación, facilitando la formulación de soluciones desde un enfoque social.
+
+A pesar de que los antecedentes corresponden a una problemática nacional, Bogotá, a pesar de ser la capital del país y contar con un mejor desarrollo regional, no está exenta de ella. Según datos del DANE, el 17% de los casos de desnutrición neonatal del segundo semestre del año 2024 corresponden a esta ciudad.
+
+El presente estudio emplea modelos de clasificación supervisada (regresión logística y KNN) utilizando los datos de nacimientos vivos en Bogotá, con el objetivo de analizar la relación entre la desnutrición neonatal y un conjunto de variables explicativas. Entre estas, se consideran el tiempo de gestación, el tipo de parto, el número de controles prenatales, la edad materna y el número de embarazos previos. La selección de estas variables se fundamenta tanto en la revisión de literatura científica relevante como en las características sociodemográficas y sanitarias propias del contexto bogotano, las cuales han sido identificadas en informes nacionales y estudios previos como factores determinantes en el estado nutricional al nacer.
+:::
+
+# Descripción de la fuente de datos
+
+::: content-block
+**Base de datos:** Encuesta de estadísticas vitales - EEVV - 2024
+
+**Unidad de análisis:** Nacimiento
+
+**Período:** (2024)
+
+**Acceso:** [https://microdatos.dane.gov.co/index.php/catalog/878](https://microdatos.dane.gov.co/index.php/catalog/878/data-dictionary/F46?file_name=BD-EEVV-Nacimientos-2024){.uri}
+
+Los datos utilizados en esta investigación provienen de la Encuesta de Estadísticas Vitales (EEVV) 2024 del Departamento Administrativo Nacional de Estadística (DANE). Esta encuesta administra el registro administrativo de nacimientos en Colombia y recoge información detallada sobre características demográficas, sociales y clínicas relacionadas con el recién nacido y su madre.
+:::
+
+# Metodología
+
+::: content-block
+La metodología de esta investigación se basa en la aplicación de dos modelos de clasificación supervisada, K-Nearest Neighbors (KNN) y Regresión Logística, con el objetivo de identificar y analizar las fallas sociales y estructurales que inciden en la desnutrición neonatal en Bogotá durante el segundo semestre de 2024. Estos modelos permiten determinar la influencia de variables sociales, económicas y de salud en este problema de salud pública, tomando como indicador principal la desnutrición al nacer.
+
+La selección de variables incluye aspectos educativos, económicos y estructurales que reflejan el control social desde la concepción hasta el nacimiento, así como parámetros clínicos relevantes. Esto garantiza un análisis integral de los determinantes del estado nutricional neonatal.
+
+El estudio utiliza una base de datos representativa y actualizada proveniente de la Encuesta de Estadísticas Vitales (EEVV) 2024 del DANE, focalizando su análisis en la población nacida en Bogotá durante ese periodo.
+
+## Procesamiento de datos
+
+Inicialmente, la base de datos contenía 34,424 registros de nacidos vivos. Como primer paso, se realizó una limpieza rigurosa:
+
+-   Se eliminaron observaciones con valores faltantes o inconsistentes en todas las variables clave.
+
+-   Se dividió la base en dos sub-bases: recién nacidos con desnutrición (“Sí”) y sin desnutrición (“No”), con base en la variable dependiente principal.
+
+-   Para evitar sesgo por desbalance de clases, se aplicó un procedimiento de balanceo, lo que permitió construir una muestra final equilibrada de 11,872 observaciones.
+
+## Variables analizadas
+
+El modelo incorpora variables seleccionadas por su relevancia empírica documentada en la literatura científica y en lineamientos oficiales:
+
+-   Tiempo de gestación (en rangos de meses)
+
+-   Tipo de parto (Cesaria, Espontaneo o instrumentado)
+
+-   Número de controles prenatales recibidos durante el embarazo
+
+-   Edad de la madre (en rangos categóricos)
+
+-   Número de embarazos previos
+
+```{r tabla_variables}
+# TABLA DE VARIABLES DEL MODELO
+variables_modelo <- data.frame(
+  Variable = c("Peso", "Tiempo gestación", "Tipo parto", 
+               "Numero control prenatal", "Edad madre", "Numero embarazos"),
+  Descripción = c("Clasificación del peso al nacer (Normal/Delicado)",
+                 "Semanas de gestación", 
+                 "Tipo de parto registrado",
+                 "Número de controles prenatales realizados",
+                 "Grupo etario de la madre",
+                 "Número de embarazos previos"),
+  Tipo_Variable = c("Categórica (binaria)", "Categórica ordinal", 
+                   "Categórica nominal", "Cuantitativa discreta",
+                   "Categórica ordinal", "Cuantitativa discreta"),
+  Notas = c("Variable dependiente - Peso normal: ≥2500g", 
+           "Considerar <37 semanas como prematurez",
+           "Espontáneo/Cesárea/Instrumentado",
+           "Indicador de acceso a salud prenatal",
+           "Recodificado a 9 rangos etarios (Códigos 1 a 9)",
+           "Incluye embarazo actual")
+)
+
+kable(variables_modelo, 
+      caption = "Tabla 1: Variables del Modelo",
+      align = c("l", "l", "l", "l"),
+      col.names = c("Variable", "Descripción", "Tipo de Variable", "Notas")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"),
+                full_width = FALSE,
+                font_size = 12) %>%
+  row_spec(0, background = "#2C3E50", color = "white", bold = TRUE) %>%
+  column_spec(1, bold = TRUE, width = "12em") %>%
+  footnote(general = "Fuente: Elaboración propia en base a la Base de Datos de Nacimientos - 2024",
+           number = c("Datos corresponden al segundo semestre del año 2024"))
+```
+
+
+```{r cargar_datos, include=FALSE}
+# Configuración inicial - manteniendo tu código base
+BD_EEVV <- read_csv("BD-EEVV-Nacimientos-2024.csv") %>%
+  select(COD_DPTO, PESO_NAC, T_GES, TIPO_PARTO, NUMCONSUL, EDAD_MADRE, N_EMB, MES) %>%
+  rename(
+    Departamento = COD_DPTO,
+    Peso_delicado = PESO_NAC,
+    Tiempo_gestación = T_GES,
+    Tipo_parto = TIPO_PARTO,
+    Numero_control_prenatal = NUMCONSUL,
+    Edad_madre = EDAD_MADRE,
+    Numero_embarazos = N_EMB,
+    Mes = MES
+  ) %>%
+  mutate(
+    Numero_control_prenatal = as.numeric(Numero_control_prenatal),
+    Numero_embarazos = as.numeric(Numero_embarazos),
+    Tiempo_gestación = factor(Tiempo_gestación,
+                              levels = c(1, 2, 3, 4, 5),
+                              labels = c("22 o menos semanas", "22-27 semanas", "28-37 semanas",
+                                         "38-41 semanas", "42 o más semanas"))
+  ) %>%
+  mutate(
+    Peso_delicado = ifelse(Peso_delicado %in% c(5, 6, 7, 8, 9), "No", "Si"),
+    Peso_delicado = factor(Peso_delicado, levels = c("Si", "No"))
+  ) %>%
+  mutate(Mes = as.numeric(Mes)) %>%
+  filter(Mes %in% c(7, 8, 9, 10, 11, 12)) %>%
+  filter(Departamento == 11) %>%
+  mutate(Departamento = "Bogotá") %>%
+  na.omit()
+```
+
+```{r balanceo_datos, include=FALSE}
+# Balanceo
+set.seed(5)
+Si <- BD_EEVV %>% filter(Peso_delicado == "Si")
+No <- BD_EEVV %>% filter(Peso_delicado == "No") %>% sample_n(6000)
+
+# Base final
+Base_datos <- bind_rows(Si, No) %>%
+  select(Tiempo_gestación, Tipo_parto, Numero_control_prenatal,
+         Edad_madre, Numero_embarazos, Peso_delicado) %>%
+  mutate(
+    Tipo_parto = case_when(
+      Tipo_parto == 1 ~ "Espontaneo",
+      Tipo_parto == 2 ~ "Cesarea",
+      Tipo_parto == 3 ~ "Instrumentado"
+    ),
+    Edad_madre = case_when(
+      Edad_madre == 1 ~ "10-14 años",
+      Edad_madre == 2 ~ "15-19 años",
+      Edad_madre == 3 ~ "20-24 años",
+      Edad_madre == 4 ~ "25-29 años",
+      Edad_madre == 5 ~ "30-34 años",
+      Edad_madre == 6 ~ "35-39 años",
+      Edad_madre == 7 ~ "40-44 años",
+      Edad_madre == 8 ~ "45-49 años",
+      Edad_madre == 9 ~ "50-54 años"
+    ),
+    Tipo_parto = as.factor(Tipo_parto),
+    Edad_madre = as.factor(Edad_madre)
+  ) %>%
+  filter(complete.cases(.))
+```
+
+Estas variables reflejan tanto el entorno social y estructural como el acceso a servicios de salud y el historial reproductivo, permitiendo un análisis integral de los riesgos de desnutrición neonatal.
+
+## Justificación de la selección de variables dependiente e independientes
+
+La variable dependiente seleccionada es el estado nutricional del recién nacido al momento del nacimiento, el cual se clasifica en dos categorías: “Sí” (el bebé presenta desnutrición al nacer) y “No” (el bebé no presenta desnutrición al nacer). Esta variable permite identificar los factores asociados a la desnutrición neonatal, la cual está asociada a mayores riesgos de morbilidad y mortalidad infantil, y es reconocida como un indicador crítico por la Organización Mundial de la Salud (OMS, 2017; DANE, 2024). La desnutrición al nacer refleja desigualdades en acceso a servicios de salud prenatal, nutrición materna, condiciones sociales y características biológicas de la gestación, y es además un predictor del desarrollo físico y cognitivo del niño (OMS, 2017; DANE, 2024).
+
+Entre las variables independientes, se escogieron aquellas que, según reportes oficiales y estudios previos, tienen una relación directa con el peso al nacer.
+
+-   **Tiempo de gestación (semanas) :** Es fundamental ya que la prematurez está asociada con un peso menor al esperado. Nacimientos antes de las 37 semanas suelen presentar bajo peso debido a la inmadurez fetal (DANE, 2024). Estudios confirman que el tiempo de gestación es el principal determinante biológico del peso neonatal (Wu et al., 2022; Kramer, 1987).
+
+-   **El tipo de parto (espontáneo, cesárea o instrumentado)** indica las características médicas de la gestación y el nacimiento. Partos por cesárea e instrumentados están frecuentemente relacionados con complicaciones que pueden influir en el peso del recién nacido (DANE, 2024).
+
+-   **La cantidad de consultas prenatales:**  constituye un indicador fundamental de acceso y calidad en la atención materna. Estudios del Instituto Nacional de Salud (2020) muestran mayor riesgo de bajo peso en madres con menos de cuatro controles, lo que evidencia la importancia del diagnóstico temprano de complicaciones, suplementación nutricional y seguimiento del desarrollo fetal.
+
+<!-- -->
+
+-   **La edad de la madre (años)**: Se considera porque las madres adolescentes y las de mayor edad tienen tasas más elevadas de bajo peso al nacer, conforme a las estadísticas en Colombia (Instituto Nacional de Salud, 2020). Estas poblaciones pueden presentar mayores riesgos biológicos y sociales asociados.
+
+<!-- -->
+
+-   **Número de embarazos previos:** Influye en la capacidad reproductiva y salud materna. El historial de embarazos múltiples puede afectar la nutrición y el ambiente uterino, lo cual impacta el peso del recién nacido
+
+Estas variables fueron elegidas considerando evidencia empírica documentada, garantizando una base sólida para un modelo predictivo que permita comprender y analizar factores asociados al peso al nacer en Bogotá, con miras a fortalecer políticas públicas de salud materno-infantil y mejorar indicadores en Colombia.
+
+## Descripción del modelo de regresión lineal múltiple
+
+Los datos empleados se obtuvieron de la página de microdatos y metadatos del DANE, utilizando la Encuesta Vital correspondiente al año 2024 de la sección de nacimientos. Se realizó una serie de modificaciones para lograr una mejor proporción y comprensión de los datos: la base fue filtrada no solo por la selección de variables, sino también por la distribución de frecuencias del umbral empleado (bajo peso al nacer), focalizando así la información correspondiente a los nacimientos en la ciudad de Bogotá durante el segundo semestre del año en que se realizó la encuesta.
+
+El motivo de la filtración exhaustiva fue lograr una mayor homogeneidad en los datos, fundamental para sustentar la hipótesis principal: respaldar, a través de la evidencia, los determinantes sociales que inciden en los índices de desnutrición en el territorio. Dada la magnitud y extensión de la base de datos original, se tomó la decisión de acotarla para obtener resultados esperados aplicando dos tipos de modelos de aprendizaje supervisados, cuyo objetivo es clasificar de manera binaria una serie de características de la población.
+
+Los modelos corresponden a:
+
+1.  **K- nearest neighbors.**
+
+Este modelo busca clasificar en dos sentencias  una serie de predicciones basadas en características que tienen las dos sentencias, es decir, clasificar mediante predicciones de las características en las sentencias que tienen caracteristicas cercanas, de ahí su nombre. "k" representa la cantidad de vecinos más cercanos considerados en el problema de clasificación o regresión, y "NN" se refiere a los vecinos más cercanos a la cantidad elegida para k. 
+
+En el problema con el que se está trabajando las caracteristicas que se tienen son las variables independientes y las sentencias son la variable dependiente que solo puede clasificar en dos opciones debido a la dicotomía de la variable. El umbral empleado tiene como palabras de clasificación si o no (si tiene bajo peso, no tiene bajo peso (peso moderado)).
+
+Con este modelo se busca indagar, la veracidad de las variables independientes como sintomas en una sentencia, es decir, si las variables seleccionadas abarcan las caracteristicas suficientes para dictaminar una sentencia congruente.
+
+2.  **Regresión logistica.**
+
+La regresion logistica es un modelo de predicción que a diferencia de un modelo de regresión lineal, que busca predecir la influencia de multiples variables independientes sobre una variable dependiente numerica, este por el contrario busca predecir la probabilidad de clasificar una serie de variables independientes sobre una variable dependiente binaria que encasilla 2 sentencias, basadas en el aprendizaje de un modelo en el cual se tiene conocimiento de los resultados.
+
+Teniendo en consideración, la problematica que se está modelando, los objetivos que se estiman es tener una probabilidad de clasificación que sea consecuente con el modelo anterior, con el fin de formular conclusiones veridicas y posteriormente soluciones a la problemática.
+
+## Base de datos del estudio
+
+Para este trabajo se emplea la base de datos de la Encuesta de Estadísticas Vitales (EEVV) 2024 del DANE, filtrada específicamente para el periodo del segundo semestre en la ciudad de Bogotá. El conjunto de datos fue depurado rigurosamente para incluir únicamente las observaciones completas y las variables relevantes para los modelos de clasificación KNN y Regresión Logística, asegurando así la calidad y pertinencia de la muestra seleccionada para el análisis.
+
+```{r tabla_interactiva,}
+# TABLA INTERACTIVA FINAL
+library(htmltools)
+reactable(
+  Base_datos,
+  defaultPageSize = 15,
+  showPageSizeOptions = TRUE,
+  pageSizeOptions = c(10, 15, 25, 50, 100),
+  filterable = TRUE,
+  searchable = TRUE,
+  sortable = TRUE,
+  resizable = TRUE,
+  striped = TRUE,
+  highlight = TRUE,
+  bordered = FALSE,
+  wrap = FALSE,
+  showSortable = TRUE,
+  defaultColDef = colDef(
+    header = function(value) {
+      name <- gsub("_", " ", value)
+      name <- gsub("([a-z])([A-Z])", "\\1 \\2", name)
+      tools::toTitleCase(tolower(name))
+    },
+    cell = function(value) {
+      if (is.numeric(value)) {
+        if (value == round(value)) {
+          format(value, big.mark = ",", scientific = FALSE)
+        } else {
+          format(round(value, 2), nsmall = 2, big.mark = ",", scientific = FALSE)
+        }
+      } else {
+        as.character(value)
+      }
+    },
+    align = "center",
+    minWidth = 100,
+    headerStyle = list(
+      background = "#2C3E50",
+      color = "white",
+      fontWeight = "600",
+      borderBottom = "2px solid #dee2e6",
+      fontSize = "13px"
+    ),
+    style = list(
+      fontSize = "12px",
+      fontFamily = "Arial, sans-serif"
+    )
+  ),
+  style = list(
+    fontFamily = "Arial, sans-serif",
+    fontSize = "13px"
+  ),
+  theme = reactableTheme(
+    stripedColor = "#f8f9fa",
+    highlightColor = "#e9ecef",
+    cellPadding = "8px 12px",
+    backgroundColor = "#ffffff",
+    borderColor = "#dee2e6",
+    style = list(
+      fontFamily = "Arial, -apple-system, BlinkMacSystemFont, sans-serif"
+    ),
+    searchInputStyle = list(
+      width = "100%",
+      padding = "8px 12px",
+      border = "1px solid #ced4da",
+      borderRadius = "4px",
+      fontSize = "14px",
+      marginBottom = "10px"
+    ),
+    headerStyle = list(
+      borderBottom = "2px solid #495057",
+      fontSize = "14px",
+      backgroundColor = "#2C3E50",
+      color = "white"
+    )
+  ),
+  columns = list(
+    Tiempo_gestación = colDef(
+      name = "Tiempo Gestación",
+      minWidth = 180,
+      filterable = TRUE,
+      align = "left"
+    ),
+    Edad_madre = colDef(
+      name = "Edad Madre", 
+      minWidth = 120,
+      filterable = TRUE
+    ),
+    Peso_delicado = colDef(
+      name = "Peso Delicado",
+      style = function(value) {
+        color <- ifelse(value == "Si", "#E74C3C", "#27AE60")
+        list(fontWeight = "bold", color = color)
+      }
+      
+    )
+  )
+)
+
+```
+:::
+
+# Estadisticas Descriptivas
+
+:::: content-block
+A continuación se presentan las estadísticas descriptivas, que resumen las características principales de la muestra estudiada. Este análisis preliminar permite conocer la distribución, tendencia central y dispersión de las variables clave, facilitando la comprensión del contexto y estableciendo la base para análisis posteriores.
+
+Las estadísticas descriptivas son fundamentales para identificar patrones y diferencias entre grupos, que apoyan la validación de los modelos predictivos empleados en el estudio.
+
+## Estadísticas descriptivas de las variables seleccionadas
+
+::: content-block
+### **Analisis de la Variable Dependiente: Desnutrición Neonatal**
+
+Los resultados obtenidos a partir del análisis descriptivo del peso de los nacimientos en Bogotá durante el segundo semestre de 2024 se resumen en la Tabla 1. Estos resultados permiten identificar diferencias clave entre los grupos de recién nacidos con peso delicado  “Si” y “No”.  Ambas categorías están equilibradas, lo que permite un análisis comparativo robusto. 
+
+```{r tabla1_1_tamano_muestral}
+# TABLA 1.1: TAMAÑO MUESTRAL POR GRUPO DE PESO
+tabla_1_1 <- Base_datos %>%
+  group_by(Peso_delicado) %>%
+  summarise(
+    n = n(),
+    Porcentaje = round(100 * n() / nrow(Base_datos), 1)
+  )
+
+kable(tabla_1_1, 
+      align = c("l", "r", "r"),
+      format.args = list(big.mark = ",", decimal.mark = "."),
+      col.names = c("Peso Delicado", "N", "%"),
+      caption = "TABLA 1.1. TAMAÑO MUESTRAL POR GRUPO DE PESO AL NACER") %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover"),
+    full_width = FALSE,
+    font_size = 12,
+    position = "center"
+  ) %>%
+  add_header_above(c(" " = 1, "Tamaño Muestral" = 2),
+                   background = "#2C3E50", color = "white") %>%
+  row_spec(0, background = "#34495E", color = "white", bold = TRUE) %>%
+  column_spec(1, bold = TRUE, width = "12em") %>%
+  column_spec(2:3, background = "#F4F6F6") %>%
+  footnote(
+    general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024.",
+    number = c("Datos corresponden a nacimientos en Bogotá (julio-diciembre 2024)")
+  )
+```
+
+La tabla muestra que el grupo de recién nacidos con desnutrición neonatal (“Sí”) representa el 49.5% de la muestra, mientras que el grupo “No” alcanza el 50.5%. Esto indica una distribución muy equilibrada entre ambos grupos lo que permite llevar a cabo análisis comparativos robustos y sin sesgos por desproporción entre categorías.
+
+Además, se realizó un análisis descriptivo de la variable dependiente en relación con las dos variables independientes cuantitativas del estudio, para identificar diferencias y tendencias principales entre los grupos.
+
+**Analisis del grupo de peso en relacion con los controles prenatales**
+
+```{r tabla1_2_controles_prenatales}
+# TABLA 1.2: CONTROLES PRENATALES POR GRUPO DE PESO
+tabla_1_2 <- Base_datos %>%
+  group_by(Peso_delicado) %>%
+  summarise(
+    Media = round(mean(Numero_control_prenatal, na.rm = TRUE), 1),
+    DE = round(sd(Numero_control_prenatal, na.rm = TRUE), 1),
+    Min = min(Numero_control_prenatal, na.rm = TRUE),
+    Max = max(Numero_control_prenatal, na.rm = TRUE)
+  )
+
+kable(tabla_1_2, 
+      align = c("l", "r", "r", "r", "r"),
+      format.args = list(big.mark = ",", decimal.mark = "."),
+      col.names = c("Peso Delicado", "Media", "DE", "Mín", "Máx"),
+      caption = "TABLA 1.2. CONTROLES PRENATALES POR GRUPO DE PESO AL NACER") %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover"),
+    full_width = FALSE,
+    font_size = 12,
+    position = "center"
+  ) %>%
+  add_header_above(c(" " = 1, "Controles Prenatales" = 4),
+                   background = "#2C3E50", color = "white") %>%
+  row_spec(0, background = "#34495E", color = "white", bold = TRUE) %>%
+  column_spec(1, bold = TRUE, width = "12em") %>%
+  column_spec(2:5, background = "#E8F8F5") %>%
+  footnote(
+    general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024.",
+    number = c("Datos corresponden a nacimientos en Bogotá (julio-diciembre 2024)")
+  )
+```
+
+El grupo de nacidos desnutridos registra un promedio de 6.6 controles, por debajo de los 7.2 en el grupo de los que no. Esto respalda estudios que señalan menor acceso a controles prenatales como factor de riesgo de bajo peso al nacer
+
+**Analisis del grupo de peso en relacion con el numero de embarazos**
+
+```{r tabla1_3_numero_embarazos}
+# TABLA 1.3: NÚMERO DE EMBARAZOS POR GRUPO DE PESO
+tabla_1_3 <- Base_datos %>%
+  group_by(Peso_delicado) %>%
+  summarise(
+    Media = round(mean(Numero_embarazos, na.rm = TRUE), 1),
+    DE = round(sd(Numero_embarazos, na.rm = TRUE), 1),
+    Min = min(Numero_embarazos, na.rm = TRUE),
+    Max = max(Numero_embarazos, na.rm = TRUE)
+  )
+
+kable(tabla_1_3, 
+      align = c("l", "r", "r", "r", "r"),
+      format.args = list(big.mark = ",", decimal.mark = "."),
+      col.names = c("Peso Delicado", "Media", "DE", "Mín", "Máx"),
+      caption = "TABLA 1.3. NÚMERO DE EMBARAZOS POR GRUPO DE PESO AL NACER") %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover"),
+    full_width = FALSE,
+    font_size = 12,
+    position = "center"
+  ) %>%
+  add_header_above(c(" " = 1, "Número de Embarazos" = 4),
+                   background = "#2C3E50", color = "white") %>%
+  row_spec(0, background = "#34495E", color = "white", bold = TRUE) %>%
+  column_spec(1, bold = TRUE, width = "12em") %>%
+  column_spec(2:5, background = "#FEF5E7") %>%
+  footnote(
+    general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024.",
+    number = c("Datos corresponden a nacimientos en Bogotá (julio-diciembre 2024)")
+  )
+```
+
+Ambos grupos presentan el mismo promedio de 1.9 embarazos previos, sugiriendo que en esta muestra particular este factor no distingue entre los dos grupos.
+
+### **Analisis de la Variable Independiente:** Tiempo De Gestación
+
+La distribución del tiempo de gestacion en la muestra se presenta en la Tabla \_\_\_. 
+
+```{r tabla2_tiempo_gestacion}
+# TABLA 2: DISTRIBUCIÓN DEL TIEMPO DE GESTACIÓN
+tabla_tiempo_gestacion <- Base_datos %>%
+  count(Tiempo_gestación) %>%
+  mutate(
+    Porcentaje = round(100 * n / sum(n), 1),
+    Porcentaje_Acumulado = cumsum(Porcentaje)
+  )
+
+kable(tabla_tiempo_gestacion, 
+      align = c("l", "c", "r", "r"),
+      col.names = c("Tiempo de Gestación", "Frecuencia", "Porcentaje (%)", "Porcentaje Acumulado (%)"),
+      caption = "TABLA 2. DISTRIBUCIÓN DEL TIEMPO DE GESTACIÓN") %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width = FALSE,
+    font_size = 12
+  ) %>%
+  add_header_above(c(" " = 1, "Distribución de Frecuencias" = 3),
+                   background = "#2C3E50", color = "white") %>%
+  row_spec(0, background = "#34495E", color = "white", bold = TRUE) %>%
+  column_spec(1, bold = TRUE, width = "20em") %>%
+  column_spec(2:4, background = "#F4F6F6") %>%
+  footnote(
+    general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024."
+  )
+```
+
+La tabla muestra la distribución del tiempo de gestación en la muestra analizada. La mayoría de los nacimientos se concentra entre 28 y 37 semanas (53.2%), seguidos de los partos entre 38 y 41 semanas (45.5%). Los nacimientos antes de las 28 semanas representan solo el 1.3%, mientras que los partos de 42 o más semanas son extremadamente infrecuentes (1 caso). Esto indica que la mayor parte de los nacimientos ocurre dentro de rangos aceptados como "a término" o moderadamente prematuros, con muy pocos casos en los extremos.
+
+Para analizar cómo el tiempo de gestación se relaciona con la variable dependiente de desnutrición neonatal, se utiliza un gráfico de barras apiladas. Este tipo de visualización permite observar de forma clara la distribución y el comportamiento de ambos grupos, facilitando la identificación de patrones y posibles asociaciones relevantes para el estudio.
+
+```{r grafico2_tiempo_vs_peso, fig.width=8, fig.height=5}
+# GRÁFICO 2: RELACIÓN TIEMPO DE GESTACIÓN VS PESO DELICADO (BARRAS APILADAS)
+tabla_tiempo_peso <- Base_datos %>%
+  count(Tiempo_gestación, Peso_delicado)
+
+plot_ly(
+  tabla_tiempo_peso,
+  x = ~Tiempo_gestación,
+  y = ~n,
+  color = ~Peso_delicado,
+  colors = c('#27AE60', '#E74C3C'),  # Verde para No, Rojo para Si
+  type = 'bar',
+  text = ~n,
+  textposition = 'inside',
+  hovertemplate = paste(
+    '<b>%{x}</b><br>',
+    'Peso Delicado: %{fullData.name}<br>',
+    'Frecuencia: %{y}<br>',
+    '<extra></extra>'
+  )
+) %>%
+  plotly::layout(
+    barmode = 'stack',
+    title = list(
+      text = "<b>Gráfico 2. Tiempo de Gestación según Peso Delicado</b><br><sub>Bogotá - Segundo Semestre 2024</sub>",
+      x = 0.5,
+      font = list(size = 16)
+    ),
+    xaxis = list(
+      title = "<b>Tiempo de Gestación</b>",
+      tickfont = list(size = 10)
+    ),
+    yaxis = list(
+      title = "<b>Frecuencia</b>"
+    ),
+    legend = list(
+      title = list(text = "<b>Peso Delicado</b>"),
+      orientation = "v",
+      x = 1.02,
+      y = 1
+    ),
+    annotations = list(
+      list(
+        text = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024",
+        xref = "paper",
+        yref = "paper",
+        x = 0.5,
+        y = -0.25,
+        showarrow = FALSE,
+        font = list(size = 10, color = "#666666"),
+        xanchor = "center"
+      )
+    ),
+    margin = list(b = 150)
+  )
+```
+
+El gráfico muestra la relación entre el tiempo de gestación y la presencia de desnutrición neonatal (“Peso Delicado”) en Bogotá durante el segundo semestre de 2024. Se observa que en el grupo de 28-37 semanas, la mayoría de los recién nacidos no presenta desnutrición, mientras que en el grupo de 38-41 semanas predomina la desnutrición neonatal (“Sí”). Los nacimientos en los extremos (22-27 semanas y 42 o más semanas) son muy poco frecuentes y aportan poco al total.
+
+### **Análisis de la Variable Independiente:** Tipo De Parto
+
+Los resultados del análisis descriptivo del tipo de parto, que incluye las categorías cesárea, espontáneo e instrumentado, se resumen en la Tabla \_\_\_.
+
+```{r tabla3_tipo_parto}
+# TABLA 3: DISTRIBUCIÓN DEL TIPO DE PARTO
+tabla_tipo_parto <- Base_datos %>%
+  count(Tipo_parto) %>%
+  mutate(
+    Porcentaje = round(100 * n / sum(n), 1),
+    Porcentaje_Acumulado = cumsum(Porcentaje)
+  )
+
+kable(tabla_tipo_parto, 
+      align = c("l", "c", "r", "r"),
+      col.names = c("Tipo de Parto", "Frecuencia", "Porcentaje (%)", "Porcentaje Acumulado (%)"),
+      caption = "TABLA 3. DISTRIBUCIÓN DEL TIPO DE PARTO") %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width = FALSE,
+    font_size = 12
+  ) %>%
+  add_header_above(c(" " = 1, "Distribución de Frecuencias" = 3),
+                   background = "#2C3E50", color = "white") %>%
+  row_spec(0, background = "#34495E", color = "white", bold = TRUE) %>%
+  column_spec(1, bold = TRUE, width = "15em") %>%
+  column_spec(2:4, background = "#F4F6F6") %>%
+  row_spec(1:nrow(tabla_tipo_parto), background = c("#FBFCFC", "#F4F6F6")) %>%
+  footnote(
+    general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024."
+  )
+```
+
+La variable “tipo de parto” muestra una distribución claramente dominada por las cesáreas, que representan el 59.3% de los nacimientos en la muestra analizada. Este resultado refleja una tendencia creciente hacia la utilización de este procedimiento en Bogotá, en línea con los reportes recientes de la Secretaría Distrital de Salud, donde también se observa un aumento sostenido en la proporción de partos por cesárea en los últimos años.​
+
+En segundo lugar, el parto espontáneo o vaginal sin intervención constituye el 38.8% de los nacimientos, mientras que el parto instrumentado (con el uso de herramientas como fórceps o ventosas) representa solo el 1.9% del total. Este último dato evidencia que la aplicación de métodos instrumentados es poco frecuente en la cohorte estudiada.
+
+ahora, para ver la relacion de esta variable con la variable dependiente estudiada se realiza un gráfico de anillos el cual permite visualizar de manera clara cómo se distribuyen los tipos de parto (cesárea y espontáneo) y su relación con el estado nutricional neonatal (“Sí” o “No”). Esto ayuda a identificar si existe una diferencia relevante en la prevalencia de desnutrición neonatal según el tipo de parto, facilitando la interpretación y el análisis de posibles asociaciones entre esas variables.
+
+```{r grafica3s}
+# GRÁFICO 3: DISTRIBUCIÓN DEL TIPO DE PARTO (SUNBURST)
+tabla_parto_sunburst <- Base_datos %>%
+  count(Tipo_parto, Peso_delicado) %>%
+  mutate(
+    # Crear jerarquía: Total -> Tipo_parto -> Peso_delicado
+    labels = case_when(
+      !is.na(Peso_delicado) ~ paste(Tipo_parto, "-", Peso_delicado),
+      TRUE ~ Tipo_parto
+    ),
+    parents = case_when(
+      !is.na(Peso_delicado) ~ Tipo_parto,
+      TRUE ~ "Total"
+    )
+  )
+
+# Agregar el nodo raíz "Total"
+nodo_total <- tibble(
+  labels = "Total",
+  parents = "",
+  n = sum(tabla_parto_sunburst$n)
+)
+
+# Agregar nodos intermedios (Tipo_parto)
+nodos_tipo_parto <- Base_datos %>%
+  count(Tipo_parto) %>%
+  mutate(
+    labels = Tipo_parto,
+    parents = "Total"
+  ) %>%
+  select(labels, parents, n)
+
+# Combinar todos los datos
+datos_sunburst <- bind_rows(
+  nodo_total,
+  nodos_tipo_parto,
+  tabla_parto_sunburst %>% select(labels, parents, n)
+)
+
+# Crear el gráfico sunburst
+plot_ly(
+  datos_sunburst,
+  labels = ~labels,
+  parents = ~parents,
+  values = ~n,
+  type = 'sunburst',
+  branchvalues = 'total',
+  marker = list(
+    colors = c('#9B59B6', '#1ABC9C', '#F39C12', '#E74C3C', '#3498DB', '#F1C40F'),
+    line = list(color = '#FFFFFF', width = 2)
+  ),
+  hovertemplate = paste(
+    '<b>%{label}</b><br>',
+    'Frecuencia: %{value}<br>',
+    'Porcentaje: %{percentParent}<br>',
+    '<extra></extra>'
+  )
+) %>%
+  layout(
+    title = list(
+      text = "<b>Gráfico 3. Distribución del Tipo de Parto</b><br><sub>Bogotá - Segundo Semestre 2024</sub>",
+      x = 0.5,
+      font = list(size = 16)
+    ),
+    annotations = list(
+      list(
+        text = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024",
+        xref = "paper",
+        yref = "paper",
+        x = 0.5,
+        y = -0.1,
+        showarrow = FALSE,
+        font = list(size = 10, color = "#666666"),
+        xanchor = "center"
+      )
+    ),
+    margin = list(b = 100, t = 100)
+  )
+
+```
+
+La grafica evidencia diferencias importantes en la distribución del bajo peso según el tipo de parto. En el grupo de partos por cesárea, el 57.3% correspondió a recién nacidos con desnutrición, mientras que el 42.3% fue un peso moderado. Esto indica que, dentro de quienes nacen por cesárea, existe una mayor proporción de bajo peso, lo que puede vincularse tanto a indicaciones clínicas asociadas a embarazos de mayor complejidad como a prácticas hospitalarias reportadas para la ciudad.​
+
+Al analizar el parto espontáneo, la tendencia se invierte: el 61.5% de los nacidos por este medio fueron clasificados como recién nacidos sin desnutrición  y el 38.5% como recién nacidos con desnutrición. Esto sugiere que el parto espontáneo suele asociarse a mejores condiciones neonatales y puede reflejar embarazos de curso más favorable.
+
+### **Análisis de la Variable Independiente:** Edad De La madre 
+
+La distribución de la edad materna en la muestra se presenta en la Tabla 4. Esta tabla resume la frecuencia y el porcentaje de nacimientos según los distintos grupos de edad de la madre, permitiendo identificar los rangos predominantes en la población de estudio.
+
+```{r tabla4_edad_madre}
+# TABLA 4: DISTRIBUCIÓN POR GRUPOS DE EDAD DE LA MADRE
+tabla_edad_madre <- Base_datos %>%
+  count(Edad_madre) %>%
+  mutate(
+    Porcentaje = round(100 * n / sum(n), 1)
+  ) %>%
+  # Extraer el número inicial del rango de edad para ordenar correctamente
+  mutate(
+    Edad_inicial = as.numeric(gsub("(\\d+)-.*", "\\1", Edad_madre))
+  ) %>%
+  arrange(Edad_inicial) %>%  # Ordenar por edad de menor a mayor
+  mutate(
+    Porcentaje_Acumulado = cumsum(Porcentaje)  # Recalcular después de ordenar
+  ) %>%
+  select(-Edad_inicial)  # Eliminar columna auxiliar
+
+kable(tabla_edad_madre, 
+      align = c("l", "c", "r", "r"),
+      col.names = c("Grupo de Edad", "Frecuencia", "Porcentaje (%)", "Porcentaje Acumulado (%)"),
+      caption = "TABLA 4. DISTRIBUCIÓN POR GRUPOS DE EDAD DE LA MADRE") %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width = FALSE,
+    font_size = 12
+  ) %>%
+  add_header_above(c(" " = 1, "Distribución de Frecuencias" = 3),
+                   background = "#2C3E50", color = "white") %>%
+  row_spec(0, background = "#34495E", color = "white", bold = TRUE) %>%
+  column_spec(1, bold = TRUE, width = "12em") %>%
+  column_spec(2:4, background = "#F4F6F6") %>%
+  row_spec(1:nrow(tabla_edad_madre), 
+           background = rep(c("#FBFCFC", "#F4F6F6"), length.out = nrow(tabla_edad_madre))) %>%
+  footnote(
+    general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024."
+  )
+```
+
+La mayor proporción de nacimientos se concentra en los grupos de madres de 20 a 24 años (22.2%), 25 a 29 años (28.3%) y 30 a 34 años (23.9%), acumulando entre estos tres grupos el 74.4% del total. Esto indica que la mayoría de los nacimientos en Bogotá durante el periodo analizado corresponden a mujeres en edades reproductivas consideradas óptimas según literatura biomédica y cifras nacionales (DANE, 2024).​
+
+Los extremos presentan frecuencias mucho menores: sólo el 0.3% de los partos ocurrió en madres adolescentes entre 10 y 14 años lo cual aunque sea poco es una cifra muy deprimente dado el contexto, y el porcentaje tan bajo con solo 2 casos en el grupo de 50 a 54 años, lo que sugiere que la maternidad extremadamente temprana y avanzada son eventos muy poco comunes en la muestra. El grupo de 15 a 19 años, aunque representa minoría, suma el 8%, indicando la presencia significativa de embarazos adolescentes, un tema relevante para políticas de salud pública.
+
+Las madres de 35 a 39 años representan un 13.5% y de 40 a 44 años un 3.5%, reflejando una transición reproductiva progresiva hacia edades mayores, pero sin constituir un grupo dominante. Los grupos de 45 a 49 y de 50 a 54 años son prácticamente residuales en la distribución observada.
+
+También se llevó a cabo un gráfico de barras agrupadas lo cual permite comparar la frecuencia de recién nacidos con y sin peso delicado en cada grupo de edad materna facilitando la identificación de grupos de edad donde la prevalencia es mayor o donde la distribución es equilibrada.
+
+```{r grafico4_edad_madre_grouped, fig.width=8, fig.height=4.6}
+# GRÁFICO 4:EDAD MADRE BARRAS AGRUPADAS
+#Preparar datos para barras agrupadas
+
+tabla_edad_peso <- Base_datos %>%
+  count(Edad_madre, Peso_delicado) %>%
+  group_by(Edad_madre) %>%
+  mutate(
+    Total = sum(n),
+    Porcentaje = round(100 * n / Total, 1)
+  ) %>%
+  ungroup()
+
+# Crear gráfico de barras agrupadas
+plot_ly(
+  tabla_edad_peso,
+  x = ~Edad_madre,
+  y = ~n,
+  color = ~Peso_delicado,
+  colors = c('#27AE60', '#E74C3C'),
+  type = 'bar',
+  text = ~paste0(n, " (", Porcentaje, "%)"),
+  textposition = 'outside',
+  textfont = list(size = 10),
+  hovertemplate = paste(
+    '<b>Edad: %{x}</b><br>',
+    'Peso Delicado: %{fullData.name}<br>',
+    'Frecuencia: %{y}<br>',
+    'Porcentaje: %{text}<br>',
+    '<extra></extra>'
+  )
+) %>%
+  plotly::layout(
+    barmode = 'group',
+    title = list(
+      text = "<b>Gráfico 4. Distribución de Peso Delicado según Edad Materna</b><br><sub>Bogotá - Segundo Semestre 2024</sub>",
+      x = 0.5,
+      font = list(size = 16)
+    ),
+    xaxis = list(
+      title = "<b>Edad de la Madre</b>",
+      tickfont = list(size = 10),
+      tickangle = -45
+    ),
+    yaxis = list(
+      title = "<b>Frecuencia</b>"
+    ),
+    legend = list(
+      title = list(text = "<b>Peso Delicado</b>"),
+      orientation = "h",
+      x = 0.5,
+      xanchor = "center",
+      y = -0.25
+    ),
+    annotations = list(
+      list(
+        text = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024",
+        xref = "paper",
+        yref = "paper",
+        x = 0.5,
+        y = -0.35,
+        showarrow = FALSE,
+        font = list(size = 10, color = "#666666"),
+        xanchor = "center"
+      )
+    ),
+    margin = list(b = 150, l = 80, r = 50, t = 100)
+  )
+```
+
+Se observa que el mayor volumen de casos se concentra en los grupos de edad de 20 a 34 años, lo que corresponde a los rangos reproductivos más frecuentes en la población.
+
+Tanto la presencia como la ausencia de peso delicado mantienen proporciones similares en cada grupo de edad, aunque algunos grupos presentan pequeñas diferencias. Por ejemplo, en madres de 25-29 años y 30-34 años, los porcentajes de peso delicado “Sí” y “No” son casi equivalentes, mientras que en los extremos de edad la cantidad de casos es mucho menor y las proporciones varían más con un porcentaje de 59.5 de niños con desnutrición en madres mayores de 45 . Destaca que el grupo de 25-29 años posee el mayor número absoluto de recién nacidos tanto con como sin peso delicado, y las diferencias porcentuales entre estados nutricionales en la mayoría de los grupos no son dramáticas.
+
+```{r tabla5_controles_prenatales}
+# TABLA 5: ESTADÍSTICAS DE CONTROLES PRENATALES
+tabla_controles <- Base_datos %>%
+  summarise(
+    Variable = "Controles Prenatales",
+    Media = round(mean(Numero_control_prenatal, na.rm = TRUE), 1),
+    DE = round(sd(Numero_control_prenatal, na.rm = TRUE), 1),
+    Mínimo = min(Numero_control_prenatal, na.rm = TRUE),
+    Máximo = max(Numero_control_prenatal, na.rm = TRUE),
+    Q1 = quantile(Numero_control_prenatal, 0.25, na.rm = TRUE),
+    Mediana = median(Numero_control_prenatal, na.rm = TRUE),
+    Q3 = quantile(Numero_control_prenatal, 0.75, na.rm = TRUE)
+  )
+
+kable(tabla_controles,
+      caption = "TABLA 5. ESTADÍSTICAS DESCRIPTIVAS - CONTROLES PRENATALES",
+      align = c("l", "r", "r", "r", "r", "r", "r", "r")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"),
+                full_width = FALSE,
+                font_size = 12) %>%
+  add_header_above(c(" " = 1, "Medidas de Tendencia Central" = 3, 
+                     "Medidas de Dispersión" = 4),
+                   background = "#2C3E50", color = "white") %>%
+  row_spec(0, background = "#34495E", color = "white", bold = TRUE) %>%
+  column_spec(1, bold = TRUE, width = "12em") %>%
+  footnote(general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024.")
+```
+
+```{r grafico5_controles_prenatales, fig.width=8, fig.height=4.6}
+# GRÁFICO 5 INTERACTIVO: DISTRIBUCIÓN DE CONTROLES PRENATALES CON ZONAS DE RIESGO
+library(plotly)
+library(dplyr)
+
+# Calcular estadísticas
+stats_controles <- Base_datos %>%
+  summarise(
+    Media = round(mean(Numero_control_prenatal, na.rm = TRUE), 1),
+    Mediana = median(Numero_control_prenatal, na.rm = TRUE),
+    DE = round(sd(Numero_control_prenatal, na.rm = TRUE), 1),
+    Q1 = quantile(Numero_control_prenatal, 0.25, na.rm = TRUE),
+    Q3 = quantile(Numero_control_prenatal, 0.75, na.rm = TRUE),
+    Min = min(Numero_control_prenatal, na.rm = TRUE),
+    Max = max(Numero_control_prenatal, na.rm = TRUE)
+  )
+
+# Crear datos de frecuencia
+freq_data <- Base_datos %>%
+  count(Numero_control_prenatal) %>%
+  mutate(
+    Zona = case_when(
+      Numero_control_prenatal < 4 ~ "Crítico (<4)",
+      Numero_control_prenatal < 8 ~ "Insuficiente (4-7)",
+      TRUE ~ "Adecuado (≥8)"
+    )
+  )
+
+# Crear gráfico interactivo
+fig <- plot_ly() %>%
+  # Barras coloreadas por zona de riesgo
+  add_bars(
+    data = freq_data,
+    x = ~Numero_control_prenatal,
+    y = ~n,
+    color = ~Zona,
+    colors = c("Crítico (<4)" = "#e74c3c", 
+               "Insuficiente (4-7)" = "#f39c12", 
+               "Adecuado (≥8)" = "#27ae60"),
+    text = ~n,
+    textposition = "outside",
+    textfont = list(size = 11, color = "#2C3E50", family = "Arial"),
+    hovertemplate = paste(
+      "<b>%{x} controles</b><br>",
+      "Frecuencia: %{y}<br>",
+      "Zona: %{fullData.name}<br>",
+      "<extra></extra>"
+    )
+  ) %>%
+  # Línea vertical para la media
+  add_segments(
+    x = stats_controles$Media,
+    xend = stats_controles$Media,
+    y = 0,
+    yend = max(freq_data$n) * 1.1,
+    line = list(color = "#e67e22", width = 3, dash = "dash"),
+    showlegend = FALSE,
+    hoverinfo = "skip"
+  ) %>%
+  # Línea vertical para la mediana
+  add_segments(
+    x = stats_controles$Mediana,
+    xend = stats_controles$Mediana,
+    y = 0,
+    yend = max(freq_data$n) * 1.1,
+    line = list(color = "#2C3E50", width = 3, dash = "dot"),
+    showlegend = FALSE,
+    hoverinfo = "skip"
+  ) %>%
+  # Línea vertical para recomendación OMS (8 controles)
+  add_segments(
+    x = 8,
+    xend = 8,
+    y = 0,
+    yend = max(freq_data$n) * 1.1,
+    line = list(color = "#8e44ad", width = 3, dash = "solid"),
+    showlegend = FALSE,
+    hoverinfo = "skip"
+  ) %>%
+  layout(
+    title = list(
+      text = "<b>FIGURA 5. Distribución de Controles Prenatales y Zonas de Riesgo</b><br><sub>Clasificación según recomendaciones de la OMS</sub>",
+      font = list(size = 16, family = "Arial, sans-serif"),
+      x = 0
+    ),
+    xaxis = list(
+      title = "<b>Número de Controles Prenatales</b>",
+      titlefont = list(size = 14, family = "Arial, sans-serif"),
+      tickfont = list(size = 12),
+      dtick = 1,
+      gridcolor = "#ecf0f1"
+    ),
+    yaxis = list(
+      title = "<b>Frecuencia Absoluta</b>",
+      titlefont = list(size = 14, family = "Arial, sans-serif"),
+      tickfont = list(size = 12),
+      gridcolor = "#ecf0f1"
+    ),
+    plot_bgcolor = "white",
+    paper_bgcolor = "white",
+    hovermode = "closest",
+    showlegend = TRUE,
+    legend = list(
+      title = list(text = "<b>Zona de Riesgo</b>", font = list(size = 12)),
+      x = 0.02,
+      y = 0.98,
+      bgcolor = "rgba(255, 255, 255, 0.95)",
+      bordercolor = "#2C3E50",
+      borderwidth = 1,
+      font = list(size = 11, family = "Arial, sans-serif")
+    ),
+    margin = list(t = 120, b = 120, l = 80, r = 80),
+    annotations = list(
+      # Recomendacion OMS
+      list(
+        x = 0.98,
+        y = 0.98,
+        xref = "paper",
+        yref = "paper",
+          text = "<b>Recomendación OMS: ≥8</b>",
+        showarrow = FALSE,
+        font = list(size = 11, color = "#8e44ad", family = "Arial"),
+        bgcolor = "rgba(142, 68, 173, 0.1)",
+        bordercolor = "#8e44ad",
+        borderwidth = 2,
+        borderpad = 6
+      ),
+      # Etiqueta Media
+      list(
+        x = stats_controles$Media,
+        y = max(freq_data$n) * 1.12,
+        text = paste0("Media: ", stats_controles$Media),
+        showarrow = FALSE,
+        font = list(size = 10, color = "#e67e22", family = "Arial"),
+        bgcolor = "rgba(255, 255, 255, 0.8)",
+        bordercolor = "#e67e22",
+        borderwidth = 1,
+        borderpad = 4
+      ),
+      # Etiqueta Mediana
+      list(
+        x = stats_controles$Mediana,
+        y = max(freq_data$n) * 1.18,
+        text = paste0("Mediana: ", stats_controles$Mediana),
+        showarrow = FALSE,
+        font = list(size = 10, color = "#2C3E50", family = "Arial"),
+        bgcolor = "rgba(255, 255, 255, 0.8)",
+        bordercolor = "#2C3E50",
+        borderwidth = 1,
+        borderpad = 4
+      ),
+      # Caption
+      list(
+        x = 0,
+        y = -0.18,
+        xref = "paper",
+        yref = "paper",
+        text = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024.<br>Línea naranja: media | Línea gris: mediana | Línea morada: recomendación OMS (≥8 controles)",
+        showarrow = FALSE,
+        xanchor = "left",
+        font = list(size = 9, color = "#7f8c8d", family = "Arial, sans-serif")
+      )
+    ),
+    barmode = "overlay"
+  ) %>%
+  config(
+    displayModeBar = TRUE,
+    modeBarButtonsToRemove = c("lasso2d", "select2d"),
+    displaylogo = FALSE,
+    toImageButtonOptions = list(
+      format = "png",
+      filename = "figura5_controles_prenatales",
+      height = 600,
+      width = 1000
+    )
+  )
+
+fig
+```
+
+# 
+
+```{r tabla6_numero_embarazos}
+# TABLA 6: ESTADÍSTICAS DE NÚMERO DE EMBARAZOS
+tabla_embarazos <- Base_datos %>%
+  summarise(
+    Variable = "Número de Embarazos",
+    Media = round(mean(Numero_embarazos, na.rm = TRUE), 1),
+    DE = round(sd(Numero_embarazos, na.rm = TRUE), 1),
+    Mínimo = min(Numero_embarazos, na.rm = TRUE),
+    Máximo = max(Numero_embarazos, na.rm = TRUE),
+    Q1 = quantile(Numero_embarazos, 0.25, na.rm = TRUE),
+    Mediana = median(Numero_embarazos, na.rm = TRUE),
+    Q3 = quantile(Numero_embarazos, 0.75, na.rm = TRUE)
+  )
+
+kable(tabla_embarazos,
+      caption = "TABLA 6. ESTADÍSTICAS DESCRIPTIVAS - NÚMERO DE EMBARAZOS",
+      align = c("l", "r", "r", "r", "r", "r", "r", "r")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"),
+                full_width = FALSE,
+                font_size = 12) %>%
+  add_header_above(c(" " = 1, "Medidas de Tendencia Central" = 3, 
+                     "Medidas de Dispersión" = 4),
+                   background = "#2C3E50", color = "white") %>%
+  row_spec(0, background = "#34495E", color = "white", bold = TRUE) %>%
+  column_spec(1, bold = TRUE, width = "12em") %>%
+  footnote(general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024.")
+```
+
+```{r grafico6_numero_embarazos_boxplot}
+# GRÁFICO 6: BOXPLOT COMPARATIVO - NÚMERO DE EMBARAZOS POR PESO DELICADO
+
+# Primero calculamos las estadísticas para las anotaciones
+stats_embarazos <- Base_datos %>%
+  group_by(Peso_delicado) %>%
+  summarise(
+    Media = round(mean(Numero_embarazos, na.rm = TRUE), 2),
+    Mediana = median(Numero_embarazos, na.rm = TRUE),
+    Q1 = quantile(Numero_embarazos, 0.25, na.rm = TRUE),
+    Q3 = quantile(Numero_embarazos, 0.75, na.rm = TRUE),
+    Min = min(Numero_embarazos, na.rm = TRUE),
+    Max = max(Numero_embarazos, na.rm = TRUE),
+    n = n()
+  )
+
+g6_boxplot <- ggplot(Base_datos, aes(x = Peso_delicado, y = Numero_embarazos, fill = Peso_delicado)) +
+  # Boxplot principal
+  geom_boxplot(alpha = 0.7, outlier.shape = 21, outlier.size = 2, 
+               outlier.fill = "white", outlier.color = "#e74c3c", width = 0.6) +
+  # Marcar la media con un rombo
+  stat_summary(fun = mean, geom = "point", shape = 23, size = 4, 
+               color = "#e67e22", fill = "#e67e22", stroke = 1.5) +
+  # Colores personalizados
+  scale_fill_manual(values = c("No" = "#3498db", "Sí" = "#e74c3c"),
+                    name = "Peso Delicado") +
+  # Etiquetas y títulos
+  labs(
+    title = "FIGURA 6. Distribución del Número de Embarazos según Peso Delicado",
+    subtitle = "Comparación de medidas de tendencia central y dispersión",
+    x = "Peso Delicado",
+    y = "Número de Embarazos",
+    caption = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024.\nRombo naranja: media | Línea central: mediana | Caja: Q1-Q3 | Bigotes: rango | Puntos rojos: valores atípicos"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold", size = 14, hjust = 0, margin = margin(b = 5)),
+    plot.subtitle = element_text(size = 10, color = "#7f8c8d", margin = margin(b = 15)),
+    plot.caption = element_text(size = 8, hjust = 0, color = "#7f8c8d", 
+                                margin = margin(t = 15), lineheight = 1.2),
+    legend.position = "none",
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.y = element_line(color = "#ecf0f1", linewidth = 0.5),
+    axis.title = element_text(face = "bold", size = 11),
+    axis.text = element_text(size = 10),
+    axis.text.x = element_text(size = 11, face = "bold"),
+    plot.margin = margin(20, 20, 20, 20)
+  ) +
+  scale_y_continuous(breaks = seq(0, max(Base_datos$Numero_embarazos, na.rm = TRUE), by = 1))
+
+# Añadir tabla de estadísticas al lado del gráfico
+g6_con_stats <- g6_boxplot +
+  # Cuadro con estadísticas para "No"
+  annotate("rect",
+           xmin = 0.55, xmax = 1.45,
+           ymin = max(Base_datos$Numero_embarazos, na.rm = TRUE) * 0.82,
+           ymax = max(Base_datos$Numero_embarazos, na.rm = TRUE) * 1.0,
+           fill = "white", color = "#3498db", linewidth = 1.2, alpha = 0.95) +
+  annotate("text",
+           x = 1,
+           y = max(Base_datos$Numero_embarazos, na.rm = TRUE) * 0.91,
+           label = paste0("Peso NO Delicado\n",
+                         "Media: ", stats_embarazos$Media[stats_embarazos$Peso_delicado == "No"], "\n",
+                         "Mediana: ", stats_embarazos$Mediana[stats_embarazos$Peso_delicado == "No"], "\n",
+                         "Q1: ", stats_embarazos$Q1[stats_embarazos$Peso_delicado == "No"],
+                         " | Q3: ", stats_embarazos$Q3[stats_embarazos$Peso_delicado == "No"]),
+           size = 3, fontface = "bold", color = "#2C3E50", lineheight = 0.9) +
+  # Cuadro con estadísticas para "Sí"
+  annotate("rect",
+           xmin = 1.55, xmax = 2.45,
+           ymin = max(Base_datos$Numero_embarazos, na.rm = TRUE) * 0.82,
+           ymax = max(Base_datos$Numero_embarazos, na.rm = TRUE) * 1.0,
+           fill = "white", color = "#e74c3c", linewidth = 1.2, alpha = 0.95) +
+  annotate("text",
+           x = 2,
+           y = max(Base_datos$Numero_embarazos, na.rm = TRUE) * 0.91,
+           label = paste0("Peso Delicado\n",
+                         "Media: ", stats_embarazos$Media[stats_embarazos$Peso_delicado == "Sí"], "\n",
+                         "Mediana: ", stats_embarazos$Mediana[stats_embarazos$Peso_delicado == "Sí"], "\n",
+                         "Q1: ", stats_embarazos$Q1[stats_embarazos$Peso_delicado == "Sí"],
+                         " | Q3: ", stats_embarazos$Q3[stats_embarazos$Peso_delicado == "Sí"]),
+           size = 3, fontface = "bold", color = "#2C3E50", lineheight = 0.9)
+
+print(g6_con_stats)
+
+```
+
+```{r tabla7_resumen}
+# TABLA 7: RESUMEN GENERAL DE OBSERVACIONES
+tabla_resumen <- Base_datos %>%
+  count(Peso_delicado) %>%
+  mutate(
+    Porcentaje = round(100 * n / sum(n), 1),
+    `Porcentaje Acumulado` = cumsum(Porcentaje),
+    Categoria = ifelse(Peso_delicado == "Si", "Si", "No")
+  ) %>%
+  select(Categoria, n, Porcentaje, `Porcentaje Acumulado`)
+
+kable(tabla_resumen, 
+      align = c("l", "c", "r", "r"),
+      col.names = c("Peso delicado", "Frecuencia", "Porcentaje (%)", "Porcentaje Acumulado (%)"),
+      caption = "TABLA 7. RESUMEN GENERAL DE OBSERVACIONES POR PESO DELICADO (SI/NO)") %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width = FALSE,
+    font_size = 12,
+    html_font = "Arial"
+  ) %>%
+  add_header_above(c(" " = 1, "Distribución de Frecuencias" = 3),
+                   background = c("#2C3E50", "#16A085"),
+                   color = "white") %>%
+  row_spec(0, background = "#2C3E50", color = "white", bold = TRUE) %>%
+  row_spec(1, background = "#E8F6F3", bold = TRUE) %>%
+  row_spec(2, background = "#EBF5FB") %>%
+  column_spec(1, bold = TRUE, width = "15em") %>%
+  column_spec(2, width = "6em", background = "#F4F6F6") %>%
+  column_spec(3:4, width = "8em") %>%
+  footnote(
+    general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024."
+  )
+```
+:::

@@ -617,9 +617,9 @@ A pesar de que los antecedentes corresponden a una problemática nacional, Bogot
 El presente estudio emplea modelos de clasificación supervisada (regresión logística y KNN) utilizando los datos de nacimientos vivos en Bogotá, con el objetivo de analizar la relación entre la desnutrición neonatal y un conjunto de variables explicativas. Entre estas, se consideran el tiempo de gestación, el tipo de parto, el número de controles prenatales, la edad materna y el número de embarazos previos. La selección de estas variables se fundamenta tanto en la revisión de literatura científica relevante como en las características sociodemográficas y sanitarias propias del contexto bogotano, las cuales han sido identificadas en informes nacionales y estudios previos como factores determinantes en el estado nutricional al nacer.
 :::
 
-# Metodología y Datos
+# Descripción de la fuente de datos
 
-:::: content-block
+::: content-block
 **Base de datos:** Encuesta de estadísticas vitales - EEVV - 2024
 
 **Unidad de análisis:** Nacimiento
@@ -629,375 +629,724 @@ El presente estudio emplea modelos de clasificación supervisada (regresión log
 **Acceso:** [https://microdatos.dane.gov.co/index.php/catalog/878](https://microdatos.dane.gov.co/index.php/catalog/878/data-dictionary/F46?file_name=BD-EEVV-Nacimientos-2024){.uri}
 
 Los datos utilizados en esta investigación provienen de la Encuesta de Estadísticas Vitales (EEVV) 2024 del Departamento Administrativo Nacional de Estadística (DANE). Esta encuesta administra el registro administrativo de nacimientos en Colombia y recoge información detallada sobre características demográficas, sociales y clínicas relacionadas con el recién nacido y su madre.
+:::
 
+# Metodología
+
+::: content-block
 La metodología de esta investigación se basa en la aplicación de dos modelos de clasificación supervisada, K-Nearest Neighbors (KNN) y Regresión Logística, con el objetivo de identificar y analizar las fallas sociales y estructurales que inciden en la desnutrición neonatal en Bogotá durante el segundo semestre de 2024. Estos modelos permiten determinar la influencia de variables sociales, económicas y de salud en este problema de salud pública, tomando como indicador principal la desnutrición al nacer.
 
 La selección de variables incluye aspectos educativos, económicos y estructurales que reflejan el control social desde la concepción hasta el nacimiento, así como parámetros clínicos relevantes. Esto garantiza un análisis integral de los determinantes del estado nutricional neonatal.
 
-El estudio utiliza una base de datos representativa y actualizada proveniente de la Encuesta de Estadísticas Vitales (EEVV) 2024 del DANE, focalizando su análisis en la población nacida en Bogotá durante ese periodo. El proceso metodológico contempla etapas rigurosas de preprocesamiento de datos, incluyendo limpieza, manejo de valores faltantes y balance de clases, así como la partición de los datos en conjuntos de entrenamiento y prueba para validar los modelos.
+El estudio utiliza una base de datos representativa y actualizada proveniente de la Encuesta de Estadísticas Vitales (EEVV) 2024 del DANE, focalizando su análisis en la población nacida en Bogotá durante ese periodo.
 
-La muestra final se concentra en los siete departamentos del Caribe colombiano: Atlántico, Bolívar, Cesar, Córdoba, La Guajira, Magdalena y Sucre. Se aplicaron filtros estrictos para garantizar la calidad de los datos, incluyendo solo observaciones con valores positivos en todas las variables clave y sin datos faltantes.
+## Procesamiento de datos 
+
+Inicialmente, la base de datos contenía 34,424 registros de nacidos vivos. Como primer paso, se realizó una limpieza rigurosa:
+
+-   Se eliminaron observaciones con valores faltantes o inconsistentes en todas las variables clave.
+
+-   Se dividió la base en dos sub-bases: recién nacidos con desnutrición (“Sí”) y sin desnutrición (“No”), con base en la variable dependiente principal.
+
+-   Para evitar sesgo por desbalance de clases, se aplicó un procedimiento de balanceo, lo que permitió construir una muestra final equilibrada de 11,872 observaciones.
+
+## Variables analizadas 
+
+El modelo incorpora variables seleccionadas por su relevancia empírica documentada en la literatura científica y en lineamientos oficiales:
+
+-   Tiempo de gestación (en rangos de meses)
+
+-   Tipo de parto (Cesaria, Espontaneo o instrumentado)
+
+-   Número de controles prenatales recibidos durante el embarazo
+
+-   Edad de la madre (en rangos categóricos)
+
+-   Número de embarazos previos
+
+```{r tabla_variables, echo=FALSE}
+# TABLA DE VARIABLES DEL MODELO
+variables_modelo <- data.frame(
+  Variable = c("Peso", "Tiempo gestación", "Tipo parto", 
+               "Numero control prenatal", "Edad madre", "Numero embarazos"),
+  Descripción = c("Clasificación del peso al nacer (Normal/Delicado)",
+                 "Semanas de gestación", 
+                 "Tipo de parto registrado",
+                 "Número de controles prenatales realizados",
+                 "Grupo etario de la madre",
+                 "Número de embarazos previos"),
+  Tipo_Variable = c("Categórica (binaria)", "Categórica ordinal", 
+                   "Categórica nominal", "Cuantitativa discreta",
+                   "Categórica ordinal", "Cuantitativa discreta"),
+  Notas = c("Variable dependiente - Peso normal: ≥2500g", 
+           "Considerar <37 semanas como prematurez",
+           "Espontáneo/Cesárea/Instrumentado",
+           "Indicador de acceso a salud prenatal",
+           "Recodificado a 9 rangos etarios (Códigos 1 a 9)",
+           "Incluye embarazo actual")
+)
+
+kable(variables_modelo, 
+      caption = "Tabla 1: Variables del Modelo",
+      align = c("l", "l", "l", "l"),
+      col.names = c("Variable", "Descripción", "Tipo de Variable", "Notas")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"),
+                full_width = FALSE,
+                font_size = 12) %>%
+  row_spec(0, background = "#2C3E50", color = "white", bold = TRUE) %>%
+  column_spec(1, bold = TRUE, width = "12em") %>%
+  footnote(general = "Fuente: Elaboración propia en base a la Base de Datos de Nacimientos - 2024",
+           number = c("Datos corresponden al segundo semestre del año 2024"))
+
+```
+
+Estas variables reflejan tanto el entorno social y estructural como el acceso a servicios de salud y el historial reproductivo, permitiendo un análisis integral de los riesgos de desnutrición neonatal.
 
 ## Justificación de la selección de variables dependiente e independientes
 
-La selección de **Ventas del Mes Anterior** como variable dependiente se fundamenta en su carácter de indicador directo del desempeño comercial de los micronegocios. Las ventas representan el resultado final de la actividad económica y constituyen la principal fuente de ingresos para estas unidades productivas.
+La variable dependiente seleccionada es el estado nutricional del recién nacido al momento del nacimiento, el cual se clasifica en dos categorías: “Sí” (el bebé presenta desnutrición al nacer) y “No” (el bebé no presenta desnutrición al nacer). Esta variable permite identificar los factores asociados a la desnutrición neonatal, la cual está asociada a mayores riesgos de morbilidad y mortalidad infantil, y es reconocida como un indicador crítico por la Organización Mundial de la Salud (OMS, 2017; DANE, 2024). La desnutrición al nacer refleja desigualdades en acceso a servicios de salud prenatal, nutrición materna, condiciones sociales y características biológicas de la gestación, y es además un predictor del desarrollo físico y cognitivo del niño (OMS, 2017; DANE, 2024).
 
-La elección de las variables independientes se basa en fundamentos teóricos de los fundamentos de la economia. Cada variable seleccionada representa un aspecto fundamental de la operación de los micronegocios:
+Entre las variables independientes, se escogieron aquellas que, según reportes oficiales y estudios previos, tienen una relación directa con el peso al nacer.
 
-1.  **Gastos mes anterior** funcionan como premisa del capital de trabajo utilizado en la generación de ventas. La teoría económica establece una relación directa entre la inversión en actividades operativas y la capacidad de generar ingresos. Esta variable captura tanto los costos variables directamente asociados a la producción como los gastos operativos necesarios para mantener la actividad comercial.
+-   **Tiempo de gestación (semanas) :** Es fundamental ya que la prematurez está asociada con un peso menor al esperado. Nacimientos antes de las 37 semanas suelen presentar bajo peso debido a la inmadurez fetal (DANE, 2024). Estudios confirman que el tiempo de gestación es el principal determinante biológico del peso neonatal (Wu et al., 2022; Kramer, 1987).
 
-2.  **Valor agregado** Representa la productividad y eficiencia de los procesos productivos del micronegocio. Esta variable es particularmente importante porque refleja la capacidad de la unidad económica para generar valor más allá del costo de los insumos utilizados. Micronegocios con mayor valor agregado deberían, en principio, generar mayores niveles de ventas.
+-   **El tipo de parto (espontáneo, cesárea o instrumentado)** indica las características médicas de la gestación y el nacimiento. Partos por cesárea e instrumentados están frecuentemente relacionados con complicaciones que pueden influir en el peso del recién nacido (DANE, 2024).
 
-3.  **Inversión de activos** Es una herramienta que sirve como indicador de las diferentes modificaciones estructurales realizadas dentro de los micronegocios en pro de aumentar la productividad y competitividad.
+-   **La cantidad de consultas prenatales:**  constituye un indicador fundamental de acceso y calidad en la atención materna. Estudios del Instituto Nacional de Salud (2020) muestran mayor riesgo de bajo peso en madres con menos de cuatro controles, lo que evidencia la importancia del diagnóstico temprano de complicaciones, suplementación nutricional y seguimiento del desarrollo fetal.
 
-4.  **Arrendamiento** representa los costos fijos estructurales que enfrentan los micronegocios. Esta variable permite controlar por diferencias en la estructura de costos que pueden afectar la relación entre otras variables y las ventas.
+<!-- -->
 
-5.  **Departamento** es incluida como variable de comparación para capturar diferentes perspectivas con factores territoriales, demograficas y de acceso a mercados. Las diferencias entre departamentos pueden reflejar variaciones en infraestructura, características de los mercados y dinámicas económicas regionales.
+-   **La edad de la madre (años)**: Se considera porque las madres adolescentes y las de mayor edad tienen tasas más elevadas de bajo peso al nacer, conforme a las estadísticas en Colombia (Instituto Nacional de Salud, 2020). Estas poblaciones pueden presentar mayores riesgos biológicos y sociales asociados.
+
+<!-- -->
+
+-   **Número de embarazos previos:** Influye en la capacidad reproductiva y salud materna. El historial de embarazos múltiples puede afectar la nutrición y el ambiente uterino, lo cual impacta el peso del recién nacido
+
+Estas variables fueron elegidas considerando evidencia empírica documentada, garantizando una base sólida para un modelo predictivo que permita comprender y analizar factores asociados al peso al nacer en Bogotá, con miras a fortalecer políticas públicas de salud materno-infantil y mejorar indicadores en Colombia.
 
 ## Descripción del modelo de regresión lineal múltiple
 
-El modelo lineal busca encontrar dependencias con las variables independientes que incluyen factores geográficos, demográficos, de inversión y gastos. Este enfoque metodológico es particularmente apropiado para el análisis de micronegocios porque permite aislar el efecto específico de cada factor mientras se controla por la influencia de las demás variables.
+Los datos empleados se obtuvieron de la página de microdatos y metadatos del DANE, utilizando la Encuesta Vital correspondiente al año 2024 de la sección de nacimientos. Se realizó una serie de modificaciones para lograr una mejor proporción y comprensión de los datos: la base fue filtrada no solo por la selección de variables, sino también por la distribución de frecuencias del umbral empleado (bajo peso al nacer), focalizando así la información correspondiente a los nacimientos en la ciudad de Bogotá durante el segundo semestre del año en que se realizó la encuesta.
 
-El modelo asume que existe una relación lineal entre las variables independientes y la variable dependiente, donde los efectos de las variables explicativas son aditivos. Esta especificación permite interpretar cada coeficiente como el cambio marginal en la variable dependiente ante un cambio unitario en la variable independiente correspondiente, manteniendo constantes las demás variables.
+El motivo de la filtración exhaustiva fue lograr una mayor homogeneidad en los datos, fundamental para sustentar la hipótesis principal: respaldar, a través de la evidencia, los determinantes sociales que inciden en los índices de desnutrición en el territorio. Dada la magnitud y extensión de la base de datos original, se tomó la decisión de acotarla para obtener resultados esperados aplicando dos tipos de modelos de aprendizaje supervisados, cuyo objetivo es clasificar de manera binaria una serie de características de la población.
 
-Los supuestos fundamentales del modelo incluyen:
+Los modelos corresponden a:
 
--   **Linealidad**: La relación entre variables independientes y dependiente es lineal en los parámetros.
+1.  **K- nearest neighbors.**
 
--   **Independencia**: Las observaciones son independientes entre sí.
+Este modelo busca clasificar en dos sentencias  una serie de predicciones basadas en características que tienen las dos sentencias, es decir, clasificar mediante predicciones de las características en las sentencias que tienen caracteristicas cercanas, de ahí su nombre. "k" representa la cantidad de vecinos más cercanos considerados en el problema de clasificación o regresión, y "NN" se refiere a los vecinos más cercanos a la cantidad elegida para k. 
 
--   **Homocedasticidad**: La varianza de los errores es constante para todas las observaciones.
+En el problema con el que se está trabajando las caracteristicas que se tienen son las variables independientes y las sentencias son la variable dependiente que solo puede clasificar en dos opciones debido a la dicotomía de la variable. El umbral empleado tiene como palabras de clasificación si o no (si tiene bajo peso, no tiene bajo peso (peso moderado)).
 
--   **Normalidad**: Los errores siguen una distribución normal.
+Con este modelo se busca indagar, la veracidad de las variables independientes como sintomas en una sentencia, es decir, si las variables seleccionadas abarcan las caracteristicas suficientes para dictaminar una sentencia congruente.
 
--   **No multicolinealidad**: Las variables independientes no están perfectamente correlacionadas entre sí.
+2.  **Regresión logistica.**
 
-El método de estimación utilizado es mínimos cuadrados ordinarios (MCO), que minimiza la suma de los cuadrados de los residuos para obtener estimadores insesgados, consistentes y eficientes. La validez de las inferencias estadísticas depende del cumplimiento de los supuestos del modelo, los cuales son evaluados mediante pruebas de diagnóstico específicas.
+La regresion logistica es un modelo de predicción que a diferencia de un modelo de regresión lineal, que busca predecir la influencia de multiples variables independientes sobre una variable dependiente numerica, este por el contrario busca predecir la probabilidad de clasificar una serie de variables independientes sobre una variable dependiente binaria que encasilla 2 sentencias, basadas en el aprendizaje de un modelo en el cual se tiene conocimiento de los resultados.
 
-## Ecuación formal del modelo
+Teniendo en consideración, la problematica que se está modelando, los objetivos que se estiman es tener una probabilidad de clasificación que sea consecuente con el modelo anterior, con el fin de formular conclusiones veridicas y posteriormente soluciones a la problemática.
 
-La regresión lineal múltiple se fundamenta en la premisa de que la variable dependiente puede expresarse como una función lineal en donde las pendinetes representan los efectos de las variables independientes sobre la unidad de la variable dependiente. Matemáticamente, el modelo se representa como:
+## Base de datos del estudio 
 
-::: content-block
-$$Ventas_i = \beta_0 + \beta_1 \, Gastos_i + \beta_2 \, ValorAgregado_i + \beta_3 \, InversionActivos_i...$$ $$+\beta_4 \, Arrendamiento_i + \sum_{j=1}^{6} \gamma_j \, Departamento_{j,i} + \varepsilon_i$$
+Para este trabajo se emplea la base de datos de la Encuesta de Estadísticas Vitales (EEVV) 2024 del DANE, filtrada específicamente para el periodo del segundo semestre en la ciudad de Bogotá. El conjunto de datos fue depurado rigurosamente para incluir únicamente las observaciones completas y las variables relevantes para los modelos de clasificación KNN y Regresión Logística, asegurando así la calidad y pertinencia de la muestra seleccionada para el análisis.
 
-Donde:
+```{r tabla_interactiva, echo=FALSE}
+# TABLA INTERACTIVA FINAL
+library(htmltools)
+reactable(
+  Base_datos,
+  defaultPageSize = 15,
+  showPageSizeOptions = TRUE,
+  pageSizeOptions = c(10, 15, 25, 50, 100),
+  filterable = TRUE,
+  searchable = TRUE,
+  sortable = TRUE,
+  resizable = TRUE,
+  striped = TRUE,
+  highlight = TRUE,
+  bordered = FALSE,
+  wrap = FALSE,
+  showSortable = TRUE,
+  defaultColDef = colDef(
+    header = function(value) {
+      name <- gsub("_", " ", value)
+      name <- gsub("([a-z])([A-Z])", "\\1 \\2", name)
+      tools::toTitleCase(tolower(name))
+    },
+    cell = function(value) {
+      if (is.numeric(value)) {
+        if (value == round(value)) {
+          format(value, big.mark = ",", scientific = FALSE)
+        } else {
+          format(round(value, 2), nsmall = 2, big.mark = ",", scientific = FALSE)
+        }
+      } else {
+        as.character(value)
+      }
+    },
+    align = "center",
+    minWidth = 100,
+    headerStyle = list(
+      background = "#2C3E50",
+      color = "white",
+      fontWeight = "600",
+      borderBottom = "2px solid #dee2e6",
+      fontSize = "13px"
+    ),
+    style = list(
+      fontSize = "12px",
+      fontFamily = "Arial, sans-serif"
+    )
+  ),
+  style = list(
+    fontFamily = "Arial, sans-serif",
+    fontSize = "13px"
+  ),
+  theme = reactableTheme(
+    stripedColor = "#f8f9fa",
+    highlightColor = "#e9ecef",
+    cellPadding = "8px 12px",
+    backgroundColor = "#ffffff",
+    borderColor = "#dee2e6",
+    style = list(
+      fontFamily = "Arial, -apple-system, BlinkMacSystemFont, sans-serif"
+    ),
+    searchInputStyle = list(
+      width = "100%",
+      padding = "8px 12px",
+      border = "1px solid #ced4da",
+      borderRadius = "4px",
+      fontSize = "14px",
+      marginBottom = "10px"
+    ),
+    headerStyle = list(
+      borderBottom = "2px solid #495057",
+      fontSize = "14px",
+      backgroundColor = "#2C3E50",
+      color = "white"
+    )
+  ),
+  columns = list(
+    Tiempo_gestación = colDef(
+      name = "Tiempo Gestación",
+      minWidth = 180,
+      filterable = TRUE,
+      align = "left"
+    ),
+    Edad_madre = colDef(
+      name = "Edad Madre", 
+      minWidth = 120,
+      filterable = TRUE
+    ),
+    Peso_delicado = colDef(
+      name = "Peso Delicado",
+      style = function(value) {
+        color <- ifelse(value == "Si", "#E74C3C", "#27AE60")
+        list(fontWeight = "bold", color = color)
+      }
+    )
+  )
+)
 
--   $Ventas_i$ representa las ventas del mes anterior para el micronegocio $i$
+# Fuente de la tabla interactiva
+tags$div(
+  style = "margin-top: 20px; font-size: 12px; color: #666; font-style: italic; text-align: center;",
+  "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024"
+)
 
--   $β_0$ es el intercepto del modelo
-
--   $β_1,β_2,β_3,β_4$ son los coeficientes de las variables cuantitativas
-
--   $Y_j$ son lo son los coeficientes de las variables dummy departamentales (j = 1, ..., 6)
-
--   $ε_i$ es el término de error aleatorio
-
--   $i=1,...,ni=1,...,n$ indexa las observaciones individuales
+```
 :::
 
-En forma matricial, el modelo se expresa como:
-
-$Y=Xβ+ε$
-
-Donde $Y$ es el vector de variables dependientes, $X$ es la matriz de variables independientes, $β$ es el vector de parámetros a estimar y $ε$ es el vector de errores aleatorios.
-::::
-
-# Resultados Descriptivos
+# Estadisticas Descriptivas
 
 :::: content-block
-El análisis de regresión lineal múltiple constituye una herramienta fundamental en la investigación empresarial y el análisis de datos comerciales. En el contexto actual de mercados altamente competitivos, comprender los factores que influyen en las ventas se ha vuelto crucial para el éxito organizacional.
+A continuación se presentan las estadísticas descriptivas, que resumen las características principales de la muestra estudiada. Este análisis preliminar permite conocer la distribución, tendencia central y dispersión de las variables clave, facilitando la comprensión del contexto y estableciendo la base para análisis posteriores.
 
-Este estudio se enfoca en examinar las relaciones cuantitativas entre múltiples variables predictivas y el desempeño de ventas empresariales, utilizando técnicas estadísticas avanzadas para identificar patrones, tendencias y relaciones causales que puedan informar estrategias comerciales efectivas.
+Las estadísticas descriptivas son fundamentales para identificar patrones y diferencias entre grupos, que apoyan la validación de los modelos predictivos empleados en el estudio.
 
-## Estadísticas descriptivas de las variables
+## Estadísticas descriptivas de las variables seleccionadas 
 
 ::: content-block
-La selección de **Ventas del Mes Anterior** como variable dependiente se fundamenta en su carácter de indicador directo del desempeño comercial de los micronegocios. Las ventas representan el resultado final de la actividad económica y constituyen la principal fuente de ingresos para estas unidades productivas.
+### **Analisis de la Variable Dependiente: Desnutrición Neonatal**
 
-La elección de las variables independientes se basa en fundamentos teóricos de los fundamentos de la economia. Cada variable seleccionada representa un aspecto fundamental de la operación de los micronegocios:
+Los resultados obtenidos a partir del análisis descriptivo del peso de los nacimientos en Bogotá durante el segundo semestre de 2024 se resumen en la Tabla 1. Estos resultados permiten identificar diferencias clave entre los grupos de recién nacidos con peso delicado  “Si” y “No”.  Ambas categorías están equilibradas, lo que permite un análisis comparativo robusto. 
 
-### Ventas de los Micronegocios en la Región Caribe
-
-```{r estadisticas de y, echo=FALSE,Warning=FALSE}
-estadisticas <- BaseFinal %>%
-  group_by(Departamento) %>%
+```{r tabla1_tamano_muestral, echo=FALSE}
+# TABLA 1.1: TAMAÑO MUESTRAL POR GRUPO DE PESO
+tabla_1_1 <- Base_datos %>%
+  group_by(Peso_delicado) %>%
   summarise(
     n = n(),
-    "Media ventas" = round(mean(`Ventas mes anterior`), 2),
-    "Desviacion de las ventas" = round(sd(`Ventas mes anterior`), 2),
-    "Mediana del mes anterior" = round(median(`Ventas mes anterior`), 2),
-    Min = round(min(`Ventas mes anterior`), 2),
-    Max = round(max(`Ventas mes anterior`), 2))
+    Porcentaje = round(100 * n() / nrow(Base_datos), 1)
+  )
 
-kable(estadisticas, 
-      align = c("l", "c", "r", "r", "r", "r", "r"),
+kable(tabla_1_1, 
+      align = c("l", "r", "r"),
       format.args = list(big.mark = ",", decimal.mark = "."),
-      col.names = c("Departamento", "Numero de registros", "Media Ventas", "Desv. Est. venta", "Mediana", "Mínimo venta", "Máximo venta"),
-      caption = "TABLA 1. ESTADISTICA DESCRIPTIVA DE LAS VENTAS.") %>%
+      col.names = c("Peso Delicado", "N", "%"),
+      caption = "TABLA 1.1. TAMAÑO MUESTRAL POR GRUPO DE PESO AL NACER") %>%
   kable_styling(
     bootstrap_options = c("striped", "hover"),
     full_width = FALSE,
     font_size = 12,
-    position = "center",
-    latex_options = "hold_position"
+    position = "center"
   ) %>%
-  add_header_above(c(" " = 1, "Tamaño Muestral" = 1, "Estadísticas de Ventas ($)" = 5),
+  add_header_above(c(" " = 1, "Tamaño Muestral" = 2),
                    background = "#2C3E50", color = "white") %>%
   row_spec(0, background = "#34495E", color = "white", bold = TRUE) %>%
   column_spec(1, bold = TRUE, width = "12em") %>%
-  column_spec(2, background = "#F4F6F6") %>%
-  column_spec(3:7, background = "#FBFCFC") %>%
-  pack_rows("", 1, nrow(estadisticas), 
-            label_row_css = "background-color: #2C3E50; color: white; font-weight: bold;") %>%
+  column_spec(2:3, background = "#F4F6F6") %>%
   footnote(
-    general = "Fuentes:Elaboracion propia en base en la Encuesta de Micronegocios - 2022",
-    number = c("Datos corresponden al mes anterior inmediato")
+    general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024.",
+    number = c("Datos corresponden a nacimientos en Bogotá (julio-diciembre 2024)")
   )
+
 
 ```
 
-En la (Tabla 1) podemos observar los valores promedio, mediana, desviación estándar, mínimo y máximo de las ventas mensuales de micronegocios en cada departamento de la región Caribe. Los cuales nos permite comparar el desempeño comercial entre departamentos y detectar la variabilidad interna. Por ejemplo, Atlántico y Bolívar presentan los valores medios más altos, lo que indica mayor dinamismo comercial, mientras que Sucre y La Guajira tienen ventas más bajas, reflejando posibles limitaciones estructurales o de mercado.
+La tabla muestra que el grupo de recién nacidos con desnutrición neonatal (“Sí”) representa el 49.5% de la muestra, mientras que el grupo “No” alcanza el 50.5%. Esto indica una distribución muy equilibrada entre ambos grupos lo que permite llevar a cabo análisis comparativos robustos y sin sesgos por desproporción entre categorías.
 
-Funciona como premisa del capital de trabajo utilizado en la generación de ventas. La teoría económica establece una relación directa entre la inversión en actividades operativas y la capacidad de generar ingresos. Esta variable captura tanto los costos variables directamente asociados a la producción como los gastos operativos necesarios para mantener la actividad comercial.
+Además, se realizó un análisis descriptivo de la variable dependiente en relación con las dos variables independientes cuantitativas del estudio, para identificar diferencias y tendencias principales entre los grupos.
 
-### Gastos de los Micronegocios en la Región Caribe
+**Analisis del grupo de peso en relacion con los controles prenatales**
 
-```{r estadisticas de gastos del mes anterior, echo=FALSE,Warning=FALSE}
-estadisticas <- BaseFinal %>%
-  group_by(Departamento) %>%
+```{r tabla1_2_controles_prenatales, echo=FALSE}
+# TABLA 1.2: CONTROLES PRENATALES POR GRUPO DE PESO
+tabla_1_2 <- Base_datos %>%
+  group_by(Peso_delicado) %>%
   summarise(
-    n = n(),
-    "Media gastos" = round(mean(`Gastos mes anterior`), 2),
-    "Desviacion de los gastos" = round(sd(`Gastos mes anterior`), 2),
-    "Mediana del mes anterior" = round(median(`Gastos mes anterior`), 2),
-    Min = round(min(`Gastos mes anterior`), 2),
-    Max = round(max(`Gastos mes anterior`), 2))
+    Media = round(mean(Numero_control_prenatal, na.rm = TRUE), 1),
+    DE = round(sd(Numero_control_prenatal, na.rm = TRUE), 1),
+    Min = min(Numero_control_prenatal, na.rm = TRUE),
+    Max = max(Numero_control_prenatal, na.rm = TRUE)
+  )
 
-kable(estadisticas, 
-      align = c("l", "c", "r", "r", "r", "r", "r"),
+kable(tabla_1_2, 
+      align = c("l", "r", "r", "r", "r"),
       format.args = list(big.mark = ",", decimal.mark = "."),
-      col.names = c("Departamento", "N", "Media", "Desv.Est", "Mediana", "Minimo", "Maximo"),
-      caption = "TABLA 2. ESTADISTICA DESCRIPTIVA DE LOS GASTOS.") %>%
+      col.names = c("Peso Delicado", "Media", "DE", "Mín", "Máx"),
+      caption = "TABLA 1.2. CONTROLES PRENATALES POR GRUPO DE PESO AL NACER") %>%
   kable_styling(
     bootstrap_options = c("striped", "hover"),
     full_width = FALSE,
     font_size = 12,
-    position = "center",
-    latex_options = "hold_position"
+    position = "center"
   ) %>%
-  add_header_above(c(" " = 1, "Muestra" = 1, "Estadisticas de Gastos ($)" = 5),
+  add_header_above(c(" " = 1, "Controles Prenatales" = 4),
                    background = "#2C3E50", color = "white") %>%
   row_spec(0, background = "#34495E", color = "white", bold = TRUE) %>%
   column_spec(1, bold = TRUE, width = "12em") %>%
-  column_spec(2, background = "#F4F6F6") %>%
-  column_spec(3:7, background = "#FBFCFC") %>%
+  column_spec(2:5, background = "#E8F8F5") %>%
   footnote(
-    general = "Fuentes:Elaboracion propia en base en la Encuesta de Micronegocios - 2022",
-    number = c("Datos corresponden al mes anterior inmediato")
+    general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024.",
+    number = c("Datos corresponden a nacimientos en Bogotá (julio-diciembre 2024)")
   )
-```
-
-*La tabla 2* permite identificar dónde los micronegocios invierten más en su funcionamiento. Se observa que La Guajira tiene los gastos más altos, pero esto no se traduce necesariamente en mayores ventas, lo que sugiere que el gasto por sí solo no garantiza mejores resultados comerciales y que otros factores pueden estar influyendo.
-
-```{r grafico dispersion gastos, echo=FALSE,Warning=FALSE}
-
-library(ggplot2)
-library(scales)
-
-ggplot(BaseFinal, aes(x = `Gastos mes anterior`, y = `Ventas mes anterior`)) +
-  geom_point(alpha = 0.7, color = "#2E86AB", size = 2.5) +
-  geom_smooth(method = "lm", se = TRUE, color = "#A23B72", fill = "#F18F01", 
-              alpha = 0.2, size = 1.2) +
-  scale_x_continuous(labels = dollar_format(prefix = "$", big.mark = ",")) +
-  scale_y_continuous(labels = dollar_format(prefix = "$", big.mark = ",")) +
-  labs(title = "Figura 2. RELACION ENTRE GASTOS MENSUALES Y VENTAS",
-       subtitle = "Analisis de correlacion y tendencia lineal",
-       x = "Gastos Mensuales (COP)", 
-       y = "Ventas Mes Anterior (COP)",
-       caption = "Fuente: Elaboracion propia en base en la Encuesta de Micronegocios - 2022") +
-  theme_minimal() +
-  theme(plot.title = element_text(face = "bold", color = "#2C3E50"),
-        plot.subtitle = element_text(color = "#7F8C8D"))
 
 ```
 
-En la *figura 2* de dispersión muestra la relación entre los gastos operativos y las ventas mensuales. La tendencia positiva indica que, en general, a mayor gasto operativo, mayores ventas, lo que valida la hipótesis de que invertir en el funcionamiento del negocio puede impulsar el desempeño comercial.
+El grupo de nacidos desnutridos registra un promedio de 6.6 controles, por debajo de los 7.2 en el grupo de los que no. Esto respalda estudios que señalan menor acceso a controles prenatales como factor de riesgo de bajo peso al nacer
 
-### Arrendamiento de los Micronegocios en la Región Caribe
+**Analisis del grupo de peso en relacion con el numero de embarazos**
 
-```{r estadisticas de arrendamiento de bienes inmuebles y muebles, echo=FALSE,Warning=FALSE}
-estadisticas <- BaseFinal %>%
-  group_by(Departamento) %>%
+```{r tabla1_3_numero_embarazos, echo=FALSE}
+# TABLA 1. NÚMERO DE EMBARAZOS POR GRUPO DE PESO
+tabla_1_3 <- Base_datos %>%
+  group_by(Peso_delicado) %>%
   summarise(
-    n = n(),
-    "Media arrendamiento" = round(mean(`Arrendamiento`), 2),
-    "Desviacion del arrendamiento" = round(sd(`Arrendamiento`), 2),
-    "Mediana del mes anterior" = round(median(`Arrendamiento`), 2),
-    Min = round(min(`Arrendamiento`), 2),
-    Max = round(max(`Arrendamiento`), 2))
+    Media = round(mean(Numero_embarazos, na.rm = TRUE), 1),
+    DE = round(sd(Numero_embarazos, na.rm = TRUE), 1),
+    Min = min(Numero_embarazos, na.rm = TRUE),
+    Max = max(Numero_embarazos, na.rm = TRUE)
+  )
 
-kable(estadisticas, 
-      align = c("l", "c", "r", "r", "r", "r", "r"),
+kable(tabla_1_3, 
+      align = c("l", "r", "r", "r", "r"),
       format.args = list(big.mark = ",", decimal.mark = "."),
-      col.names = c("Departamento", "N", "Media", "Desv.Est", "Mediana", "Minimo", "Maximo"),
-      caption = "TABLA 3. ESTADISTICA DESCRIPTIVA DEL ARRENDAMIENTO.") %>%
+      col.names = c("Peso Delicado", "Media", "DE", "Mín", "Máx"),
+      caption = "TABLA 1.3. NÚMERO DE EMBARAZOS POR GRUPO DE PESO AL NACER") %>%
   kable_styling(
     bootstrap_options = c("striped", "hover"),
     full_width = FALSE,
     font_size = 12,
-    position = "center",
-    latex_options = "hold_position"
+    position = "center"
   ) %>%
-  add_header_above(c(" " = 1, "Muestra" = 1, "Estadisticas de Arrendamientos ($)" = 5),
+  add_header_above(c(" " = 1, "Número de Embarazos" = 4),
                    background = "#2C3E50", color = "white") %>%
   row_spec(0, background = "#34495E", color = "white", bold = TRUE) %>%
   column_spec(1, bold = TRUE, width = "12em") %>%
-  column_spec(2, background = "#F4F6F6") %>%
-  column_spec(3:7, background = "#FBFCFC") %>%
+  column_spec(2:5, background = "#FEF5E7") %>%
   footnote(
-    general = "Fuentes:Elaboracion propia en base en la Encuesta de Micronegocios - 2022",
-    number = c("Datos corresponden al mes anterior inmediato")
+    general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024.",
+    number = c("Datos corresponden a nacimientos en Bogotá (julio-diciembre 2024)")
   )
-```
-
-En esta tabla *(Ver* *figura 3)* se refleja que el departamento de Sucre es el que tiene el menor valor representativo de todos los departamentos, esto se puede interpretar como un indicador de la calidad socioeconómica del territorio  en los arrendamientos que benefician a los micronegocios, es decir que en el departamento, el gasto operativo de los arrendamientos es más rentable que en el resto de departamentos.
-
-```{r grafico dispersion arrendamiento, echo=FALSE,Warning=FALSE}
-ggplot(BaseFinal, aes(x = Arrendamiento, y = `Ventas mes anterior`)) +
-  geom_point(alpha = 0.7, color = "#F39C12", size = 2.5) +
-  geom_smooth(method = "lm", se = TRUE, color = "#2C3E50", fill = "#95A5A6", 
-              alpha = 0.2, size = 1.2) +
-  scale_x_continuous(labels = dollar_format(prefix = "$", big.mark = ",")) +
-  scale_y_continuous(labels = dollar_format(prefix = "$", big.mark = ",")) +
-  labs(title = "Figura 3. RELACION ENTRE ARRENDAMIENTO Y VENTAS",
-       subtitle = "Impacto de los costos de arrendamiento en las ventas",
-       x = "Arrendamiento (COP)", 
-       y = "Ventas Mes Anterior (COP)",
-       caption = "Fuente: Elaboracion propia en base en la Encuesta de Micronegocios - 2022") +
-  theme_minimal() +
-  theme(plot.title = element_text(face = "bold", color = "#2C3E50"),
-        plot.subtitle = element_text(color = "#7F8C8D"))
 
 ```
 
-Este gráfico de la *figura 3* de dispersión ilustra cómo los gastos de arrendamiento se relacionan con las ventas. Se observa una tendencia positiva, lo que sugiere que los micronegocios que invierten más en infraestructura tienden a tener mejores resultados comerciales, posiblemente por ubicaciones más estratégicas o instalaciones de mayor calidad.
+Ambos grupos presentan el mismo promedio de 1.9 embarazos previos, sugiriendo que en esta muestra particular este factor no distingue entre los dos grupos.
 
-### Valor Agregado de los Micronegocios en la Región Caribe
+### **Analisis de la Variable Independiente:** Tiempo De Gestación 
 
-```{r estadisticas de valor agregado, echo=FALSE,Warning=FALSE}
-estadisticas <- BaseFinal %>%
-  group_by(Departamento) %>%
-  summarise(
-    n = n(),
-    "Media del valor agregado" = round(mean(`Valor agregado`), 2),
-    "Desviacion del valor agregado" = round(sd(`Valor agregado`), 2),
-    "Mediana del mes anterior" = round(median(`Valor agregado`), 2),
-    Min = round(min(`Valor agregado`), 2),
-    Max = round(max(`Valor agregado`), 2))
+La distribución del tiempo de gestacion en la muestra se presenta en la Tabla \_\_\_. 
 
-kable(estadisticas, 
-      align = c("l", "c", "r", "r", "r", "r", "r"),
-      format.args = list(big.mark = ",", decimal.mark = "."),
-      col.names = c("Departamento", "N", "Media", "Desv.Est", "Mediana", "Minimo", "Maximo"),
-      caption = "TABLA 4. ESTADISTICA DESCRIPTIVA DEL VALOR AGREGADO.") %>%
+```{r tabla2_tiempo_gestacion, echo=FALSE}
+# TABLA 2: DISTRIBUCIÓN DEL TIEMPO DE GESTACIÓN
+tabla_tiempo_gestacion <- Base_datos %>%
+  count(Tiempo_gestación) %>%
+  mutate(
+    Porcentaje = round(100 * n / sum(n), 1),
+    Porcentaje_Acumulado = cumsum(Porcentaje)
+  )
+
+kable(tabla_tiempo_gestacion, 
+      align = c("l", "c", "r", "r"),
+      col.names = c("Tiempo de Gestación", "Frecuencia", "Porcentaje (%)", "Porcentaje Acumulado (%)"),
+      caption = "TABLA 2. DISTRIBUCIÓN DEL TIEMPO DE GESTACIÓN") %>%
   kable_styling(
-    bootstrap_options = c("striped", "hover"),
+    bootstrap_options = c("striped", "hover", "condensed"),
     full_width = FALSE,
-    font_size = 12,
-    position = "center",
-    latex_options = "hold_position"
+    font_size = 12
   ) %>%
-  add_header_above(c(" " = 1, "Muestra" = 1, "Estadisticas de Valor agregado ($)" = 5),
+  add_header_above(c(" " = 1, "Distribución de Frecuencias" = 3),
+                   background = "#2C3E50", color = "white") %>%
+  row_spec(0, background = "#34495E", color = "white", bold = TRUE) %>%
+  column_spec(1, bold = TRUE, width = "20em") %>%
+  column_spec(2:4, background = "#F4F6F6") %>%
+  footnote(
+    general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024."
+  )
+
+```
+
+La tabla muestra la distribución del tiempo de gestación en la muestra analizada. La mayoría de los nacimientos se concentra entre 28 y 37 semanas (53.2%), seguidos de los partos entre 38 y 41 semanas (45.5%). Los nacimientos antes de las 28 semanas representan solo el 1.3%, mientras que los partos de 42 o más semanas son extremadamente infrecuentes (1 caso). Esto indica que la mayor parte de los nacimientos ocurre dentro de rangos aceptados como "a término" o moderadamente prematuros, con muy pocos casos en los extremos.
+
+Para analizar cómo el tiempo de gestación se relaciona con la variable dependiente de desnutrición neonatal, se utiliza un gráfico de barras apiladas. Este tipo de visualización permite observar de forma clara la distribución y el comportamiento de ambos grupos, facilitando la identificación de patrones y posibles asociaciones relevantes para el estudio.
+
+```{r grafico2_tiempo_vs_peso, echo=FALSE, fig.width=10, fig.height=6}
+# GRÁFICO 2: RELACIÓN TIEMPO DE GESTACIÓN VS PESO DELICADO (BARRAS APILADAS)
+tabla_tiempo_peso <- Base_datos %>%
+  count(Tiempo_gestación, Peso_delicado)
+
+plot_ly(
+  tabla_tiempo_peso,
+  x = ~Tiempo_gestación,
+  y = ~n,
+  color = ~Peso_delicado,
+  colors = c('#27AE60', '#E74C3C'),  # Verde para No, Rojo para Si
+  type = 'bar',
+  text = ~n,
+  textposition = 'inside',
+  hovertemplate = paste(
+    '<b>%{x}</b><br>',
+    'Peso Delicado: %{fullData.name}<br>',
+    'Frecuencia: %{y}<br>',
+    '<extra></extra>'
+  )
+) %>%
+  plotly::layout(
+    barmode = 'stack',
+    title = list(
+      text = "<b>Gráfico 2. Tiempo de Gestación según Peso Delicado</b><br><sub>Bogotá - Segundo Semestre 2024</sub>",
+      x = 0.5,
+      font = list(size = 16)
+    ),
+    xaxis = list(
+      title = "<b>Tiempo de Gestación</b>",
+      tickfont = list(size = 10)
+    ),
+    yaxis = list(
+      title = "<b>Frecuencia</b>"
+    ),
+    legend = list(
+      title = list(text = "<b>Peso Delicado</b>"),
+      orientation = "v",
+      x = 1.02,
+      y = 1
+    ),
+    annotations = list(
+      list(
+        text = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024",
+        xref = "paper",
+        yref = "paper",
+        x = 0.5,
+        y = -0.25,
+        showarrow = FALSE,
+        font = list(size = 10, color = "#666666"),
+        xanchor = "center"
+      )
+    ),
+    margin = list(b = 150)
+  )
+
+
+
+```
+
+El gráfico muestra la relación entre el tiempo de gestación y la presencia de desnutrición neonatal (“Peso Delicado”) en Bogotá durante el segundo semestre de 2024. Se observa que en el grupo de 28-37 semanas, la mayoría de los recién nacidos no presenta desnutrición, mientras que en el grupo de 38-41 semanas predomina la desnutrición neonatal (“Sí”). Los nacimientos en los extremos (22-27 semanas y 42 o más semanas) son muy poco frecuentes y aportan poco al total.
+
+### **Análisis de la Variable Independiente:** Tipo De Parto
+
+Los resultados del análisis descriptivo del tipo de parto, que incluye las categorías cesárea, espontáneo e instrumentado, se resumen en la Tabla \_\_\_.
+
+```{r tabla3_tipo_parto, echo=FALSE}
+# TABLA 3: DISTRIBUCIÓN DEL TIPO DE PARTO
+tabla_tipo_parto <- Base_datos %>%
+  count(Tipo_parto) %>%
+  mutate(
+    Porcentaje = round(100 * n / sum(n), 1),
+    Porcentaje_Acumulado = cumsum(Porcentaje)
+  )
+
+kable(tabla_tipo_parto, 
+      align = c("l", "c", "r", "r"),
+      col.names = c("Tipo de Parto", "Frecuencia", "Porcentaje (%)", "Porcentaje Acumulado (%)"),
+      caption = "TABLA 3. DISTRIBUCIÓN DEL TIPO DE PARTO") %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width = FALSE,
+    font_size = 12
+  ) %>%
+  add_header_above(c(" " = 1, "Distribución de Frecuencias" = 3),
+                   background = "#2C3E50", color = "white") %>%
+  row_spec(0, background = "#34495E", color = "white", bold = TRUE) %>%
+  column_spec(1, bold = TRUE, width = "15em") %>%
+  column_spec(2:4, background = "#F4F6F6") %>%
+  row_spec(1:nrow(tabla_tipo_parto), background = c("#FBFCFC", "#F4F6F6")) %>%
+  footnote(
+    general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024."
+  )
+
+```
+
+La variable “tipo de parto” muestra una distribución claramente dominada por las cesáreas, que representan el 59.3% de los nacimientos en la muestra analizada. Este resultado refleja una tendencia creciente hacia la utilización de este procedimiento en Bogotá, en línea con los reportes recientes de la Secretaría Distrital de Salud, donde también se observa un aumento sostenido en la proporción de partos por cesárea en los últimos años.​
+
+En segundo lugar, el parto espontáneo o vaginal sin intervención constituye el 38.8% de los nacimientos, mientras que el parto instrumentado (con el uso de herramientas como fórceps o ventosas) representa solo el 1.9% del total. Este último dato evidencia que la aplicación de métodos instrumentados es poco frecuente en la cohorte estudiada.
+
+ahora, para ver la relacion de esta variable con la variable dependiente estudiada se realiza un gráfico de anillos el cual permite visualizar de manera clara cómo se distribuyen los tipos de parto (cesárea y espontáneo) y su relación con el estado nutricional neonatal (“Sí” o “No”). Esto ayuda a identificar si existe una diferencia relevante en la prevalencia de desnutrición neonatal según el tipo de parto, facilitando la interpretación y el análisis de posibles asociaciones entre esas variables.
+
+```{r grafica3s, echo=FALSE}
+# GRÁFICO 3: DISTRIBUCIÓN DEL TIPO DE PARTO (SUNBURST)
+tabla_parto_sunburst <- Base_datos %>%
+  count(Tipo_parto, Peso_delicado) %>%
+  mutate(
+    # Crear jerarquía: Total -> Tipo_parto -> Peso_delicado
+    labels = case_when(
+      !is.na(Peso_delicado) ~ paste(Tipo_parto, "-", Peso_delicado),
+      TRUE ~ Tipo_parto
+    ),
+    parents = case_when(
+      !is.na(Peso_delicado) ~ Tipo_parto,
+      TRUE ~ "Total"
+    )
+  )
+
+# Agregar el nodo raíz "Total"
+nodo_total <- tibble(
+  labels = "Total",
+  parents = "",
+  n = sum(tabla_parto_sunburst$n)
+)
+
+# Agregar nodos intermedios (Tipo_parto)
+nodos_tipo_parto <- Base_datos %>%
+  count(Tipo_parto) %>%
+  mutate(
+    labels = Tipo_parto,
+    parents = "Total"
+  ) %>%
+  select(labels, parents, n)
+
+# Combinar todos los datos
+datos_sunburst <- bind_rows(
+  nodo_total,
+  nodos_tipo_parto,
+  tabla_parto_sunburst %>% select(labels, parents, n)
+)
+
+# Crear el gráfico sunburst
+plot_ly(
+  datos_sunburst,
+  labels = ~labels,
+  parents = ~parents,
+  values = ~n,
+  type = 'sunburst',
+  branchvalues = 'total',
+  marker = list(
+    colors = c('#9B59B6', '#1ABC9C', '#F39C12', '#E74C3C', '#3498DB', '#F1C40F'),
+    line = list(color = '#FFFFFF', width = 2)
+  ),
+  hovertemplate = paste(
+    '<b>%{label}</b><br>',
+    'Frecuencia: %{value}<br>',
+    'Porcentaje: %{percentParent}<br>',
+    '<extra></extra>'
+  )
+) %>%
+  layout(
+    title = list(
+      text = "<b>Gráfico 3. Distribución del Tipo de Parto</b><br><sub>Bogotá - Segundo Semestre 2024</sub>",
+      x = 0.5,
+      font = list(size = 16)
+    ),
+    annotations = list(
+      list(
+        text = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024",
+        xref = "paper",
+        yref = "paper",
+        x = 0.5,
+        y = -0.1,
+        showarrow = FALSE,
+        font = list(size = 10, color = "#666666"),
+        xanchor = "center"
+      )
+    ),
+    margin = list(b = 100, t = 100)
+  )
+
+
+```
+
+La grafica evidencia diferencias importantes en la distribución del bajo peso según el tipo de parto. En el grupo de partos por cesárea, el 57.3% correspondió a recién nacidos con desnutrición, mientras que el 42.3% fue un peso moderado. Esto indica que, dentro de quienes nacen por cesárea, existe una mayor proporción de bajo peso, lo que puede vincularse tanto a indicaciones clínicas asociadas a embarazos de mayor complejidad como a prácticas hospitalarias reportadas para la ciudad.​
+
+Al analizar el parto espontáneo, la tendencia se invierte: el 61.5% de los nacidos por este medio fueron clasificados como recién nacidos sin desnutrición  y el 38.5% como recién nacidos con desnutrición. Esto sugiere que el parto espontáneo suele asociarse a mejores condiciones neonatales y puede reflejar embarazos de curso más favorable.
+
+### **Análisis de la Variable Independiente:** Edad De La madre 
+
+La distribución de la edad materna en la muestra se presenta en la Tabla 4. Esta tabla resume la frecuencia y el porcentaje de nacimientos según los distintos grupos de edad de la madre, permitiendo identificar los rangos predominantes en la población de estudio.
+
+```{r tabla4_edad_madre, echo=FALSE}
+# TABLA 4: DISTRIBUCIÓN POR GRUPOS DE EDAD DE LA MADRE
+tabla_edad_madre <- Base_datos %>%
+  count(Edad_madre) %>%
+  mutate(
+    Porcentaje = round(100 * n / sum(n), 1)
+  ) %>%
+  # Extraer el número inicial del rango de edad para ordenar correctamente
+  mutate(
+    Edad_inicial = as.numeric(gsub("(\\d+)-.*", "\\1", Edad_madre))
+  ) %>%
+  arrange(Edad_inicial) %>%  # Ordenar por edad de menor a mayor
+  mutate(
+    Porcentaje_Acumulado = cumsum(Porcentaje)  # Recalcular después de ordenar
+  ) %>%
+  select(-Edad_inicial)  # Eliminar columna auxiliar
+
+kable(tabla_edad_madre, 
+      align = c("l", "c", "r", "r"),
+      col.names = c("Grupo de Edad", "Frecuencia", "Porcentaje (%)", "Porcentaje Acumulado (%)"),
+      caption = "TABLA 4. DISTRIBUCIÓN POR GRUPOS DE EDAD DE LA MADRE") %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width = FALSE,
+    font_size = 12
+  ) %>%
+  add_header_above(c(" " = 1, "Distribución de Frecuencias" = 3),
                    background = "#2C3E50", color = "white") %>%
   row_spec(0, background = "#34495E", color = "white", bold = TRUE) %>%
   column_spec(1, bold = TRUE, width = "12em") %>%
-  column_spec(2, background = "#F4F6F6") %>%
-  column_spec(3:7, background = "#FBFCFC") %>%
+  column_spec(2:4, background = "#F4F6F6") %>%
+  row_spec(1:nrow(tabla_edad_madre), 
+           background = rep(c("#FBFCFC", "#F4F6F6"), length.out = nrow(tabla_edad_madre))) %>%
   footnote(
-    general = "Fuentes:Elaboracion propia en base en la Encuesta de Micronegocios - 2022",
-    number = c("Datos corresponden al mes anterior inmediato")
+    general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024."
   )
-```
-
-Siguiendo con la *tabla 4* ahondamos en la variable de valor agregado, se revela que el departamento de Bolívar lleva la delantera con un valor representativo (mediana=870,000) con un valor mínimo de 10000 y un máximo de 22,850,000. Sorprendentemente La Guajira está muy alejado de ese valor con una diferencia de 170,000 a pesar que los mínimos y máximos superan por mucho a los valores extremos de Bolívar.
-
-```{r grafico dispersion valor agregado, echo=FALSE,Warning=FALSE}
-
-ggplot(BaseFinal, aes(x = `Valor agregado`, y = `Ventas mes anterior`)) +
-  geom_point(alpha = 0.7, color = "#E74C3C", size = 2.5) +
-  geom_smooth(method = "lm", se = TRUE, color = "#2980B9", fill = "#16A085", 
-              alpha = 0.2, size = 1.2) +
-  scale_x_continuous(labels = dollar_format(prefix = "$", big.mark = ",")) +
-  scale_y_continuous(labels = dollar_format(prefix = "$", big.mark = ",")) +
-  labs(title = "Figura 4. RELACION ENTRE VALOR AGREGADO Y VENTAS",
-       subtitle = "Correlacion entre creacion de valor y desempeno comercial",
-       x = "Valor Agregado (COP)", 
-       y = "Ventas Mes Anterior (COP)",
-       caption = "Fuente: Elaboracion propia en base en la Encuesta de Micronegocios - 2022") +
-  theme_minimal() +
-  theme(plot.title = element_text(face = "bold", color = "#2C3E50"),
-        plot.subtitle = element_text(color = "#7F8C8D"))
 
 ```
 
-Este gráfico de dispersión evidencia que existe una relación positiva entre el valor agregado y las ventas. Los micronegocios que logran generar más valor a partir de sus insumos tienden a obtener mayores ingresos, lo que resalta la importancia de la eficiencia productiva y la innovación.
+La mayor proporción de nacimientos se concentra en los grupos de madres de 20 a 24 años (22.2%), 25 a 29 años (28.3%) y 30 a 34 años (23.9%), acumulando entre estos tres grupos el 74.4% del total. Esto indica que la mayoría de los nacimientos en Bogotá durante el periodo analizado corresponden a mujeres en edades reproductivas consideradas óptimas según literatura biomédica y cifras nacionales (DANE, 2024).​
+
+Los extremos presentan frecuencias mucho menores: sólo el 0.3% de los partos ocurrió en madres adolescentes entre 10 y 14 años lo cual aunque sea poco es una cifra muy deprimente dado el contexto, y el porcentaje tan bajo con solo 2 casos en el grupo de 50 a 54 años, lo que sugiere que la maternidad extremadamente temprana y avanzada son eventos muy poco comunes en la muestra. El grupo de 15 a 19 años, aunque representa minoría, suma el 8%, indicando la presencia significativa de embarazos adolescentes, un tema relevante para políticas de salud pública.
+
+Las madres de 35 a 39 años representan un 13.5% y de 40 a 44 años un 3.5%, reflejando una transición reproductiva progresiva hacia edades mayores, pero sin constituir un grupo dominante. Los grupos de 45 a 49 y de 50 a 54 años son prácticamente residuales en la distribución observada.
+
+También se llevó a cabo un gráfico de barras agrupadas lo cual permite comparar la frecuencia de recién nacidos con y sin peso delicado en cada grupo de edad materna facilitando la identificación de grupos de edad donde la prevalencia es mayor o donde la distribución es equilibrada
+
+```{r grafico4_edad_madre_grouped, echo=FALSE, fig.width=12, fig.height=7}
+# GRÁFICO 4:EDAD MADRE BARRAS AGRUPADAS
+#Preparar datos para barras agrupadas
+
+tabla_edad_peso <- Base_datos %>%
+  count(Edad_madre, Peso_delicado) %>%
+  group_by(Edad_madre) %>%
+  mutate(
+    Total = sum(n),
+    Porcentaje = round(100 * n / Total, 1)
+  ) %>%
+  ungroup()
+
+# Crear gráfico de barras agrupadas
+plot_ly(
+  tabla_edad_peso,
+  x = ~Edad_madre,
+  y = ~n,
+  color = ~Peso_delicado,
+  colors = c('#27AE60', '#E74C3C'),
+  type = 'bar',
+  text = ~paste0(n, " (", Porcentaje, "%)"),
+  textposition = 'outside',
+  textfont = list(size = 10),
+  hovertemplate = paste(
+    '<b>Edad: %{x}</b><br>',
+    'Peso Delicado: %{fullData.name}<br>',
+    'Frecuencia: %{y}<br>',
+    'Porcentaje: %{text}<br>',
+    '<extra></extra>'
+  )
+) %>%
+  plotly::layout(
+    barmode = 'group',
+    title = list(
+      text = "<b>Gráfico 4. Distribución de Peso Delicado según Edad Materna</b><br><sub>Bogotá - Segundo Semestre 2024</sub>",
+      x = 0.5,
+      font = list(size = 16)
+    ),
+    xaxis = list(
+      title = "<b>Edad de la Madre</b>",
+      tickfont = list(size = 10),
+      tickangle = -45
+    ),
+    yaxis = list(
+      title = "<b>Frecuencia</b>"
+    ),
+    legend = list(
+      title = list(text = "<b>Peso Delicado</b>"),
+      orientation = "h",
+      x = 0.5,
+      xanchor = "center",
+      y = -0.25
+    ),
+    annotations = list(
+      list(
+        text = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024",
+        xref = "paper",
+        yref = "paper",
+        x = 0.5,
+        y = -0.35,
+        showarrow = FALSE,
+        font = list(size = 10, color = "#666666"),
+        xanchor = "center"
+      )
+    ),
+    margin = list(b = 150, l = 80, r = 50, t = 100)
+  )
+
+
+```
+
+Se observa que el mayor volumen de casos se concentra en los grupos de edad de 20 a 34 años, lo que corresponde a los rangos reproductivos más frecuentes en la población.
+
+Tanto la presencia como la ausencia de peso delicado mantienen proporciones similares en cada grupo de edad, aunque algunos grupos presentan pequeñas diferencias. Por ejemplo, en madres de 25-29 años y 30-34 años, los porcentajes de peso delicado “Sí” y “No” son casi equivalentes, mientras que en los extremos de edad la cantidad de casos es mucho menor y las proporciones varían más con un porcentaje de 59.5 de niños con desnutrición en madres mayores de 45 . Destaca que el grupo de 25-29 años posee el mayor número absoluto de recién nacidos tanto con como sin peso delicado, y las diferencias porcentuales entre estados nutricionales en la mayoría de los grupos no son dramáticas.
 
 ### Inversión de Activos de los Micronegocios en la Región Caribe
 
 ```{r estadisticas de inversion de activos, echo=FALSE,Warning=FALSE}
 
-estadisticas <- BaseFinal %>%
-  group_by(Departamento) %>%
-  summarise(
-    n = n(),
-    "Media de la inversion de activos" = round(mean(`Inversion de activos`), 2),
-    "Desviacion de los activos" = round(sd(`Inversion de activos`), 2),
-    "Mediana del mes anterior" = round(median(`Inversion de activos`), 2),
-    Min = round(min(`Inversion de activos`), 2),
-    Max = round(max(`Inversion de activos`), 2))
 
-kable(estadisticas, 
-      align = c("l", "c", "r", "r", "r", "r", "r"),
-      format.args = list(big.mark = ",", decimal.mark = "."),
-      col.names = c("Departamento", "N", "Media", "Desv.Est", "Mediana", "Minimo", "Maximo"),
-      caption = "TABLA 5. ESTADISTICA DESCRIPTIVA DE LA INVERSION DE ACTIVOS.") %>%
-  kable_styling(
-    bootstrap_options = c("striped", "hover"),
-    full_width = FALSE,
-    font_size = 12,
-    position = "center",
-    latex_options = "hold_position"
-  ) %>%
-  add_header_above(c(" " = 1, "Muestra" = 1, "Estadisticas de Inversion de activos ($)" = 5),
-                   background = "#2C3E50", color = "white") %>%
-  row_spec(0, background = "#34495E", color = "white", bold = TRUE) %>%
-  column_spec(1, bold = TRUE, width = "12em") %>%
-  column_spec(2, background = "#F4F6F6") %>%
-  column_spec(3:7, background = "#FBFCFC") %>%
-  footnote(
-    general = "Fuentes:Elaboracion propia en base en la Encuesta de Micronegocios - 2022",
-    number = c("Datos corresponden al mes anterior inmediato")
-  )
 ```
 
 La *tabla 5* resume la inversión en activos productivos (maquinaria, equipos, etc.) por departamento. Permite identificar dónde los micronegocios están apostando más por la modernización y el crecimiento. Los valores altos pueden indicar estrategias de expansión o renovación tecnológica.
 
 ```{r grafico dispersion inversion, echo=FALSE,Warning=FALSE}
-ggplot(BaseFinal, aes(x = `Inversion de activos`, y = `Ventas mes anterior`)) +
-  geom_point(alpha = 0.7, color = "#27AE60", size = 2.5) +
-  geom_smooth(method = "lm", se = TRUE, color = "#8E44AD", fill = "#F39C12", 
-              alpha = 0.2, size = 1.2) +
-  scale_x_continuous(labels = dollar_format(prefix = "$", big.mark = ",")) +
-  scale_y_continuous(labels = dollar_format(prefix = "$", big.mark = ",")) +
-  labs(title = "Figura 5.RELACION ENTRE INVERSION EN ACTIVOS Y VENTAS",
-       subtitle = "Impacto de la inversion en activos sobre las ventas",
-       x = "Inversion en Activos (COP)", 
-       y = "Ventas Mes Anterior (COP)",
-       caption = "Fuente: Elaboracion propia en base en la Encuesta de Micronegocios - 2022") +
-  theme_minimal() +
-  theme(plot.title = element_text(face = "bold", color = "#2C3E50"),
-        plot.subtitle = element_text(color = "#7F8C8D"))
+
 
 ```
 
@@ -1006,41 +1355,7 @@ El gráfico *figura 5* muestra que sí existe una relación positiva entre la in
 ### Departamento de los Micronegocios en la Región Caribe
 
 ```{r estadisticas de los departamentos, echo=FALSE,Warning=FALSE}
-analisis_departamentos <- BaseFinal %>%
-  count(Departamento, name = "Frecuencia") %>%
-  mutate(
-    Porcentaje = round(Frecuencia / sum(Frecuencia) * 100, 2)
-  ) %>%
-  arrange(desc(Frecuencia)) %>%  # ordenar antes de calcular acumulado
-  mutate(
-    `Porcentaje Acumulado (%)` = cumsum(Porcentaje),
-    Ranking = row_number()
-  )
-kable(analisis_departamentos, 
-      align = c("l", "c", "r", "r", "c"),
-      col.names = c("Departamento", "Frecuencia", "Porcentaje (%)", "Porcentaje Acumulado (%)", "Ranking"),
-      caption = "TABLA 6. ESTADISTICA DESCRIPTIVA DE LOS DEPARTAMENTOS.") %>%
-  kable_styling(
-    bootstrap_options = c("striped", "hover", "condensed"),
-    full_width = TRUE,
-    font_size = 12,
-    html_font = "Arial"
-  ) %>%
-  add_header_above(c(" " = 1, 
-                     "Distribución de Frecuencias" = 3,
-                     "Posición" = 1),
-                   background = c("#2C3E50", "#16A085", "#2980B9")) %>%
-  row_spec(0, background = "#2C3E50", color = "white", bold = TRUE) %>%
-  row_spec(1, background = "#E8F6F3", bold = TRUE) %>%
-  row_spec(2:3, background = "#EBF5FB") %>%
-  column_spec(1, bold = TRUE, width = "15em") %>%
-  column_spec(2, width = "6em", background = "#F4F6F6") %>%
-  column_spec(3:4, width = "8em") %>%
-  column_spec(5, width = "5em", background = "#FEF9E7") %>%
-  footnote(
-    general = "Fuentes:Elaboracion propia en base en la Encuesta de Micronegocios - 2022",
-    number = c("Datos corresponden al mes anterior inmediato")
-  )
+
 
 ```
 
@@ -1049,18 +1364,7 @@ Es incluida como variable de comparación para capturar diferentes perspectivas 
 El análisis descriptivo de los datos revela características importantes de los micronegocios en la región Caribe Colombiana. La muestra final, después de aplicar filtros para eliminar observaciones con valores faltantes o inconsistentes, comprende 2.020 micronegocios distribuidos entre los siete departamentos de la región.
 
 ```{r boxplot departamentovsventas, echo=FALSE,Warning=FALSE}
-ggplot(BaseFinal, aes(x = Departamento, y = `Ventas mes anterior`)) +
-  geom_boxplot(fill = "#3498DB", alpha = 0.7, outlier.color = "#E74C3C") +
-  scale_y_continuous(labels = dollar_format(prefix = "$", big.mark = ",")) +
-  labs(title = "Figura 6. DISTRIBUCION DE VENTAS POR DEPARTAMENTO",
-       subtitle = "Comparacion del desempeno comercial por region",
-       x = "Departamento", 
-       y = "Ventas Mes Anterior (COP)",
-       caption = "Fuente: Elaboracion propia en base en la Encuesta de Micronegocios - 2022") +
-  theme_minimal() +
-  theme(plot.title = element_text(face = "bold", color = "#2C3E50"),
-        plot.subtitle = element_text(color = "#7F8C8D"),
-        axis.text.x = element_text(angle = 45, hjust = 1))
+
 
 
 ```
@@ -1118,34 +1422,12 @@ Este estudio se enfoca en examinar las relaciones cuantitativas entre múltiples
 ## Tabla de coeficientes e interpretación de cada variable
 
 ```{r modelo_creacion, echo=FALSE, warning=FALSE, message=FALSE}
-library(ggplot2)
-library(car)
-library(lmtest)
-formula_text <- "`Ventas mes anterior` ~ `Gastos mes anterior` + 
-                 `Valor agregado` + `Inversion de activos` + 
-                 Departamento + Arrendamiento"
 
-Modelo <- lm(
-  as.formula(formula_text),
-  data = BaseFinal
-)
 
 ```
 
 ```{r modelo, echo=FALSE, warning=FALSE, message=FALSE}
-library(ggplot2)
-library(gridExtra)
-library(car)
-library(lmtest)
 
-if (!exists("Modelo")) {
-  Modelo <- lm(
-    `Ventas mes anterior` ~ `Gastos mes anterior` +
-      `Valor agregado` + `Inversion de activos` 
-    + factor(Departamento) + Arrendamiento,
-    data = BaseFinal
-  )
-}
 
 ```
 
@@ -1153,66 +1435,7 @@ if (!exists("Modelo")) {
 Los resultados de la estimación del modelo de regresión múltiple se presentan en la siguiente tabla de coeficientes:
 
 ```{r tabla sumary, echo=FALSE, warning=FALSE, message=FALSE}
-library(broom)
-library(dplyr)
-library(kableExtra)
-library(stringr)
 
-tidy_mod <- broom::tidy(Modelo, conf.int = TRUE)
-
-tabla_coef <- tidy_mod %>%
-  mutate(
-    term_clean = term %>%
-      str_replace_all("`", "") %>%
-      str_replace("^Departamento(.*)$", "Departamento: \\1") %>%
-      str_replace_all("_", " ") %>%
-      str_trim(),
-    estimate_f = formatC(estimate, format = "f", digits = 4),
-    std.error_f = formatC(std.error, format = "f", digits = 4),
-    statistic_f = formatC(statistic, format = "f", digits = 3),
-    p.value_f = ifelse(p.value < 0.001,
-                       formatC(p.value, format = "e", digits = 2),
-                       formatC(p.value, format = "f", digits = 4)),
-    sig = case_when(
-      p.value < 0.001 ~ "***",
-      p.value < 0.01  ~ "**",
-      p.value < 0.05  ~ "*",
-      p.value < 0.1   ~ ".",
-      TRUE ~ ""
-    )
-  ) %>%
-  select(term_clean, estimate_f, std.error_f, statistic_f, p.value_f, sig)
-
-colnames(tabla_coef) <- c("Variable", "Coeficiente", "Error Estándar", "Estadístico t", "Valor p", "Sig.")
-
-gof <- broom::glance(Modelo) %>%
-  transmute(
-    R2 = round(r.squared, 4),
-    Adj_R2 = round(adj.r.squared, 4),
-    Sigma = round(sigma, 4),
-    N = nobs
-  )
-
-kable(tabla_coef, "html", escape = FALSE, 
-      align = c("l", "r", "r", "r", "r", "c"),
-      caption = "TABLA 7. Resultados del Modelo de Regresión (Resumen de coeficientes)") %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
-                full_width = FALSE, font_size = 13, position = "center") %>%
-  row_spec(0, background = "#2C3E50", color = "white", bold = TRUE) %>%
-  column_spec(1, bold = TRUE, width = "20em") %>%
-  column_spec(2:5, width = "8em") %>%
-  column_spec(6, width = "4em") %>%
-  add_header_above(c(" " = 1, "Estimación" = 4, " " = 1),
-                   background = "#34495E", color = "white") %>%
- footnote(
-    general = paste0("Medidas de ajuste — R² = ", gof$R2,
-                     " | Adj. R² = ", gof$Adj_R2,
-                     " | Sigma = ", gof$Sigma,
-                     " | N = ", gof$N,
-                     " | Fuente: Elaboracion propia en base en la Encuesta de Micronegocios - 2022)"),
-    general_title = "Resumen:",
-    symbol = c("*** p<0.001", "** p<0.01", "* p<0.05", ". p<0.1")
-  )
 
 ```
 
@@ -1266,30 +1489,7 @@ Se asumen supuestos fundamentales sobre el término de error aleatorio (ei) que 
 **Gráfico Q-Q Normal:**
 
 ```{r plot2 , echo=FALSE, warning=FALSE, message=FALSE}
-# Plot 2: QQ-Plot
-p2 <- ggplot(data.frame(residuales = residuals(Modelo)), 
-             aes(sample = residuales)) +
-  stat_qq(alpha = 0.7, color = "#2E86C1", size = 2) +
-  stat_qq_line(color = "#E74C3C", linewidth = 0.8) +
-  scale_x_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
-  scale_y_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
-  labs(title = "Figura 8. QQ-Plot de Residuales",
-       subtitle = "Verificación de normalidad de los residuales",
-       x = "Cuantiles Teóricos", 
-       y = "Cuantiles de Residuales",
-       caption = "Fuente: Elaboracion propia en base en la Encuesta de Micronegocios - 2022") +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
-    plot.subtitle = element_text(size = 10, hjust = 0.5, color = "gray40"),
-    plot.caption = element_text(size = 9, color = "gray50", hjust = 1),
-    panel.grid.minor = element_blank(),
-    panel.grid.major = element_line(color = "gray90", linewidth = 0.3),
-    panel.background = element_rect(fill = "white", color = NA),
-    plot.background = element_rect(fill = "white", color = NA)
-  )
 
-print(p2)
 
 ```
 
@@ -1298,28 +1498,7 @@ El gráfico Q-Q muestra que los puntos se alinean razonablemente bien con la lí
 **Histograma de los Residuos:**
 
 ```{r histograma, echo=FALSE, warning=FALSE, message=FALSE}
-p6 <- ggplot(data.frame(residuales = residuals(Modelo)), aes(x = residuales)) +
-  geom_histogram(bins = 20, fill = "#5DADE2", color = "white", alpha = 0.8, linewidth = 0.3) +
-  geom_vline(xintercept = 0, linetype = "dashed", color = "#E74C3C", linewidth = 0.8) +
-  scale_x_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
-  scale_y_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
-  labs(title = "Figura 9. Histograma de los Residuales",
-       subtitle = "Distribución de los residuales del modelo de regresión",
-       x = "Residuales", 
-       y = "Frecuencia",
-       caption = "Fuente: Elaboracion propia en base en la Encuesta de Micronegocios - 2022") +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
-    plot.subtitle = element_text(size = 10, hjust = 0.5, color = "gray40"),
-    plot.caption = element_text(size = 9, color = "gray50", hjust = 1),
-    panel.grid.minor = element_blank(),
-    panel.grid.major = element_line(color = "gray90", linewidth = 0.3),
-    panel.background = element_rect(fill = "white", color = NA),
-    plot.background = element_rect(fill = "white", color = NA)
-  )
 
-print(p6)
 ```
 
 La distribución de los residuales muestra una forma aproximadamente simétrica y centrada en cero, con características similares a una distribución normal. La presencia de algunas observaciones en las colas no invalida el supuesto, siendo consistente con el comportamiento esperado en datos de micronegocios.
@@ -1333,31 +1512,7 @@ Para determinar si los errores tienen varianza constante se grafican los residua
 **Residuals vs Valores Ajustados:**
 
 ```{r plot4 , echo=FALSE, warning=FALSE, message=FALSE}
-p4 <- ggplot(data.frame(Gastos = BaseFinal$`Gastos mes anterior`,
-                        residuales = residuals(Modelo)), 
-             aes(x = Gastos, y = residuales)) +
-  geom_point(alpha = 0.7, color = "blue", size = 2) +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "#E74C3C", linewidth = 0.8) +
-  geom_smooth(method = "loess", se = FALSE, color = "#2E86C1", linewidth = 0.8) +
-  scale_x_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
-  scale_y_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
-  labs(title = "Figura 14. Residuales vs Gastos del Mes Anterior",
-       subtitle = "Verificación de patrones en residuales vs variable predictora",
-       x = "Gastos del Mes Anterior", 
-       y = "Residuales",
-       caption = "Fuente: Elaboracion propia en base en la Encuesta de Micronegocios - 2022") +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
-    plot.subtitle = element_text(size = 10, hjust = 0.5, color = "gray40"),
-    plot.caption = element_text(size = 9, color = "gray50", hjust = 1),
-    panel.grid.minor = element_blank(),
-    panel.grid.major = element_line(color = "gray90", linewidth = 0.3),
-    panel.background = element_rect(fill = "white", color = NA),
-    plot.background = element_rect(fill = "white", color = NA)
-  )
 
-print(p4)
 ```
 
 El gráfico muestra que los residuales se distribuyen de manera relativamente uniforme alrededor de cero a lo largo del rango de gastos, sin evidenciar patrones claros de ensanchamiento o estrechamiento. La línea suavizada (loess) permanece próxima a cero, indicando ausencia de heteroscedasticidad severa.
@@ -1365,30 +1520,7 @@ El gráfico muestra que los residuales se distribuyen de manera relativamente un
 **Scale-Location Plot (Residuos vs Valores Ajustados):**
 
 ```{r plot3 , echo=FALSE, warning=FALSE, message=FALSE}
-p3 <- ggplot(data.frame(ajustado = fitted(Modelo),
-                       sqrt_abs_resid = sqrt(abs(residuals(Modelo)))), 
-             aes(x = ajustado, y = sqrt_abs_resid)) +
-  geom_point(alpha = 0.7, color = "#5DADE2", size = 2) +
-  geom_smooth(method = "loess", se = FALSE, color = "#2E86C1", linewidth = 0.8) +
-  scale_x_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
-  scale_y_continuous(labels = function(x) format(x, big.mark = ",", scientific = FALSE)) +
-  labs(title = "Figura 10. Scale-Location Plot",
-       subtitle = "Verificación de homocedasticidad - Varianza constante de residuales",
-       x = "Valores Ajustados", 
-       y = "√|Residuales|",
-       caption = "Fuente: Elaboracion propia en base en la Encuesta de Micronegocios - 2022") +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
-    plot.subtitle = element_text(size = 10, hjust = 0.5, color = "gray40"),
-    plot.caption = element_text(size = 9, color = "gray50", hjust = 1),
-    panel.grid.minor = element_blank(),
-    panel.grid.major = element_line(color = "gray90", linewidth = 0.3),
-    panel.background = element_rect(fill = "white", color = NA),
-    plot.background = element_rect(fill = "white", color = NA)
-  )
 
-print(p3)
 
 ```
 
@@ -1405,95 +1537,7 @@ Evaluamos mediante el Factor de Inflación de Varianza (VIF), que mide cuánto s
 **Tabla de Análisis de Multicolinealidad mediante VIF y Gráfico de barras del VIF**
 
 ```{r multicolinealidad, echo=FALSE, warning=FALSE, message=FALSE}
-calcular_vif_seguro <- function(Modelo) {
-  tryCatch({
-    vif_resultados <- vif(Modelo)
-    
-    if(is.matrix(vif_resultados)) {
-      data.frame(
-        Variable = rownames(vif_resultados),
-        VIF = as.numeric(vif_resultados[, "GVIF"]),
-        stringsAsFactors = FALSE
-      )
-    } else {
-      data.frame(
-        Variable = names(vif_resultados),
-        VIF = as.numeric(vif_resultados),
-        stringsAsFactors = FALSE
-      )
-    }
-  }, error = function(e) {
-    X <- model.matrix(Modelo)
-    if("(Intercept)" %in% colnames(X)) {
-      X <- X[, colnames(X) != "(Intercept)", drop = FALSE]
-    }
-    
-    if(ncol(X) > 0) {
-      cor_matrix <- cor(X)
-      vif_manual <- diag(solve(cor_matrix))
-      data.frame(
-        Variable = colnames(X),
-        VIF = vif_manual,
-        stringsAsFactors = FALSE
-      )
-    } else {
-      stop("No se pueden calcular VIF")
-    }
-  })
-}
 
-vif_df <- calcular_vif_seguro(Modelo)
-
-vif_procesado <- vif_df %>%
-  mutate(
-    VIF = round(VIF, 3),
-    Tolerancia = round(1/VIF, 4),
-    Diagnóstico = case_when(
-      VIF >= 10 ~ "GRAVE",
-      VIF >= 5 & VIF < 10 ~ "MODERADO", 
-      VIF < 5 ~ "ACEPTABLE"
-    )
-  ) %>%
-  arrange(desc(VIF))
-
-
-tabla_vif_simple <- vif_procesado %>%
-  select(Variable, VIF, Tolerancia, Diagnóstico)
-
-kable(tabla_vif_simple, 
-      caption = "Tabla 9. Análisis de Multicolinealidad",
-      align = c( "c", "c", "c"),
-      format = ifelse(knitr::is_latex_output(), "latex", "pipe")) %>%
-  kable_styling(bootstrap_options = c("striped", "hover"), 
-                full_width = FALSE,
-                position = "center")
-
-grafico_vif_rmd <- ggplot(vif_procesado, aes(x = reorder(Variable, VIF), y = VIF, fill = Diagnóstico)) +
-  geom_col(width = 0.7, alpha = 0.8) +
-  geom_hline(yintercept = 5, color = "#D69E2E", linetype = "dashed", linewidth = 1) +
-  geom_hline(yintercept = 10, color = "#E53E3E", linetype = "dashed", linewidth = 1) +
-  geom_text(aes(label = sprintf("%.2f", VIF)), hjust = -0.2, size = 3.5, fontface = "bold") +
-  scale_fill_manual(values = c("✅ ACEPTABLE" = "#48BB78", 
-                              "⚠ MODERADO" = "#ECC94B", 
-                              "🚨 GRAVE" = "#F56565")) +
-  coord_flip() +
-  labs(
-    title = "Figura 13. Análisis de Multicolinealidad",
-    subtitle = "Valores de referencia VIF:
-< 5 = Aceptable | 5-10 = Moderado | > 10 = Grave",
-    x = NULL,
-    y = "VIF",
-    caption = "Fuente: Elaboracion propia en base en la Encuesta de Micronegocios - 2022"
-  ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(face = "bold", hjust = 0.5),
-    plot.subtitle = element_text(hjust = 0.5, color = "gray40"),
-    axis.text.y = element_text(face = "bold"),
-    legend.position = "bottom"
-  )
-
-print(grafico_vif_rmd)
 ```
 
 Los resultados del análisis de multicolinealidad muestran que todas las variables independientes presentan valores VIF inferiores a 5, clasificándose como "ACEPTABLE" según los criterios establecidos. Esto indica que:
@@ -1509,47 +1553,7 @@ El gráfico de residuos estandarizados vs leverage muestra que la gran mayoría 
 
 ```{r plot5 , echo=FALSE, warning=FALSE, message=FALSE}
 
-library(broom)
-res_df <- augment(Modelo)
-library(plotly)
-res_df$CooksD <- cooks.distance(Modelo)
 
-GraficoValidacion=ggplot(res_df, aes(x = .hat, y = .std.resid, text = paste(
-  "Leverage:", round(.hat, 3), "<br>",
-  "Residuos estandarizados:", round(.std.resid, 3), "<br>",
-  "Cook’s Distance:", round(CooksD, 4)))) +
-  geom_point(aes(size = CooksD, 
-                 color = ifelse(CooksD > 4 / nrow(res_df), "#E81123", "#0078D4")),
-             alpha = 0.6) +
-  geom_smooth(method = "loess", se = FALSE, color = "#FFB900", linewidth = 1) +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "#E81123") +
-  labs(
-    title = "Figura 11. Residuos estandarizados vs Leverage",
-    subtitle = "Identificación de observaciones influyentes (Cook’s distance)",
-    x = "Leverage", y = "Residuos estandarizados",
-    caption = "Fuente: Elaboracion propia en base en la Encuesta de Micronegocios - 2022 | ") +
-  guides(size = "none", color = "none")+ theme_classic()
-
-GV_interactivo <- ggplotly(GraficoValidacion, tooltip = "text") %>%
-  layout(
-    font = list(family = "Segoe UI", size = 12, color = "#323130"),
-    title = list(x = 0.05, y = 0.95),
-    plot_bgcolor = "#ffffff",
-    paper_bgcolor = "#ffffff",
-    xaxis = list(title = "<b>Leverage</b>", gridcolor = "#f3f2f1"),
-    yaxis = list(title = "<b>Residuos estandarizados</b>", gridcolor = "#f3f2f1"),
-    margin = list(l = 70, r = 40, t = 90, b = 60),
-    annotations = list(
-      list(
-        x = 0.02, y = -0.15,
-        text = "Fuente: Elaboracion propia en base en la Encuesta de Micronegocios - 2022 |",
-        showarrow = FALSE,
-        xref = "paper", yref = "paper",
-        xanchor = "left", yanchor = "bottom",
-        font = list(size = 10, color = "#605e5c")))) %>%
-  config(displaylogo = FALSE, displayModeBar = TRUE)
-
-GV_interactivo
 
 ```
 
@@ -1561,59 +1565,7 @@ La Tabla 10 presenta seis escenarios que demuestran la capacidad predictiva del 
 
 ```{r  predicion, echo=FALSE,Warning=FALSE}
 
-Modelo <- lm(
-  `Ventas mes anterior` ~ `Gastos mes anterior` +
-    `Valor agregado` + `Inversion de activos` + 
-    factor(Departamento) + Arrendamiento ,
-  data = BaseFinal
-)
 
-summary(Modelo)
-
-newdata <- data.frame(
-  `Gastos mes anterior` = c(100000, 200000, 300000, 150000, 250000,350000),
-  `Valor agregado` = c(200000, 400000, 600000, 350000, 450000,150000),
-  `Inversion de activos` = c(50000, 100000, 150000, 80000, 120000,400000),
-  Arrendamiento = c(30000, 40000, 50000, 35000, 45000,70000),
-  Departamento = c("Atlántico", "Bolívar", "La Guajira", "Córdoba", "Magdalena","Cesar")
-)
-
-names(newdata) <- c("Gastos mes anterior", "Valor agregado", 
-                    "Inversion de activos", "Arrendamiento", "Departamento")
-
-
-newdata$Departamento <- factor(newdata$Departamento)
-
-# Hacer la predicción
-predicciones <- predict(Modelo, newdata)
-
-tabla_predicciones <- cbind(
-  newdata,
-  "Venta Predicho (COP)" = round(predicciones, 3))
-
-kable(tabla_predicciones,
-      caption = "Tabla 10. Predicciones de Ventas de micronegocios para Diferentes Escenarios",
-      align = c("l", "r", "r", "r", "l", "r"),  # 7 columnas
-      col.names = c("Gastos mes anterior", "Valor agregado", "Inversion activos", 
-                    "Arrendamiento", "Departamento", "Venta Predicho (COP)")) %>%
-  kable_styling(
-    bootstrap_options = c("striped", "hover", "condensed"),
-    full_width = FALSE,
-    font_size = 14,
-    position = "center"
-  ) %>%
-  row_spec(0, background = "#2b6cb0", color = "white", bold = TRUE) %>%
-  column_spec(1, bold = TRUE, width = "2cm") %>%
-  column_spec(2, width = "2cm") %>%
-  column_spec(3, width = "2cm") %>%
-  column_spec(4, width = "2cm") %>%
-  column_spec(5, width = "1.5cm") %>%
-  column_spec(6, width = "2cm") %>%
-  footnote(
-    general = "Fuente: Elaboracion propia en base en la Encuesta de Micronegocios - 2022.",
-    general_title = "Nota:",
-    footnote_as_chunk = TRUE
-  )
 ```
 
 Hallazgos principales:
@@ -1735,3 +1687,5 @@ Los resultados obtenidos constituyen una base confiable para la toma de decision
 -   Ejemplos.co. (2024). *25 Ejemplos de Variables Dependientes e Independientes*. [**https://www.ejemplos.co/variables-dependientes-e-independientes/**](https://www.ejemplos.co/variables-dependientes-e-independientes/)
 :::
 ::::
+
+:::::::::::::

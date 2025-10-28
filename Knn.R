@@ -51,6 +51,7 @@ BD_test_output_kNN <- knn(train = BD_entrena_input,
 BD_knnEntrenado
 
 # Gráfica del k óptimo
+
 plot(BD_knnEntrenado)
 
 # Predicciones

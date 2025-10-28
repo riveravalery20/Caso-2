@@ -1,0 +1,647 @@
+  
+/* PALETA ACADÉMICA MARINA PROFESIONAL */
+:root {
+  --deep-ocean: #2C5F7A;         /* Azul marino profundo */
+  --ocean-teal: #3A8E96;         /* Verde azulado principal */
+  --sea-glass: #4FB0A8;          /* Turquesa suave */
+  --seafoam: #8FD4C1;            /* Espuma de mar */
+  --mist: #F8FCFB;               /* Blanco académico con tono marino suave */
+  --parchment: #FDFDF6;          /* Color pergamino académico */
+  --coral: #D94E4E;              /* Acento coral sobrio */
+  --dark-ink: #2C3E50;           /* Color tinta para texto */
+  --light-ink: #4A6572;          /* Texto secundario */
+  --border-light: #E1F0ED;       /* Bordes sutiles */
+  --accent-gold: #C4A747;        /* Dorado académico */
+}
+
+/* IMPORTAR FUENTES ACADÉMICAS */
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Source+Serif+Pro:wght@300;400;600&family=Lato:wght@300;400;700&display=swap');
+
+/* ESTILOS BASE ACADÉMICOS */
+body {
+  font-family: 'Source Serif Pro', 'Georgia', 'Times New Roman', serif;
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--dark-ink);
+  background-color: var(--parchment);
+  font-size: 17px;
+  text-align: justify;
+}
+
+.main-content {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 3rem;
+  background: var(--mist);
+  box-shadow: 
+    0 5px 30px rgba(42, 95, 122, 0.08),
+    0 1px 3px rgba(0,0,0,0.03);
+  border-radius: 4px;
+  border: 1px solid var(--border-light);
+  position: relative;
+}
+
+/* ENCABEZADOS ACADÉMICOS */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Merriweather', 'Georgia', 'Times New Roman', serif;
+  color: var(--deep-ocean) !important;
+  margin-top: 2.5rem;
+  margin-bottom: 1.2rem;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: left;
+}
+
+h1 {
+  font-size: 2.6rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.2rem;
+  border-bottom: 3px double var(--sea-glass);
+  color: var(--deep-ocean) !important;
+  background: none;
+  -webkit-text-fill-color: var(--deep-ocean);
+  letter-spacing: -0.5px;
+}
+
+h2 {
+  font-size: 2rem;
+  border-left: 4px solid var(--ocean-teal);
+  padding-left: 1.2rem;
+  margin-top: 3rem;
+  background: linear-gradient(90deg, rgba(79, 176, 168, 0.08) 0%, transparent 100%);
+  padding: 0.8rem 1.2rem;
+  border-radius: 0;
+  position: relative;
+  font-weight: 600;
+}
+
+h3 {
+  font-size: 1.5rem;
+  color: var(--ocean-teal) !important;
+  border-bottom: 1px solid var(--border-light);
+  padding-bottom: 0.5rem;
+  margin-top: 2.2rem;
+  font-weight: 600;
+}
+
+h4 {
+  font-size: 1.3rem;
+  color: var(--sea-glass) !important;
+  margin-top: 1.8rem;
+  font-style: italic;
+}
+
+h5 {
+  font-size: 1.1rem;
+  color: var(--light-ink) !important;
+  margin-top: 1.5rem;
+}
+
+/* TOC Y SIDEBAR - ARREGLO COMPLETO PARA R MARKDOWN */
+
+/* Sidebar principal */
+.sidebar, #sidebar, .col-sm-3, .tocify {
+  background: linear-gradient(135deg, var(--mist) 0%, #F0F9F7 100%) !important;
+  border-right: 2px solid var(--border-light) !important;
+  padding: 1.5rem !important;
+}
+
+/* Contenedor del TOC */
+#TOC, .tocify, .list-group {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100% !important;
+}
+
+/* Items del TOC - TODOS LOS NIVELES */
+#TOC ul, 
+#TOC li, 
+.tocify ul, 
+.tocify li, 
+.list-group-item {
+  background: transparent !important;
+  border: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+  display: block !important;
+  width: 100% !important;
+}
+
+/* Enlaces del TOC - NIVEL 1 */
+#TOC > ul > li > a,
+.tocify-header > a,
+.list-group-item > a {
+  color: var(--deep-ocean) !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0.8rem 1rem !important;
+  margin: 0.2rem 0 !important;
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+  border-left: 3px solid transparent !important;
+  transition: all 0.3s ease !important;
+  display: block !important;
+  text-decoration: none !important;
+}
+
+/* Enlaces del TOC - NIVEL 2 */
+#TOC ul ul li a,
+.tocify-subheader a,
+.list-group .list-group-item a {
+  color: var(--light-ink) !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0.6rem 1rem 0.6rem 1.8rem !important;
+  margin: 0.1rem 0 !important;
+  font-weight: 400 !important;
+  font-size: 0.95rem !important;
+  border-left: 2px solid transparent !important;
+  transition: all 0.3s ease !important;
+  display: block !important;
+  text-decoration: none !important;
+}
+
+/* Enlaces del TOC - NIVEL 3 */
+#TOC ul ul ul li a,
+.tocify-subheader .tocify-subheader a {
+  color: var(--light-ink) !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0.5rem 1rem 0.5rem 2.6rem !important;
+  margin: 0.1rem 0 !important;
+  font-weight: 300 !important;
+  font-size: 0.9rem !important;
+  border-left: 1px solid transparent !important;
+  transition: all 0.3s ease !important;
+  display: block !important;
+  text-decoration: none !important;
+}
+
+/* Hover para todos los niveles */
+#TOC a:hover,
+.tocify a:hover,
+.list-group-item a:hover {
+  color: var(--deep-ocean) !important;
+  background: rgba(79, 176, 168, 0.08) !important;
+  border-left: 3px solid var(--sea-glass) !important;
+  transform: translateX(2px);
+}
+
+/* Active state */
+#TOC a:active,
+#TOC a:focus,
+.tocify a:active,
+.tocify a:focus,
+.list-group-item.active a {
+  color: var(--deep-ocean) !important;
+  background: rgba(79, 176, 168, 0.12) !important;
+  border-left: 3px solid var(--ocean-teal) !important;
+  font-weight: 600 !important;
+}
+
+/* Listas anidadas */
+#TOC ul ul,
+.tocify-subheader,
+.list-group .list-group {
+  padding-left: 0.5rem !important;
+  margin: 0 !important;
+  border-left: 1px solid var(--border-light) !important;
+}
+
+/* Título del TOC */
+#TOC .toc-title,
+.tocify-header:first-child {
+  font-family: 'Merriweather', serif !important;
+  font-size: 1.3rem !important;
+  font-weight: 700 !important;
+  color: var(--deep-ocean) !important;
+  margin-bottom: 1rem !important;
+  padding-bottom: 0.5rem !important;
+  border-bottom: 2px solid var(--sea-glass) !important;
+  text-align: center !important;
+  background: transparent !important;
+  border: none !important;
+}
+/* CONTENEDOR PRINCIPAL */
+.container-fluid {
+  background: linear-gradient(135deg, #F5FBFA 0%, var(--parchment) 100%);
+  min-height: 100vh;
+  padding: 1.5rem;
+}
+
+/* HEADER ACADÉMICO */
+.page-header {
+  background: linear-gradient(135deg, var(--deep-ocean) 0%, var(--ocean-teal) 100%) !important;
+  color: white;
+  padding: 3.5rem 2rem !important;
+  text-align: center;
+  margin-bottom: 2.5rem !important;
+  border-radius: 0;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 4px solid var(--sea-glass);
+}
+
+.page-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 60%);
+}
+
+.page-header h1 {
+  color: white !important;
+  font-size: 2.8rem;
+  font-weight: 700;
+  border: none;
+  background: none;
+  -webkit-text-fill-color: white;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  position: relative;
+  z-index: 2;
+  margin-bottom: 0.5rem;
+}
+
+.page-header h2 {
+  color: rgba(255,255,255,0.95) !important;
+  font-size: 1.4rem;
+  font-weight: 300;
+  border: none;
+  background: none;
+  font-family: 'Source Serif Pro', serif;
+  position: relative;
+  z-index: 2;
+  margin-top: 0.5rem;
+}
+
+/* BLOQUES DE CÓDIGO ACADÉMICOS */
+pre {
+  background: #f8f9fa !important;
+  color: var(--dark-ink) !important;
+  padding: 1.2rem !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: 4px !important;
+  border-left: 4px solid var(--ocean-teal) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
+  font-size: 0.85em;
+  line-height: 1.5;
+  margin: 1.2rem 0;
+}
+
+code {
+  background: rgba(79, 176, 168, 0.1) !important;
+  color: var(--ocean-teal) !important;
+  padding: 0.15rem 0.4rem !important;
+  border-radius: 3px;
+  font-family: 'Consolas', 'Monaco', monospace !important;
+  font-size: 0.8em;
+  border: 1px solid rgba(79, 176, 168, 0.2);
+}
+
+/* TABLAS ACADÉMICAS */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.8rem 0;
+  box-shadow: 0 1px 4px rgba(42, 95, 122, 0.08);
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  overflow: hidden;
+  font-family: 'Lato', sans-serif;
+}
+
+th {
+  background: linear-gradient(135deg, var(--ocean-teal), var(--deep-ocean)) !important;
+  color: white !important;
+  font-weight: 600;
+  padding: 0.9rem !important;
+  text-align: left;
+  border: none !important;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.9rem;
+}
+
+td {
+  padding: 0.8rem !important;
+  border: none !important;
+  border-bottom: 1px solid var(--border-light) !important;
+  font-size: 0.9rem;
+}
+
+tr:nth-child(even) {
+  background: rgba(143, 212, 193, 0.05) !important;
+}
+
+tr:hover {
+  background: rgba(79, 176, 168, 0.08) !important;
+}
+
+/* GRÁFICOS ACADÉMICOS */
+.plotly.html-widget {
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(42, 95, 122, 0.1);
+  padding: 0.8rem;
+  background: white;
+  border: 1px solid var(--border-light);
+  margin: 1.5rem 0;
+}
+
+/* BOTONES ACADÉMICOS */
+.btn {
+  background: linear-gradient(135deg, var(--ocean-teal), var(--sea-glass)) !important;
+  color: white !important;
+  border: none !important;
+  padding: 0.6rem 1.2rem !important;
+  border-radius: 4px !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 1px 4px rgba(58, 142, 150, 0.3) !important;
+  font-family: 'Lato', sans-serif !important;
+}
+
+.btn:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 8px rgba(58, 142, 150, 0.4) !important;
+}
+
+/* FOOTER ACADÉMICO */
+.academic-footer {
+  text-align: center;
+  color: var(--ocean-teal);
+  margin-top: 4rem;
+  padding: 2.5rem 2rem;
+  border-top: 2px solid var(--border-light);
+  background: var(--mist);
+  font-family: 'Merriweather', serif;
+  font-size: 0.9rem;
+}
+
+/* CITAS Y BLOCKQUOTES */
+blockquote {
+  border-left: 4px solid var(--sea-glass);
+  background: rgba(143, 212, 193, 0.05);
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+  font-style: italic;
+  color: var(--light-ink);
+  border-radius: 0 4px 4px 0;
+}
+
+/* LISTAS ACADÉMICAS */
+ul, ol {
+  padding-left: 1.8rem;
+  margin: 1.2rem 0;
+}
+
+li {
+  margin: 0.5rem 0;
+  line-height: 1.6;
+}
+
+/* RESPONSIVE DESIGN ACADÉMICO */
+@media (max-width: 768px) {
+  .main-content {
+    padding: 1.5rem;
+    margin: 1rem;
+    border-radius: 0;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+  
+  h2 {
+    font-size: 1.6rem;
+    padding: 0.6rem 1rem;
+  }
+  
+  .page-header {
+    padding: 2.5rem 1rem !important;
+  }
+  
+  .page-header h1 {
+    font-size: 2rem;
+  }
+  
+  #TOC {
+    padding: 1.5rem 1rem !important;
+    margin: 1.5rem 0 !important;
+  }
+}
+
+/* ENLACES ACADÉMICOS */
+a {
+  color: var(--ocean-teal);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+a:hover {
+  color: var(--deep-ocean);
+  border-bottom-color: var(--sea-glass);
+}
+
+/* SCROLLBAR DISCRETO */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--mist);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--sea-glass);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ocean-teal);
+}
+
+/* CONTROLES DE CÓDIGO ACADÉMICOS */
+.code-toggle-container {
+  text-align: center;
+  margin: 3rem 0 2rem 0;
+  padding: 2rem;
+  background: linear-gradient(135deg, var(--mist) 0%, #F0F9F7 100%);
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  box-shadow: 0 2px 12px rgba(42, 95, 122, 0.08);
+  border-left: 4px solid var(--ocean-teal);
+}
+
+.code-toggle-container h4 {
+  margin-top: 0 !important;
+  color: var(--deep-ocean) !important;
+  font-family: 'Merriweather', serif !important;
+  font-size: 1.3rem !important;
+  border: none !important;
+  background: none !important;
+  padding: 0 !important;
+}
+
+.code-toggle-container p {
+  color: var(--light-ink) !important;
+  margin-bottom: 1.5rem !important;
+  font-family: 'Source Serif Pro', serif !important;
+  font-size: 0.95rem !important;
+}
+
+.code-toggle-btn {
+  background: linear-gradient(135deg, var(--ocean-teal), var(--sea-glass));
+  color: white !important;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 6px;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(58, 142, 150, 0.3);
+  margin: 0 0.5rem 0.5rem 0;
+}
+
+.code-toggle-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(58, 142, 150, 0.4);
+  background: linear-gradient(135deg, var(--sea-glass), var(--ocean-teal));
+}
+
+.code-toggle-btn.secondary {
+  background: linear-gradient(135deg, var(--seafoam), var(--sea-glass));
+  color: var(--dark-ink) !important;
+}
+
+.code-toggle-btn.secondary:hover {
+  background: linear-gradient(135deg, var(--sea-glass), var(--seafoam));
+}
+
+/* BOTÓN FLOTANTE GLOBAL */
+.global-code-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  background: linear-gradient(135deg, var(--ocean-teal), var(--deep-ocean));
+  color: white;
+  border: none;
+  padding: 0.8rem 1.2rem;
+  border-radius: 25px;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(42, 95, 122, 0.4);
+  transition: all 0.3s ease;
+}
+
+.global-code-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(42, 95, 122, 0.6);
+}
+
+/* CONTENEDORES DE CÓDIGO CON TOGGLE */
+.code-chunk {
+  margin: 2rem 0;
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(42, 95, 122, 0.08);
+  transition: all 0.3s ease;
+}
+
+.code-chunk:hover {
+  box-shadow: 0 4px 15px rgba(42, 95, 122, 0.12);
+}
+
+.code-header {
+  background: linear-gradient(135deg, var(--ocean-teal), var(--deep-ocean));
+  color: white;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Lato', sans-serif;
+}
+
+.code-header:hover {
+  background: linear-gradient(135deg, var(--deep-ocean), var(--ocean-teal));
+}
+
+.chunk-title {
+  font-family: 'Lato', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.toggle-icon {
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: transform 0.3s ease;
+}
+
+.toggle-icon.rotated {
+  transform: rotate(180deg);
+}
+
+.code-content {
+  background: #f8f9fa;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.code-content.collapsed {
+  max-height: 0;
+  opacity: 0;
+  padding: 0;
+}
+
+.code-content.expanded {
+  max-height: 5000px;
+  opacity: 1;
+  padding: 1rem;
+}
+
+/* INDICADOR DE ESTADO */
+.code-status {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.code-status.visible {
+  background: #4CAF50;
+  box-shadow: 0 0 5px #4CAF50;
+}
+
+.code-status.hidden {
+  background: #FF9800;
+  box-shadow: 0 0 5px #FF9800;
+}
+
+/* SMOOTH SCROLL Y NAVEGACIÓN */
+html {
+  scroll-behavior: smooth;
+}
+
