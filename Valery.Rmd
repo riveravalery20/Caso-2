@@ -860,7 +860,6 @@ document.addEventListener('DOMContentLoaded', function() {
 *El modelo presenta un poder explicativo robusto y significancia estadística global. Los supuestos de regresión se cumplen de manera aceptable para datos económicos reales, con ligeras desviaciones que no comprometen la validez práctica del análisis.*
 
 *Las predicciones generadas permiten evaluar diferentes escenarios operativos y confirman que la eficiencia en el uso del capital de trabajo es más determinante que la capitalización en activos fijos para el éxito comercial de los micronegocios en la región estudiada.*
-
 :::
 
 # Introducción
@@ -958,7 +957,6 @@ kable(variables_modelo,
   footnote(general = "Fuente: Elaboración propia en base a la Base de Datos de Nacimientos - 2024",
            number = c("Datos corresponden al segundo semestre del año 2024"))
 ```
-
 
 ```{r cargar_datos, include=FALSE}
 # Configuración inicial - manteniendo tu código base
@@ -1644,6 +1642,10 @@ Se observa que el mayor volumen de casos se concentra en los grupos de edad de 2
 
 Tanto la presencia como la ausencia de peso delicado mantienen proporciones similares en cada grupo de edad, aunque algunos grupos presentan pequeñas diferencias. Por ejemplo, en madres de 25-29 años y 30-34 años, los porcentajes de peso delicado “Sí” y “No” son casi equivalentes, mientras que en los extremos de edad la cantidad de casos es mucho menor y las proporciones varían más con un porcentaje de 59.5 de niños con desnutrición en madres mayores de 45 . Destaca que el grupo de 25-29 años posee el mayor número absoluto de recién nacidos tanto con como sin peso delicado, y las diferencias porcentuales entre estados nutricionales en la mayoría de los grupos no son dramáticas.
 
+### **Analisis de la Variable Independiente:** Controles Prenatales
+
+La distribución de los controles prenatales en la muestra se presenta en la Tabla \_\_\_. 
+
 ```{r tabla5_controles_prenatales}
 # TABLA 5: ESTADÍSTICAS DE CONTROLES PRENATALES
 tabla_controles <- Base_datos %>%
@@ -1671,6 +1673,12 @@ kable(tabla_controles,
   column_spec(1, bold = TRUE, width = "12em") %>%
   footnote(general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024.")
 ```
+
+El análisis descriptivo del número de controles prenatales, muestra que las madres de la muestra tuvieron en promedio 6.9 controles prenatales durante el embarazo, con una desviación estándar de 2.8. El rango observado va desde 0 controles (mínimo) hasta un máximo de 25 controles en algunos casos.
+
+Estos resultados indican que, en general, la mayoría de las madres no accedió al número adecuado de controles prenatales, ya que la media no se acerca a la recomendación mínima de ocho controles establecida en las guías nacionales e internacionales. Sin embargo, la presencia de casos con 0 controles evidencia que todavía existen brechas en el acceso a la atención materna en ciertos sectores de la población, lo que puede aumentar los riesgos de desenlaces adversos como la desnutrición neonatal.
+
+tambien se realizo un histograma de barras agrupadas, donde se visualiza la distribución de controles prenatales según zonas de riesgo (“Adecuado”, “Insuficiente” y “Crítico”) definido por las recomendaciones de la OMS. El eje X muestra el número de controles prenatales recibidos y el eje Y la frecuencia absoluta registrada para cada caso.
 
 ```{r grafico5_controles_prenatales, fig.width=8, fig.height=4.6}
 # GRÁFICO 5 INTERACTIVO: DISTRIBUCIÓN DE CONTROLES PRENATALES CON ZONAS DE RIESGO
@@ -1852,7 +1860,11 @@ fig <- plot_ly() %>%
 fig
 ```
 
-# 
+El análisis revela que la mayoría de las madres recibieron entre 4 y 7 controles prenatales, ubicándose en la zona “Insuficiente” según la OMS; la mediana es 7 y la media 6.9. El grupo “Adecuado” (8 o más controles) también es significativo, aunque menos frecuente. Los controles “Críticos” (menos de 4) son minoritarios. Esto indica que, aunque una parte relevante cumple con recomendaciones mínimas, existe oportunidad de mejora en el acceso y seguimiento prenatal para lograr el estándar recomendado (8 o más controles).
+
+### Analisis de la Variable Independiente: Numero de Embarazos
+
+La distribución del número de embarazos  en la muestra se presenta en la Tabla \_\_\_. 
 
 ```{r tabla6_numero_embarazos}
 # TABLA 6: ESTADÍSTICAS DE NÚMERO DE EMBARAZOS
@@ -1882,10 +1894,17 @@ kable(tabla_embarazos,
   footnote(general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024.")
 ```
 
+El análisis descriptivo del número de embarazos revela que, en promedio, las mujeres de la muestra han tenido 1.9 embarazos, con una desviación estándar de 1.1. El valor mínimo registrado es de 1 embarazo y el máximo alcanza los 14 embarazos.
+
+Estos datos indican que, en general, la mayoría de las mujeres estudiadas tiene entre 1 y 2 embarazos a lo largo de su vida reproductiva, lo que corresponde a un perfil reproductivo moderado, acorde con la tendencia observada en Bogotá en los últimos años. La baja desviación estándar muestra poca dispersión, es decir, el número de embarazos está relativamente concentrado cerca de la media.
+
+Sin embargo, el hecho de que existan mujeres con hasta 14 embarazos resalta la presencia de subgrupos dentro de la población con comportamientos reproductivos significativamente diferentes al promedio general. Esto puede estar relacionado con factores sociales, culturales o de acceso a servicios de salud y planificación familiar.
+
+Seguido a esto se hizo un diagrama de caja o boxplot comparativo, este tipo de gráfico representa la distribución, tendencia central (media y mediana) y dispersión del número de embarazos en dos grupos: recién nacidos con peso delicado (“Sí”) y recién nacidos sin peso delicado (“No”).
+
 ```{r grafico6_numero_embarazos_boxplot}
 # GRÁFICO 6: BOXPLOT COMPARATIVO - NÚMERO DE EMBARAZOS POR PESO DELICADO
 
-# Primero calculamos las estadísticas para las anotaciones
 stats_embarazos <- Base_datos %>%
   group_by(Peso_delicado) %>%
   summarise(
@@ -1898,17 +1917,35 @@ stats_embarazos <- Base_datos %>%
     n = n()
   )
 
+
+stats_df <- as.data.frame(stats_embarazos)
+
+
+cat1 <- as.character(stats_df$Peso_delicado[1])
+media1 <- stats_df$Media[1]
+mediana1 <- stats_df$Mediana[1]
+q1_1 <- stats_df$Q1[1]
+q3_1 <- stats_df$Q3[1]
+
+
+cat2 <- as.character(stats_df$Peso_delicado[2])
+media2 <- stats_df$Media[2]
+mediana2 <- stats_df$Mediana[2]
+q1_2 <- stats_df$Q1[2]
+q3_2 <- stats_df$Q3[2]
+
 g6_boxplot <- ggplot(Base_datos, aes(x = Peso_delicado, y = Numero_embarazos, fill = Peso_delicado)) +
-  # Boxplot principal
-  geom_boxplot(alpha = 0.7, outlier.shape = 21, outlier.size = 2, 
-               outlier.fill = "white", outlier.color = "#e74c3c", width = 0.6) +
-  # Marcar la media con un rombo
+  geom_boxplot(alpha = 0.7, 
+               outlier.shape = 21, 
+               outlier.size = 1.5, 
+               outlier.fill = "#e74c3c",
+               outlier.color = "#c0392b",
+               outlier.stroke = 2,
+               width = 0.6) +
   stat_summary(fun = mean, geom = "point", shape = 23, size = 4, 
                color = "#e67e22", fill = "#e67e22", stroke = 1.5) +
-  # Colores personalizados
   scale_fill_manual(values = c("No" = "#3498db", "Sí" = "#e74c3c"),
                     name = "Peso Delicado") +
-  # Etiquetas y títulos
   labs(
     title = "FIGURA 6. Distribución del Número de Embarazos según Peso Delicado",
     subtitle = "Comparación de medidas de tendencia central y dispersión",
@@ -1933,75 +1970,308 @@ g6_boxplot <- ggplot(Base_datos, aes(x = Peso_delicado, y = Numero_embarazos, fi
   ) +
   scale_y_continuous(breaks = seq(0, max(Base_datos$Numero_embarazos, na.rm = TRUE), by = 1))
 
-# Añadir tabla de estadísticas al lado del gráfico
+
+max_y <- max(Base_datos$Numero_embarazos, na.rm = TRUE)
+
+
 g6_con_stats <- g6_boxplot +
-  # Cuadro con estadísticas para "No"
   annotate("rect",
            xmin = 0.55, xmax = 1.45,
-           ymin = max(Base_datos$Numero_embarazos, na.rm = TRUE) * 0.82,
-           ymax = max(Base_datos$Numero_embarazos, na.rm = TRUE) * 1.0,
-           fill = "white", color = "#3498db", linewidth = 1.2, alpha = 0.95) +
+           ymin = max_y * 0.82,
+           ymax = max_y * 1.0,
+           fill = "white", 
+           color = if(cat1 == "No") "#3498db" else "#e74c3c", 
+           linewidth = 1.2, alpha = 0.95) +
   annotate("text",
            x = 1,
-           y = max(Base_datos$Numero_embarazos, na.rm = TRUE) * 0.91,
-           label = paste0("Peso NO Delicado\n",
-                         "Media: ", stats_embarazos$Media[stats_embarazos$Peso_delicado == "No"], "\n",
-                         "Mediana: ", stats_embarazos$Mediana[stats_embarazos$Peso_delicado == "No"], "\n",
-                         "Q1: ", stats_embarazos$Q1[stats_embarazos$Peso_delicado == "No"],
-                         " | Q3: ", stats_embarazos$Q3[stats_embarazos$Peso_delicado == "No"]),
+           y = max_y * 0.91,
+           label = paste0(cat1, "\n",
+                         "Media: ", media1, "\n",
+                         "Mediana: ", mediana1, "\n",
+                         "Q1: ", q1_1, " | Q3: ", q3_1),
            size = 3, fontface = "bold", color = "#2C3E50", lineheight = 0.9) +
-  # Cuadro con estadísticas para "Sí"
+  
   annotate("rect",
            xmin = 1.55, xmax = 2.45,
-           ymin = max(Base_datos$Numero_embarazos, na.rm = TRUE) * 0.82,
-           ymax = max(Base_datos$Numero_embarazos, na.rm = TRUE) * 1.0,
-           fill = "white", color = "#e74c3c", linewidth = 1.2, alpha = 0.95) +
+           ymin = max_y * 0.82,
+           ymax = max_y * 1.0,
+           fill = "white", 
+           color = if(cat2 == "No") "#3498db" else "#e74c3c",
+           linewidth = 1.2, alpha = 0.95) +
   annotate("text",
            x = 2,
-           y = max(Base_datos$Numero_embarazos, na.rm = TRUE) * 0.91,
-           label = paste0("Peso Delicado\n",
-                         "Media: ", stats_embarazos$Media[stats_embarazos$Peso_delicado == "Sí"], "\n",
-                         "Mediana: ", stats_embarazos$Mediana[stats_embarazos$Peso_delicado == "Sí"], "\n",
-                         "Q1: ", stats_embarazos$Q1[stats_embarazos$Peso_delicado == "Sí"],
-                         " | Q3: ", stats_embarazos$Q3[stats_embarazos$Peso_delicado == "Sí"]),
+           y = max_y * 0.91,
+           label = paste0(cat2, "\n",
+                         "Media: ", media2, "\n",
+                         "Mediana: ", mediana2, "\n",
+                         "Q1: ", q1_2, " | Q3: ", q3_2),
            size = 3, fontface = "bold", color = "#2C3E50", lineheight = 0.9)
 
 print(g6_con_stats)
 
 ```
 
-```{r tabla7_resumen}
-# TABLA 7: RESUMEN GENERAL DE OBSERVACIONES
-tabla_resumen <- Base_datos %>%
-  count(Peso_delicado) %>%
-  mutate(
-    Porcentaje = round(100 * n / sum(n), 1),
-    `Porcentaje Acumulado` = cumsum(Porcentaje),
-    Categoria = ifelse(Peso_delicado == "Si", "Si", "No")
-  ) %>%
-  select(Categoria, n, Porcentaje, `Porcentaje Acumulado`)
+La figura muestra que en ambos grupos, la media y la mediana son prácticamente iguales: media de 1.88 y mediana de 2 para “Sí”, media de 1.86 y mediana de 2 para “No”. El rango intercuartílico (Q1 a Q3) es idéntico, situándose entre 1 y 2 embarazos en ambos casos.
 
-kable(tabla_resumen, 
-      align = c("l", "c", "r", "r"),
-      col.names = c("Peso delicado", "Frecuencia", "Porcentaje (%)", "Porcentaje Acumulado (%)"),
-      caption = "TABLA 7. RESUMEN GENERAL DE OBSERVACIONES POR PESO DELICADO (SI/NO)") %>%
-  kable_styling(
-    bootstrap_options = c("striped", "hover", "condensed"),
-    full_width = FALSE,
-    font_size = 12,
-    html_font = "Arial"
+ En conclusión, no existen diferencias notables entre los dos grupos en cuanto al número de embarazos previos, lo que indica que esta variable no parece estar asociada de manera relevante con la presencia de peso delicado al nacer en la muestra analizada.
+:::
+::::
+
+# Estimacion De Modelos
+
+::: content-block
+```{r librerias modelos}
+library(readr)
+library(dplyr)
+library(tidyverse)
+library(caret)
+library(ISLR)
+library(kableExtra)
+```
+
+En este estudio se emplean dos modelos de clasificación supervisada para analizar los factores asociados a la desnutrición neonatal en Bogotá: K-Nearest Neighbors (KNN) y Regresión Logística. Ambos modelos permiten abordar el problema desde perspectivas complementarias y robustecer la interpretación de los resultados.
+
+## Modelo KNN( K- Nearest- Neighbors)
+
+```{r cargar modelo KNN}
+# Librerías esenciales
+library(dplyr)
+library(tidyverse)
+library(caret)
+library(pROC)
+library(class)
+
+# KNN COMPLETO
+set.seed(200)
+
+# División de datos
+index_muestra <- sample(11873, 11873)
+index_entrena <- sample(11873, 8904)
+index_test <- index_muestra[!index_muestra %in% index_entrena]
+
+BD_entrena <- Base_datos[index_entrena, ] %>% 
+  filter(!is.na(Peso_delicado))
+
+BD_test <- Base_datos[index_test, ] %>% 
+  filter(!is.na(Peso_delicado))
+
+# Asegurar niveles correctos
+BD_entrena$Peso_delicado <- factor(BD_entrena$Peso_delicado, levels = c("Si", "No"))
+BD_test$Peso_delicado <- factor(BD_test$Peso_delicado, levels = c("Si", "No"))
+
+BD_entrena_input <- Base_datos[, 1:5]
+BD_entrena_output <- Base_datos[, 6]
+
+BD_test_input <- Base_datos[, -6]
+BD_test_output <- Base_datos[, 6]
+
+# Entrenar k-NN
+BD_knnEntrenado <- train(Peso_delicado ~ ., 
+                         data = BD_entrena, 
+                         method = "knn",  
+                         tuneLength = 200
+)
+#Numero optimo
+
+BD_test_output_kNN <- knn(train = BD_entrena_input, 
+                            cl = BD_entrena_output, 
+                            test = BD_test_input, 
+                            k = 43)
+# Resultados del modelo
+BD_knnEntrenado
+
+# Gráfica del k óptimo
+plot(BD_knnEntrenado)
+
+# Predicciones
+BD_knnPrediccion <- predict(BD_knnEntrenado, newdata = BD_test)
+
+# Matriz de confusión final
+confusionMatrix(BD_knnPrediccion, BD_test$Peso_delicado, positive = "Si")
+
+prob_knnPrediccion <- predict(BD_knnEntrenado, newdata = BD_test, type = "prob")
+head(prob_knnPrediccion, 10)
+
+data.frame(
+  Real = BD_test$Peso_delicado[1:20],
+  Predicho = BD_knnPrediccion[1:20],
+  Prob_Si = round(prob_knnPrediccion$Si[1:20], 4),
+  Prob_No = round(prob_knnPrediccion$No[1:20], 4)
+)
+
+roc_obj <- roc(BD_test$Peso_delicado, prob_knnPrediccion$Si)
+auc_val <- auc(roc_obj)
+plot(roc_obj, main = paste("Curva ROC k-NN - AUC =", round(auc_val, 3)))
+legend("bottomright", legend = paste("AUC =", round(auc_val, 3)), bty = "n")
+
+```
+
+```{r probabilidades}
+prob_knnPrediccion %>%
+  head(10) %>%
+  mutate(
+    Observación = 1:10,
+    .before = Si
   ) %>%
-  add_header_above(c(" " = 1, "Distribución de Frecuencias" = 3),
-                   background = c("#2C3E50", "#16A085"),
-                   color = "white") %>%
-  row_spec(0, background = "#2C3E50", color = "white", bold = TRUE) %>%
-  row_spec(1, background = "#E8F6F3", bold = TRUE) %>%
-  row_spec(2, background = "#EBF5FB") %>%
-  column_spec(1, bold = TRUE, width = "15em") %>%
-  column_spec(2, width = "6em", background = "#F4F6F6") %>%
-  column_spec(3:4, width = "8em") %>%
-  footnote(
-    general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024."
+  rename(
+    `P(Desnutrición)` = Si,
+    `P(No Desnutrición)` = No
+  ) %>%
+  kable(digits = 4, align = "c", caption = "Probabilidades de Predicción - Primeras 10 Observaciones") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), 
+                full_width = FALSE, position = "center") %>%
+  row_spec(0, background = "#2E86AB", color = "white", bold = TRUE)
+
+```
+
+```{r tabla comparativa}
+tabla_comparativa <- data.frame(
+  Observación = 1:20,
+  Real = BD_test$Peso[1:20],
+  Predicho = BD_knnPrediccion[1:20],
+  `P(Desnutrición)` = round(prob_knnPrediccion$Si[1:20], 3),
+  `P(No Desnutrición)` = round(prob_knnPrediccion$No[1:20], 3),
+  Resultado = ifelse(BD_test$Peso[1:20] == BD_knnPrediccion[1:20], 
+                     "✅ Correcto", "❌ Incorrecto")
+)
+
+tabla_comparativa %>%
+  kable(align = "c", caption = "Comparación: Valores Reales vs Predicciones") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), 
+                full_width = FALSE) %>%
+  column_spec(6, color = ifelse(tabla_comparativa$Resultado == "✅ Correcto", 
+                               "green", "red")) %>%
+  row_spec(0, background = "#A23B72", color = "white", bold = TRUE)
+
+```
+
+```{r  Curva ROC}
+# Curva ROC mejorada
+roc_obj <- roc(BD_test$Peso, prob_knnPrediccion$Si)
+auc_val <- auc(roc_obj)
+
+# Crear dataframe para ggplot
+roc_data <- data.frame(
+  FPR = 1 - roc_obj$specificities,
+  TPR = roc_obj$sensitivities
+)
+
+ggplot(roc_data, aes(x = FPR, y = TPR)) +
+  geom_line(color = "#2E86AB", size = 1.5) +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "red", alpha = 0.7) +
+  geom_polygon(aes(x = FPR, y = TPR), fill = "#2E86AB", alpha = 0.3) +
+  labs(
+    title = "Curva ROC - Modelo k-NN para Detección de Desnutrición",
+    subtitle = sprintf("Área bajo la curva (AUC) = %.3f", auc_val),
+    x = "Tasa de Falsos Positivos (1 - Especificidad)",
+    y = "Tasa de Verdaderos Positivos (Sensibilidad)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+    plot.subtitle = element_text(size = 12, hjust = 0.5, color = "darkblue"),
+    panel.grid.minor = element_blank(),
+    legend.position = "none"
+  ) +
+  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
+  annotate("text", x = 0.7, y = 0.2, 
+           label = paste("AUC =", round(auc_val, 3)), 
+           size = 5, color = "darkblue", fontface = "bold")
+
+
+```
+
+```{r matriz de confusion}
+# Matriz de confusión visual mejorada
+conf_matrix <- confusionMatrix(BD_knnPrediccion, BD_test$Peso, positive = "Si")
+
+# Crear dataframe para la matriz
+conf_df <- as.data.frame(conf_matrix$table)
+conf_df$Porcentaje <- round(conf_df$Freq / sum(conf_df$Freq) * 100, 1)
+
+ggplot(conf_df, aes(x = Reference, y = Prediction, fill = Freq)) +
+  geom_tile(color = "white", alpha = 0.8) +
+  geom_text(aes(label = paste(Freq, "\n(", Porcentaje, "%)", sep = "")), 
+            color = "white", size = 5, fontface = "bold") +
+  scale_fill_gradient(low = "#F18F01", high = "#C73E1D", name = "Frecuencia") +
+  labs(
+    title = "Matriz de Confusión - Modelo k-NN",
+    subtitle = "Desnutrición Neonatal",
+    x = "Valor Real",
+    y = "Predicción del Modelo"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+    plot.subtitle = element_text(size = 12, hjust = 0.5),
+    axis.text = element_text(size = 11),
+    axis.title = element_text(face = "bold", size = 12)
+  ) +
+  coord_fixed()
+
+```
+
+```{r summary}
+# Tabla resumen de métricas
+metricas <- data.frame(
+  Métrica = c("Accuracy", "Sensibilidad", "Especificidad", 
+              "Valor Predictivo Positivo", "Valor Predictivo Negativo",
+              "Prevalencia", "AUC"),
+  Valor = c(
+    round(conf_matrix$overall["Accuracy"], 4),
+    round(conf_matrix$byClass["Sensitivity"], 4),
+    round(conf_matrix$byClass["Specificity"], 4),
+    round(conf_matrix$byClass["Pos Pred Value"], 4),
+    round(conf_matrix$byClass["Neg Pred Value"], 4),
+    round(conf_matrix$byClass["Prevalence"], 4),
+    round(auc_val, 4)
+  ),
+  Interpretación = c(
+    "Proporción total de predicciones correctas",
+    "Capacidad de detectar desnutrición real",
+    "Capacidad de identificar correctamente casos sin desnutrición",
+    "Precisión cuando predice desnutrición",
+    "Precisión cuando predice no desnutrición", 
+    "Proporción real de desnutrición en los datos",
+    "Capacidad general de discriminación del modelo"
   )
+)
+
+metricas %>%
+  kable(align = "lcc", caption = "Métricas de Rendimiento del Modelo k-NN") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), 
+                full_width = FALSE) %>%
+  row_spec(0, background = "#2E86AB", color = "white", bold = TRUE) %>%
+  column_spec(1, bold = TRUE) %>%
+  column_spec(2, color = "darkblue", bold = TRUE)
+
+```
+
+```{r distribucion probabilidades}
+# Gráfico adicional: Distribución de probabilidades por clase real
+prob_df <- data.frame(
+  Probabilidad = prob_knnPrediccion$Si,
+  Clase_Real = BD_test$Peso
+)
+
+ggplot(prob_df, aes(x = Probabilidad, fill = Clase_Real)) +
+  geom_density(alpha = 0.6) +
+  scale_fill_manual(values = c("Si" = "#C73E1D", "No" = "#2E86AB")) +
+  labs(
+    title = "Distribución de Probabilidades por Clase Real",
+    subtitle = "Separación entre casos con y sin desnutrición",
+    x = "Probabilidad de Desnutrición (P(Si))",
+    y = "Densidad",
+    fill = "Clase Real"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
+    plot.subtitle = element_text(size = 11, hjust = 0.5),
+    legend.position = "top"
+  ) +
+  geom_vline(xintercept = 0.5, linetype = "dashed", color = "red")
+
 ```
 :::
