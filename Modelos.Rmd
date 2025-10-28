@@ -18,10 +18,6 @@ library(caret)
 library(ISLR)
 library(kableExtra)
 library(pROC)
-<<<<<<< HEAD
-=======
-
->>>>>>> df26b3bdbbac582e931dba01743d4edd34f4c028
 ```
 
 ```{r Knn}
@@ -624,4 +620,135 @@ tabla_comparativa %>%
   pack_rows("Métricas Compuestas", 11, 11, label_row_css = "background-color: #E8F4F8; font-weight: bold;")
 
 ```
+
+```{r grafico araña comparativo}
+library(plotly)
+library(dplyr)
+
+conf_matrix_knn <- confusionMatrix(BD_knnPrediccion, BD_test$Peso_delicado, positive = "Si")
+roc_knn <- roc(BD_test$Peso_delicado, prob_knnPrediccion$Si)
+auc_knn <- auc(roc_knn)
+
+conf_matrix_logit <- confusionMatrix(pred_clase, BD_test$Peso_delicado, positive = "Si")
+roc_logit <- roc(response = BD_test$Peso_delicado, predictor = p_hat, levels = c("No","Si"))
+auc_logit <- auc(roc_logit)
+
+metricas_comparacion <- data.frame(
+  Métrica = c("Exactitud", "Sensibilidad", "Especificidad", 
+              "Precisión", "AUC"),
+  kNN = c(
+    round(conf_matrix_knn$overall["Accuracy"], 3),
+    round(conf_matrix_knn$byClass["Sensitivity"], 3),
+    round(conf_matrix_knn$byClass["Specificity"], 3),
+    round(conf_matrix_knn$byClass["Pos Pred Value"], 3),
+    round(auc_knn, 3)
+  ),
+  Logit = c(
+    round(conf_matrix_logit$overall["Accuracy"], 3),
+    round(conf_matrix_logit$byClass["Sensitivity"], 3),
+    round(conf_matrix_logit$byClass["Specificity"], 3),
+    round(conf_matrix_logit$byClass["Pos Pred Value"], 3),
+    round(auc_logit, 3)
+  )
+)
+
+fig <- plot_ly(
+  type = 'scatterpolar',
+  mode = 'lines+markers',
+  fill = 'toself'
+) 
+
+
+fig <- fig %>%
+  add_trace(
+    r = c(metricas_comparacion$kNN, metricas_comparacion$kNN[1]),
+    theta = c(metricas_comparacion$Métrica, metricas_comparacion$Métrica[1]),
+    name = 'k-NN',
+    fillcolor = 'rgba(30, 144, 255, 0.4)',
+    line = list(color = 'rgb(30, 144, 255)', width = 3),
+    marker = list(
+      color = 'rgb(30, 144, 255)',
+      size = 6,
+      symbol = 'circle'
+    ),
+    hovertemplate = "<b>k-NN</b><br>Métrica: %{theta}<br>Valor: %{r:.3f}<br><extra></extra>"
+  ) 
+
+fig <- fig %>%
+  add_trace(
+    r = c(metricas_comparacion$Logit, metricas_comparacion$Logit[1]),
+    theta = c(metricas_comparacion$Métrica, metricas_comparacion$Métrica[1]),
+    name = 'Regresión Logística',
+    fillcolor = 'rgba(70, 130, 180, 0.4)',
+    line = list(color = 'rgb(70, 130, 180)', width = 3),
+    marker = list(
+      color = 'rgb(70, 130, 180)',
+      size = 6,
+      symbol = 'diamond'
+    ),
+    hovertemplate = "<b>Regresión Logística</b><br>Métrica: %{theta}<br>Valor: %{r:.3f}<br><extra></extra>"
+  ) 
+
+fig <- fig %>%
+  layout(
+    title = list(
+      text = "<b>COMPARACIÓN INTERACTIVA DE MODELOS</b><br><sub>k-NN vs Regresión Logística</sub>",
+      x = 0.5,
+      y = 0.95,
+      font = list(size = 22, family = "Arial, sans-serif")
+    ),
+    polar = list(
+      radialaxis = list(
+        visible = TRUE,
+        range = c(0, 1),
+        tickfont = list(size = 11),
+        color = 'rgb(100, 100, 100)',
+        gridcolor = 'rgb(200, 200, 200)',
+        linecolor = 'rgb(100, 100, 100)'
+      ),
+      angularaxis = list(
+        direction = "clockwise",
+        rotation = 90,
+        tickfont = list(size = 12, color = 'rgb(50, 50, 50)'),
+        color = 'rgb(100, 100, 100)',
+        gridcolor = 'rgb(200, 200, 200)'
+      ),
+      bgcolor = 'rgb(245, 245, 245)',
+      domain = list(x = c(0, 1), y = c(0, 0.8)
+      )
+    ),
+    showlegend = TRUE,
+    legend = list(
+      x = 0.85,
+      y = 0.05,
+      bgcolor = 'rgba(255, 255, 255, 0.8)',
+      bordercolor = 'rgb(200, 200, 200)',
+      borderwidth = 1,
+      font = list(size = 12)
+    ),
+    
+    margin = list(l = 80, r = 80, t = 120, b = 80),
+    paper_bgcolor = 'rgb(255, 255, 255)',
+    plot_bgcolor = 'rgb(255, 255, 255)',
+    
+    autosize = TRUE,
+    height = 700
+  ) %>%
+  config(
+    displayModeBar = TRUE,
+    modeBarButtonsToAdd = list("drawline", "drawopenpath", "drawclosedpath", "drawcircle", "drawrect", "eraseshape"),
+    displaylogo = FALSE,
+    responsive = TRUE,
+    toImageButtonOptions = list(
+      format = "png",
+      filename = "comparacion_modelos",
+      width = 1000,
+      height = 700,
+      scale = 2
+    )
+  )
+
+fig
+```
+
 
