@@ -1,135 +1,188 @@
   
-/* PALETA DE AGUA MARINA PROFESIONAL */
+/* PALETA ACADÉMICA MARINA PROFESIONAL */
 :root {
   --deep-ocean: #2C5F7A;         /* Azul marino profundo */
   --ocean-teal: #3A8E96;         /* Verde azulado principal */
   --sea-glass: #4FB0A8;          /* Turquesa suave */
   --seafoam: #8FD4C1;            /* Espuma de mar */
-  --mist: #D6F0E6;               /* Bruma marina clara */
-  --coral: #FF7B6B;              /* Acento coral para contraste */
-  --sand: #F5F1E6;               /* Arena clara */
-  --deep-abyss: #1A3C4D;         /* Azul muy oscuro */
-  --white: #FFFFFF;
-  --text-dark: #2C3E50;
-  --text-medium: #4A6572;
+  --mist: #F8FCFB;               /* Blanco académico con tono marino suave */
+  --parchment: #FDFDF6;          /* Color pergamino académico */
+  --coral: #D94E4E;              /* Acento coral sobrio */
+  --dark-ink: #2C3E50;           /* Color tinta para texto */
+  --light-ink: #4A6572;          /* Texto secundario */
+  --border-light: #E1F0ED;       /* Bordes sutiles */
+  --accent-gold: #C4A747;        /* Dorado académico */
 }
 
-/* ESTILOS BASE */
+/* IMPORTAR FUENTES ACADÉMICAS */
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Source+Serif+Pro:wght@300;400;600&family=Lato:wght@300;400;700&display=swap');
+
+/* ESTILOS BASE ACADÉMICOS */
 body {
-  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Source Serif Pro', 'Georgia', 'Times New Roman', serif;
   font-weight: 400;
-  line-height: 1.6;
-  color: var(--text-dark);
-  background: linear-gradient(135deg, var(--mist) 0%, var(--white) 100%);
-  font-size: 16px;
+  line-height: 1.7;
+  color: var(--dark-ink);
+  background-color: var(--parchment);
+  font-size: 17px;
+  text-align: justify;
 }
 
 .main-content {
   max-width: 1200px;
   margin: 2rem auto;
   padding: 3rem;
-  background: var(--white);
+  background: var(--mist);
   box-shadow: 
-    0 10px 40px rgba(42, 95, 122, 0.1),
-    0 1px 3px rgba(0,0,0,0.05);
-  border-radius: 12px;
-  border-left: 4px solid var(--sea-glass);
+    0 5px 30px rgba(42, 95, 122, 0.08),
+    0 1px 3px rgba(0,0,0,0.03);
+  border-radius: 4px;
+  border: 1px solid var(--border-light);
   position: relative;
-  overflow: hidden;
 }
 
-.main-content::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--deep-ocean), var(--sea-glass), var(--seafoam));
-}
-
-/* ENCABEZADOS ELEGANTES */
+/* ENCABEZADOS ACADÉMICOS */
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Georgia', 'Times New Roman', serif;
+  font-family: 'Merriweather', 'Georgia', 'Times New Roman', serif;
   color: var(--deep-ocean) !important;
   margin-top: 2.5rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.2rem;
   font-weight: 600;
   line-height: 1.3;
+  text-align: left;
 }
 
 h1 {
-  font-size: 2.8rem;
+  font-size: 2.6rem;
   font-weight: 700;
   text-align: center;
-  margin-bottom: 2.5rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 2px solid var(--seafoam);
-  background: linear-gradient(135deg, var(--deep-ocean), var(--ocean-teal));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  margin-bottom: 2rem;
+  padding-bottom: 1.2rem;
+  border-bottom: 3px double var(--sea-glass);
+  color: var(--deep-ocean) !important;
+  background: none;
+  -webkit-text-fill-color: var(--deep-ocean);
+  letter-spacing: -0.5px;
 }
 
 h2 {
-  font-size: 2.2rem;
-  border-left: 5px solid var(--sea-glass);
-  padding-left: 1.5rem;
+  font-size: 2rem;
+  border-left: 4px solid var(--ocean-teal);
+  padding-left: 1.2rem;
   margin-top: 3rem;
-  background: linear-gradient(90deg, var(--mist) 0%, transparent 100%);
-  padding: 1rem 1.5rem;
-  border-radius: 0 8px 8px 0;
+  background: linear-gradient(90deg, rgba(79, 176, 168, 0.08) 0%, transparent 100%);
+  padding: 0.8rem 1.2rem;
+  border-radius: 0;
   position: relative;
-}
-
-h2::before {
-  content: '';
-  position: absolute;
-  left: -5px;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: linear-gradient(to bottom, var(--sea-glass), var(--ocean-teal));
-  border-radius: 3px;
+  font-weight: 600;
 }
 
 h3 {
-  font-size: 1.7rem;
+  font-size: 1.5rem;
   color: var(--ocean-teal) !important;
-  border-bottom: 2px solid var(--mist);
-  padding-bottom: 0.7rem;
-  margin-top: 2.5rem;
+  border-bottom: 1px solid var(--border-light);
+  padding-bottom: 0.5rem;
+  margin-top: 2.2rem;
+  font-weight: 600;
 }
 
 h4 {
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   color: var(--sea-glass) !important;
-  margin-top: 2rem;
-}
-
-h5 {
-  font-size: 1.2rem;
-  color: var(--ocean-teal) !important;
+  margin-top: 1.8rem;
   font-style: italic;
 }
 
-/* CONTENEDOR PRINCIPAL MEJORADO */
-.container-fluid {
-  background: linear-gradient(135deg, var(--mist) 0%, #f8fbfa 50%, var(--white) 100%);
-  min-height: 100vh;
-  padding: 2rem;
+h5 {
+  font-size: 1.1rem;
+  color: var(--light-ink) !important;
+  margin-top: 1.5rem;
 }
 
-/* HEADER ELEGANTE - CORREGIDO */
+/* TOC ACADÉMICO MEJORADO - PARTE IZQUIERDA */
+#TOC {
+  background: linear-gradient(135deg, var(--mist) 0%, #F0F9F7 100%) !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: 6px !important;
+  padding: 2rem 1.5rem !important;
+  margin: 2rem 0 !important;
+  box-shadow: 0 2px 12px rgba(42, 95, 122, 0.06) !important;
+  font-family: 'Merriweather', serif !important;
+}
+
+
+
+#TOC ul {
+  list-style: none !important;
+  padding-left: 0 !important;
+  margin: 0 !important;
+}
+
+#TOC li {
+  margin: 0.7rem 0 !important;
+  padding: 0.4rem 0.8rem !important;
+  border-left: 3px solid transparent;
+  border-radius: 0;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+}
+
+#TOC li:hover {
+  border-left-color: var(--ocean-teal);
+  background: rgba(79, 176, 168, 0.05);
+  transform: translateX(3px);
+}
+
+#TOC a {
+  color: var(--light-ink) !important;
+  text-decoration: none !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  font-family: 'Source Serif Pro', serif !important;
+  display: block;
+  padding: 0.2rem 0;
+}
+
+#TOC a:hover {
+  color: var(--deep-ocean) !important;
+  background: none !important;
+}
+
+#TOC ul ul {
+  padding-left: 1.2rem !important;
+  margin-top: 0.3rem !important;
+  border-left: 1px solid var(--border-light);
+}
+
+#TOC ul ul li {
+  margin: 0.4rem 0 !important;
+  padding: 0.2rem 0.6rem !important;
+  font-size: 0.9rem;
+}
+
+#TOC ul ul a {
+  color: var(--light-ink) !important;
+  font-weight: 400 !important;
+}
+
+/* CONTENEDOR PRINCIPAL */
+.container-fluid {
+  background: linear-gradient(135deg, #F5FBFA 0%, var(--parchment) 100%);
+  min-height: 100vh;
+  padding: 1.5rem;
+}
+
+/* HEADER ACADÉMICO */
 .page-header {
   background: linear-gradient(135deg, var(--deep-ocean) 0%, var(--ocean-teal) 100%) !important;
   color: white;
-  padding: 4rem 2rem !important;
+  padding: 3.5rem 2rem !important;
   text-align: center;
-  margin-bottom: 3rem !important;
-  border-radius: 0 0 20px 20px;
+  margin-bottom: 2.5rem !important;
+  border-radius: 0;
   position: relative;
   overflow: hidden;
+  border-bottom: 4px solid var(--sea-glass);
 }
 
 .page-header::before {
@@ -139,230 +192,196 @@ h5 {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 50%);
-  background-size: cover;
+  background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 60%);
 }
 
 .page-header h1 {
   color: white !important;
-  font-size: 3.2rem;
+  font-size: 2.8rem;
   font-weight: 700;
   border: none;
   background: none;
   -webkit-text-fill-color: white;
-  text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
   position: relative;
   z-index: 2;
+  margin-bottom: 0.5rem;
 }
 
 .page-header h2 {
-  color: rgba(255,255,255,0.9) !important;
-  font-size: 1.6rem;
+  color: rgba(255,255,255,0.95) !important;
+  font-size: 1.4rem;
   font-weight: 300;
   border: none;
   background: none;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: 'Source Serif Pro', serif;
+  position: relative;
+  z-index: 2;
+  margin-top: 0.5rem;
 }
 
-/* BLOQUES DE CÓDIGO ELEGANTES */
+/* BLOQUES DE CÓDIGO ACADÉMICOS */
 pre {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
-  color: #e0e0e0 !important;
-  padding: 1.5rem !important;
-  border: none !important;
-  border-radius: 12px !important;
-  border-left: 4px solid var(--sea-glass) !important;
-  box-shadow: 
-    0 4px 20px rgba(0,0,0,0.3),
-    inset 0 1px 0 rgba(255,255,255,0.1);
-  font-family: 'Fira Code', 'Consolas', 'Monaco', monospace !important;
-  font-size: 0.9em;
+  background: #f8f9fa !important;
+  color: var(--dark-ink) !important;
+  padding: 1.2rem !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: 4px !important;
+  border-left: 4px solid var(--ocean-teal) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
+  font-size: 0.85em;
   line-height: 1.5;
-  margin: 1.5rem 0;
+  margin: 1.2rem 0;
 }
 
 code {
-  background: var(--mist) !important;
-  color: var(--deep-ocean) !important;
-  padding: 0.2rem 0.4rem !important;
-  border-radius: 4px;
-  font-family: 'Fira Code', 'Consolas', monospace !important;
-  font-size: 0.85em;
-  border: 1px solid var(--seafoam);
+  background: rgba(79, 176, 168, 0.1) !important;
+  color: var(--ocean-teal) !important;
+  padding: 0.15rem 0.4rem !important;
+  border-radius: 3px;
+  font-family: 'Consolas', 'Monaco', monospace !important;
+  font-size: 0.8em;
+  border: 1px solid rgba(79, 176, 168, 0.2);
 }
 
-/* TABLAS ELEGANTES */
+/* TABLAS ACADÉMICAS */
 table {
   width: 100%;
   border-collapse: collapse;
-  margin: 2rem 0;
-  box-shadow: 0 2px 15px rgba(42, 95, 122, 0.1);
-  border-radius: 12px;
+  margin: 1.8rem 0;
+  box-shadow: 0 1px 4px rgba(42, 95, 122, 0.08);
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
   overflow: hidden;
+  font-family: 'Lato', sans-serif;
 }
 
 th {
   background: linear-gradient(135deg, var(--ocean-teal), var(--deep-ocean)) !important;
   color: white !important;
   font-weight: 600;
-  padding: 1rem !important;
+  padding: 0.9rem !important;
   text-align: left;
   border: none !important;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.9rem;
 }
 
 td {
-  padding: 1rem !important;
+  padding: 0.8rem !important;
   border: none !important;
-  border-bottom: 1px solid var(--mist) !important;
+  border-bottom: 1px solid var(--border-light) !important;
+  font-size: 0.9rem;
 }
 
 tr:nth-child(even) {
-  background: var(--mist) !important;
+  background: rgba(143, 212, 193, 0.05) !important;
 }
 
 tr:hover {
-  background: var(--seafoam) !important;
-  transform: translateX(2px);
-  transition: all 0.2s ease;
+  background: rgba(79, 176, 168, 0.08) !important;
 }
 
-/* GRÁFICOS Y VISUALIZACIONES */
+/* GRÁFICOS ACADÉMICOS */
 .plotly.html-widget {
-  border-radius: 12px;
-  box-shadow: 0 4px 25px rgba(42, 95, 122, 0.15);
-  padding: 1rem;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(42, 95, 122, 0.1);
+  padding: 0.8rem;
   background: white;
-  border: 1px solid var(--mist);
-  transition: all 0.3s ease;
+  border: 1px solid var(--border-light);
+  margin: 1.5rem 0;
 }
 
-.plotly.html-widget:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 35px rgba(42, 95, 122, 0.2);
-}
-
-/* BOTONES Y CONTROLES */
+/* BOTONES ACADÉMICOS */
 .btn {
   background: linear-gradient(135deg, var(--ocean-teal), var(--sea-glass)) !important;
   color: white !important;
   border: none !important;
-  padding: 0.8rem 1.5rem !important;
-  border-radius: 8px !important;
-  font-weight: 600 !important;
-  transition: all 0.3s ease !important;
-  box-shadow: 0 2px 10px rgba(58, 142, 150, 0.3) !important;
+  padding: 0.6rem 1.2rem !important;
+  border-radius: 4px !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 1px 4px rgba(58, 142, 150, 0.3) !important;
+  font-family: 'Lato', sans-serif !important;
 }
 
 .btn:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 4px 20px rgba(58, 142, 150, 0.4) !important;
-  background: linear-gradient(135deg, var(--sea-glass), var(--ocean-teal)) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 8px rgba(58, 142, 150, 0.4) !important;
 }
 
-/* TOC ELEGANTE */
-#TOC {
-  background: linear-gradient(135deg, var(--white) 0%, var(--mist) 100%) !important;
-  border: 2px solid var(--seafoam) !important;
-  border-radius: 12px !important;
-  padding: 2rem !important;
-  margin: 2rem 0 !important;
-  box-shadow: 0 4px 20px rgba(42, 95, 122, 0.1) !important;
-}
-
-#TOC ul {
-  list-style: none !important;
-  padding-left: 0 !important;
-}
-
-#TOC li {
-  margin: 0.8rem 0 !important;
-  padding: 0.5rem 1rem !important;
-  border-left: 3px solid transparent;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-}
-
-#TOC li:hover {
-  border-left-color: var(--sea-glass);
-  background: var(--mist);
-  transform: translateX(5px);
-}
-
-#TOC a {
-  color: var(--text-medium) !important;
-  text-decoration: none !important;
-  font-weight: 500 !important;
-  transition: all 0.3s ease !important;
-}
-
-#TOC a:hover {
-  color: var(--deep-ocean) !important;
-}
-
-/* FOOTER ELEGANTE */
+/* FOOTER ACADÉMICO */
 .academic-footer {
   text-align: center;
   color: var(--ocean-teal);
   margin-top: 4rem;
-  padding: 3rem 2rem;
-  border-top: 2px solid var(--mist);
-  background: linear-gradient(135deg, var(--white) 0%, var(--mist) 100%);
-  border-radius: 12px 12px 0 0;
-  font-family: 'Georgia', serif;
+  padding: 2.5rem 2rem;
+  border-top: 2px solid var(--border-light);
+  background: var(--mist);
+  font-family: 'Merriweather', serif;
+  font-size: 0.9rem;
 }
 
-/* ANIMACIONES SUAVES */
-* {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+/* CITAS Y BLOCKQUOTES */
+blockquote {
+  border-left: 4px solid var(--sea-glass);
+  background: rgba(143, 212, 193, 0.05);
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+  font-style: italic;
+  color: var(--light-ink);
+  border-radius: 0 4px 4px 0;
 }
 
-.main-content {
-  animation: fadeInUp 0.8s ease-out;
+/* LISTAS ACADÉMICAS */
+ul, ol {
+  padding-left: 1.8rem;
+  margin: 1.2rem 0;
 }
 
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+li {
+  margin: 0.5rem 0;
+  line-height: 1.6;
 }
 
-/* RESPONSIVE DESIGN */
+/* RESPONSIVE DESIGN ACADÉMICO */
 @media (max-width: 768px) {
   .main-content {
     padding: 1.5rem;
     margin: 1rem;
-    border-radius: 8px;
+    border-radius: 0;
   }
   
   h1 {
-    font-size: 2.2rem;
+    font-size: 2rem;
   }
   
   h2 {
-    font-size: 1.8rem;
-    padding: 0.8rem 1rem;
+    font-size: 1.6rem;
+    padding: 0.6rem 1rem;
   }
   
   .page-header {
-    padding: 3rem 1rem !important;
+    padding: 2.5rem 1rem !important;
   }
   
   .page-header h1 {
-    font-size: 2.5rem;
+    font-size: 2rem;
+  }
+  
+  #TOC {
+    padding: 1.5rem 1rem !important;
+    margin: 1.5rem 0 !important;
   }
 }
 
-/* ESTADOS INTERACTIVOS */
+/* ENLACES ACADÉMICOS */
 a {
   color: var(--ocean-teal);
   text-decoration: none;
   border-bottom: 1px solid transparent;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 a:hover {
@@ -370,9 +389,9 @@ a:hover {
   border-bottom-color: var(--sea-glass);
 }
 
-/* SCROLLBAR PERSONALIZADO */
+/* SCROLLBAR DISCRETO */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -380,11 +399,224 @@ a:hover {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(var(--sea-glass), var(--ocean-teal));
-  border-radius: 4px;
+  background: var(--sea-glass);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(var(--ocean-teal), var(--deep-ocean));
+  background: var(--ocean-teal);
+}
+
+/* CONTROLES DE CÓDIGO ACADÉMICOS */
+.code-toggle-container {
+  text-align: center;
+  margin: 3rem 0 2rem 0;
+  padding: 2rem;
+  background: linear-gradient(135deg, var(--mist) 0%, #F0F9F7 100%);
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  box-shadow: 0 2px 12px rgba(42, 95, 122, 0.08);
+  border-left: 4px solid var(--ocean-teal);
+}
+
+.code-toggle-container h4 {
+  margin-top: 0 !important;
+  color: var(--deep-ocean) !important;
+  font-family: 'Merriweather', serif !important;
+  font-size: 1.3rem !important;
+  border: none !important;
+  background: none !important;
+  padding: 0 !important;
+}
+
+.code-toggle-container p {
+  color: var(--light-ink) !important;
+  margin-bottom: 1.5rem !important;
+  font-family: 'Source Serif Pro', serif !important;
+  font-size: 0.95rem !important;
+}
+
+.code-toggle-btn {
+  background: linear-gradient(135deg, var(--ocean-teal), var(--sea-glass));
+  color: white !important;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 6px;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(58, 142, 150, 0.3);
+  margin: 0 0.5rem 0.5rem 0;
+}
+
+.code-toggle-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(58, 142, 150, 0.4);
+  background: linear-gradient(135deg, var(--sea-glass), var(--ocean-teal));
+}
+
+.code-toggle-btn.secondary {
+  background: linear-gradient(135deg, var(--seafoam), var(--sea-glass));
+  color: var(--dark-ink) !important;
+}
+
+.code-toggle-btn.secondary:hover {
+  background: linear-gradient(135deg, var(--sea-glass), var(--seafoam));
+}
+
+/* BOTÓN FLOTANTE GLOBAL */
+.global-code-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  background: linear-gradient(135deg, var(--ocean-teal), var(--deep-ocean));
+  color: white;
+  border: none;
+  padding: 0.8rem 1.2rem;
+  border-radius: 25px;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(42, 95, 122, 0.4);
+  transition: all 0.3s ease;
+}
+
+.global-code-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(42, 95, 122, 0.6);
+}
+
+/* CONTENEDORES DE CÓDIGO CON TOGGLE */
+.code-chunk {
+  margin: 2rem 0;
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(42, 95, 122, 0.08);
+  transition: all 0.3s ease;
+}
+
+.code-chunk:hover {
+  box-shadow: 0 4px 15px rgba(42, 95, 122, 0.12);
+}
+
+.code-header {
+  background: linear-gradient(135deg, var(--ocean-teal), var(--deep-ocean));
+  color: white;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Lato', sans-serif;
+}
+
+.code-header:hover {
+  background: linear-gradient(135deg, var(--deep-ocean), var(--ocean-teal));
+}
+
+.chunk-title {
+  font-family: 'Lato', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.toggle-icon {
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: transform 0.3s ease;
+}
+
+.toggle-icon.rotated {
+  transform: rotate(180deg);
+}
+
+.code-content {
+  background: #f8f9fa;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.code-content.collapsed {
+  max-height: 0;
+  opacity: 0;
+  padding: 0;
+}
+
+.code-content.expanded {
+  max-height: 5000px;
+  opacity: 1;
+  padding: 1rem;
+}
+
+/* INDICADOR DE ESTADO */
+.code-status {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.code-status.visible {
+  background: #4CAF50;
+  box-shadow: 0 0 5px #4CAF50;
+}
+
+.code-status.hidden {
+  background: #FF9800;
+  box-shadow: 0 0 5px #FF9800;
+}
+
+/* SMOOTH SCROLL Y NAVEGACIÓN */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Resaltado de sección activa en TOC */
+.tocify-item a.active {
+  color: var(--deep-ocean) !important;
+  font-weight: 600 !important;
+  border-left: 3px solid var(--ocean-teal) !important;
+  background: rgba(79, 176, 168, 0.1) !important;
+}
+
+/* RESPONSIVE PARA CONTROLES */
+@media (max-width: 768px) {
+  .code-toggle-container {
+    padding: 1.5rem 1rem;
+    margin: 2rem 0 1rem 0;
+  }
+  
+  .code-toggle-btn {
+    display: block;
+    width: 100%;
+    margin: 0.5rem 0;
+  }
+  
+  .global-code-toggle {
+    padding: 0.6rem 1rem;
+    font-size: 0.8rem;
+    top: 10px;
+    right: 10px;
+  }
+  
+  .code-header {
+    padding: 0.8rem 1rem;
+  }
+  
+  .chunk-title {
+    font-size: 0.85rem;
+  }
 }
 
