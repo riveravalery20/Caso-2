@@ -445,3 +445,123 @@ tabla_comparativa_logit %>%
   row_spec(0, background = "#2E86AB", color = "white", bold = TRUE)
 ```
 
+```{r tabla comparativa knn y logit}
+# Extraer métricas del modelo k-NN
+conf_matrix_knn <- confusionMatrix(BD_knnPrediccion, BD_test$Peso_delicado, positive = "Si")
+roc_knn <- roc(BD_test$Peso_delicado, prob_knnPrediccion$Si)
+auc_knn <- auc(roc_knn)
+
+# Extraer métricas del modelo Logit
+conf_matrix_logit <- confusionMatrix(pred_clase, BD_test$Peso_delicado, positive = "Si")
+roc_logit <- roc(response = BD_test$Peso_delicado, predictor = p_hat, levels = c("No","Si"))
+auc_logit <- auc(roc_logit)
+
+# Crear tabla comparativa profesional
+tabla_comparativa <- data.frame(
+  Métrica = c(
+    "Exactitud (Accuracy)",
+    "Sensibilidad (Recall)",
+    "Especificidad", 
+    "Valor Predictivo Positivo (Precision)",
+    "Valor Predictivo Negativo",
+    "Prevalencia",
+    "AUC (Área bajo la curva ROC)",
+    "Kappa",
+    "Tasa de Falsos Positivos",
+    "Tasa de Falsos Negativos",
+    "Score F1"
+  ),
+  kNN = c(
+    round(conf_matrix_knn$overall["Accuracy"], 4),
+    round(conf_matrix_knn$byClass["Sensitivity"], 4),
+    round(conf_matrix_knn$byClass["Specificity"], 4),
+    round(conf_matrix_knn$byClass["Pos Pred Value"], 4),
+    round(conf_matrix_knn$byClass["Neg Pred Value"], 4),
+    round(conf_matrix_knn$byClass["Prevalence"], 4),
+    round(auc_knn, 4),
+    round(conf_matrix_knn$overall["Kappa"], 4),
+    round(1 - conf_matrix_knn$byClass["Specificity"], 4),
+    round(1 - conf_matrix_knn$byClass["Sensitivity"], 4),
+    round(2 * (conf_matrix_knn$byClass["Pos Pred Value"] * conf_matrix_knn$byClass["Sensitivity"]) / 
+            (conf_matrix_knn$byClass["Pos Pred Value"] + conf_matrix_knn$byClass["Sensitivity"]), 4)
+  ),
+  Logit = c(
+    round(conf_matrix_logit$overall["Accuracy"], 4),
+    round(conf_matrix_logit$byClass["Sensitivity"], 4),
+    round(conf_matrix_logit$byClass["Specificity"], 4),
+    round(conf_matrix_logit$byClass["Pos Pred Value"], 4),
+    round(conf_matrix_logit$byClass["Neg Pred Value"], 4),
+    round(conf_matrix_logit$byClass["Prevalence"], 4),
+    round(auc_logit, 4),
+    round(conf_matrix_logit$overall["Kappa"], 4),
+    round(1 - conf_matrix_logit$byClass["Specificity"], 4),
+    round(1 - conf_matrix_logit$byClass["Sensitivity"], 4),
+    round(2 * (conf_matrix_logit$byClass["Pos Pred Value"] * conf_matrix_logit$byClass["Sensitivity"]) / 
+            (conf_matrix_logit$byClass["Pos Pred Value"] + conf_matrix_logit$byClass["Sensitivity"]), 4)
+  ),
+  Diferencia = c(
+    round(conf_matrix_knn$overall["Accuracy"] - conf_matrix_logit$overall["Accuracy"], 4),
+    round(conf_matrix_knn$byClass["Sensitivity"] - conf_matrix_logit$byClass["Sensitivity"], 4),
+    round(conf_matrix_knn$byClass["Specificity"] - conf_matrix_logit$byClass["Specificity"], 4),
+    round(conf_matrix_knn$byClass["Pos Pred Value"] - conf_matrix_logit$byClass["Pos Pred Value"], 4),
+    round(conf_matrix_knn$byClass["Neg Pred Value"] - conf_matrix_logit$byClass["Neg Pred Value"], 4),
+    round(conf_matrix_knn$byClass["Prevalence"] - conf_matrix_logit$byClass["Prevalence"], 4),
+    round(auc_knn - auc_logit, 4),
+    round(conf_matrix_knn$overall["Kappa"] - conf_matrix_logit$overall["Kappa"], 4),
+    round((1 - conf_matrix_knn$byClass["Specificity"]) - (1 - conf_matrix_logit$byClass["Specificity"]), 4),
+    round((1 - conf_matrix_knn$byClass["Sensitivity"]) - (1 - conf_matrix_logit$byClass["Sensitivity"]), 4),
+    round((2 * (conf_matrix_knn$byClass["Pos Pred Value"] * conf_matrix_knn$byClass["Sensitivity"]) / 
+             (conf_matrix_knn$byClass["Pos Pred Value"] + conf_matrix_knn$byClass["Sensitivity"])) - 
+            (2 * (conf_matrix_logit$byClass["Pos Pred Value"] * conf_matrix_logit$byClass["Sensitivity"]) / 
+               (conf_matrix_logit$byClass["Pos Pred Value"] + conf_matrix_logit$byClass["Sensitivity"])), 4)
+  ),
+  Mejor_Modelo = c(
+    ifelse(conf_matrix_knn$overall["Accuracy"] > conf_matrix_logit$overall["Accuracy"], "k-NN", "Logit"),
+    ifelse(conf_matrix_knn$byClass["Sensitivity"] > conf_matrix_logit$byClass["Sensitivity"], "k-NN", "Logit"),
+    ifelse(conf_matrix_knn$byClass["Specificity"] > conf_matrix_logit$byClass["Specificity"], "k-NN", "Logit"),
+    ifelse(conf_matrix_knn$byClass["Pos Pred Value"] > conf_matrix_logit$byClass["Pos Pred Value"], "k-NN", "Logit"),
+    ifelse(conf_matrix_knn$byClass["Neg Pred Value"] > conf_matrix_logit$byClass["Neg Pred Value"], "k-NN", "Logit"),
+    "N/A",  # La prevalencia debería ser igual en ambos
+    ifelse(auc_knn > auc_logit, "k-NN", "Logit"),
+    ifelse(conf_matrix_knn$overall["Kappa"] > conf_matrix_logit$overall["Kappa"], "k-NN", "Logit"),
+    ifelse((1 - conf_matrix_knn$byClass["Specificity"]) < (1 - conf_matrix_logit$byClass["Specificity"]), "k-NN", "Logit"),
+    ifelse((1 - conf_matrix_knn$byClass["Sensitivity"]) < (1 - conf_matrix_logit$byClass["Sensitivity"]), "k-NN", "Logit"),
+    ifelse((2 * (conf_matrix_knn$byClass["Pos Pred Value"] * conf_matrix_knn$byClass["Sensitivity"]) / 
+              (conf_matrix_knn$byClass["Pos Pred Value"] + conf_matrix_knn$byClass["Sensitivity"])) > 
+             (2 * (conf_matrix_logit$byClass["Pos Pred Value"] * conf_matrix_logit$byClass["Sensitivity"]) / 
+                (conf_matrix_logit$byClass["Pos Pred Value"] + conf_matrix_logit$byClass["Sensitivity"])), "k-NN", "Logit")
+  )
+)
+
+# Formatear la tabla profesional
+tabla_comparativa %>%
+  kable(align = "lcccc", 
+        caption = "COMPARATIVA DE MODELOS: k-NN vs REGRESIÓN LOGÍSTICA") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), 
+                full_width = FALSE,
+                font_size = 12) %>%
+  row_spec(0, background = "#2E86AB", color = "white", bold = TRUE) %>%
+  column_spec(1, bold = TRUE, width = "3.5cm") %>%
+  column_spec(2:3, width = "2cm") %>%
+  column_spec(4, width = "2cm", 
+              color = ifelse(tabla_comparativa$Diferencia > 0, "green", 
+                            ifelse(tabla_comparativa$Diferencia < 0, "red", "black"))) %>%
+  column_spec(5, width = "2cm", bold = TRUE,
+              color = ifelse(tabla_comparativa$Mejor_Modelo == "k-NN", "#3498DB", 
+                            ifelse(tabla_comparativa$Mejor_Modelo == "Logit", "#E74C3C", "black"))) %>%
+  footnote(
+    general = "Valores positivos en 'Diferencia' indican mejor rendimiento de k-NN. Valores negativos indican mejor rendimiento de Logit.",
+    general_title = "Interpretación:",
+    symbol = c("Comparación basada en el mismo conjunto de prueba", 
+               "Prevalencia debe ser igual para ambos modelos")
+  ) %>%
+  pack_rows("Métricas Básicas", 1, 1, label_row_css = "background-color: #E8F4F8; font-weight: bold;") %>%
+  pack_rows("Métricas de Clasificación", 2, 5, label_row_css = "background-color: #E8F4F8; font-weight: bold;") %>%
+  pack_rows("Métricas de Distribución", 6, 6, label_row_css = "background-color: #E8F4F8; font-weight: bold;") %>%
+  pack_rows("Métricas de Discriminación", 7, 7, label_row_css = "background-color: #E8F4F8; font-weight: bold;") %>%
+  pack_rows("Métricas de Concordancia", 8, 8, label_row_css = "background-color: #E8F4F8; font-weight: bold;") %>%
+  pack_rows("Tasas de Error", 9, 10, label_row_css = "background-color: #E8F4F8; font-weight: bold;") %>%
+  pack_rows("Métricas Compuestas", 11, 11, label_row_css = "background-color: #E8F4F8; font-weight: bold;")
+
+```
+
