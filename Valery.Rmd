@@ -682,78 +682,6 @@ writeLines(Valery_css, "Valery-styles.css")
 
 ```
 
-# Introducción
-
-::: content-block
-El peso al nacer es uno de los determinantes más importantes del bienestar con el que un ser humano inicia su vida. Es un indicador de morbilidad y mortalidad pediátrica y neonatal, así como un antecedente clave en las diferencias del desarrollo cognitivo y de las enfermedades crónicas en etapas posteriores. Sin embargo, también representa una problemática multifactorial en la que intervienen diversas fallas sociales, como la desigualdad económica, el acceso a la salud, las condiciones de vida y la educación en salud materno-infantil. Todo esto genera brechas en las propiedades intelectuales y materiales durante una etapa tan vital y crítica como el desarrollo óptimo de los nacidos vivos del país, lo que produce impactos en los niveles de natalidad, el desarrollo de niños y adolescentes, y en las madres presentes y futuras.
-
-Un recién nacido con bajo peso y/o desnutrición no solo refleja una falta de responsabilidad materna hacia su hijo, sino también las brechas que impiden que las madres accedan a un seguimiento adecuado y controlado de su embarazo. Esto les dificulta vivir este proceso de manera tranquila y exitosa, y hace que sus hijos no inicien sus primeros momentos de vida de forma satisfactoria.
-
-Como se mencionó anteriormente, el desarrollo prenatal del bebé representa uno de los factores más influyentes desde el punto de vista social, ya que engloba y describe las condiciones del entorno en el que nace el individuo y en el que probablemente transitara las etapas futuras de su desarrollo. Lo anterior se resume en las particularidades del embarazo de las madres de los recién nacidos vivos. Estos aspectos se abordarán en el desarrollo de la presente investigación, puesto que desde el área de la ingeniería es posible realizar una prospectiva de la situación, facilitando la formulación de soluciones desde un enfoque social.
-
-A pesar de que los antecedentes corresponden a una problemática nacional, Bogotá, a pesar de ser la capital del país y contar con un mejor desarrollo regional, no está exenta de ella. Según datos del DANE, el 17% de los casos de desnutrición neonatal del segundo semestre del año 2024 corresponden a esta ciudad.
-
-El presente estudio emplea modelos de clasificación supervisada (regresión logística y KNN) utilizando los datos de nacimientos vivos en Bogotá, con el objetivo de analizar la relación entre la desnutrición neonatal y un conjunto de variables explicativas. Entre estas, se consideran el tiempo de gestación, el tipo de parto, el número de controles prenatales, la edad materna y el número de embarazos previos. La selección de estas variables se fundamenta tanto en la revisión de literatura científica relevante como en las características sociodemográficas y sanitarias propias del contexto bogotano, las cuales han sido identificadas en informes nacionales y estudios previos como factores determinantes en el estado nutricional al nacer.
-:::
-
-```{r tabla_variables}
-# TABLA DE VARIABLES DEL MODELO
-variables_modelo <- data.frame(
-  Variable = c("Peso", "Tiempo gestación", "Tipo parto", 
-               "Numero control prenatal", "Edad madre", "Numero embarazos"),
-  Descripción = c("Clasificación del peso al nacer (Normal/Delicado)",
-                 "Semanas de gestación", 
-                 "Tipo de parto registrado",
-                 "Número de controles prenatales realizados",
-                 "Grupo etario de la madre",
-                 "Número de embarazos previos"),
-  Tipo_Variable = c("Categórica (binaria)", "Categórica ordinal", 
-                   "Categórica nominal", "Cuantitativa discreta",
-                   "Categórica ordinal", "Cuantitativa discreta"),
-  Notas = c("Variable dependiente - Peso normal: ≥2500g", 
-           "Considerar <37 semanas como prematurez",
-           "Espontáneo/Cesárea/Instrumentado",
-           "Indicador de acceso a salud prenatal",
-           "Recodificado a 9 rangos etarios (Códigos 1 a 9)",
-           "Incluye embarazo actual")
-)
-
-kable(variables_modelo, 
-      caption = "Tabla 1: Variables del Modelo",
-      align = c("l", "l", "l", "l"),
-      col.names = c("Variable", "Descripción", "Tipo de Variable", "Notas")) %>%
-  kable_styling(bootstrap_options = c("striped", "hover"),
-                full_width = FALSE,
-                font_size = 12) %>%
-  row_spec(0, background = "#2C3E50", color = "white", bold = TRUE) %>%
-  column_spec(1, bold = TRUE, width = "12em") %>%
-  footnote(general = "Fuente: Elaboración propia en base a la Base de Datos de Nacimientos - 2024",
-           number = c("Datos corresponden al segundo semestre del año 2024"))
-```
-
-# Metodología y Datos
-
-::: content-block
-**Base de datos:** Encuesta de estadísticas vitales - EEVV - 2024
-
-**Unidad de análisis:** Nacimiento
-
-**Período:** (2024)
-
-**Acceso:** [https://microdatos.dane.gov.co/index.php/catalog/878](https://microdatos.dane.gov.co/index.php/catalog/878/data-dictionary/F46?file_name=BD-EEVV-Nacimientos-2024){.uri}
-
-Los datos utilizados en esta investigación provienen de la Encuesta de Estadísticas Vitales (EEVV) 2024 del Departamento Administrativo Nacional de Estadística (DANE). Esta encuesta administra el registro administrativo de nacimientos en Colombia y recoge información detallada sobre características demográficas, sociales y clínicas relacionadas con el recién nacido y su madre.
-
-La metodología de esta investigación se basa en la aplicación de dos modelos de clasificación supervisada, K-Nearest Neighbors (KNN) y Regresión Logística, con el objetivo de identificar y analizar las fallas sociales y estructurales que inciden en la desnutrición neonatal en Bogotá durante el segundo semestre de 2024. Estos modelos permiten determinar la influencia de variables sociales, económicas y de salud en este problema de salud pública, tomando como indicador principal la desnutrición al nacer.
-
-La selección de variables incluye aspectos educativos, económicos y estructurales que reflejan el control social desde la concepción hasta el nacimiento, así como parámetros clínicos relevantes. Esto garantiza un análisis integral de los determinantes del estado nutricional neonatal.
-
-El estudio utiliza una base de datos representativa y actualizada proveniente de la Encuesta de Estadísticas Vitales (EEVV) 2024 del DANE, focalizando su análisis en la población nacida en Bogotá durante ese periodo. El proceso metodológico contempla etapas rigurosas de preprocesamiento de datos, incluyendo limpieza, manejo de valores faltantes y balance de clases, así como la partición de los datos en conjuntos de entrenamiento y prueba para validar los modelos.
-
-La muestra final se concentra en los siete departamentos del Caribe colombiano: Atlántico, Bolívar, Cesar, Córdoba, La Guajira, Magdalena y Sucre. Se aplicaron filtros estrictos para garantizar la calidad de los datos, incluyendo solo observaciones con valores positivos en todas las variables clave y sin datos faltantes.
-
-## Justificación de la selección de variables dependiente e independientes
-
 ```{js, echo=FALSE}
 document.addEventListener('DOMContentLoaded', function() {
   // ELIMINADO: Smooth scroll que bloqueaba el TOC
@@ -924,6 +852,114 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 ```
 
+::: abstract
+**Resumen** : *Este estudio analiza los determinantes de las ventas en micronegocios de la región Caribe colombiana mediante regresión lineal múltiple. Se utilizaron datos de la Encuesta de Micronegocios (EMICRON) 2022 del DANE, con una muestra de 2.020 observaciones de siete departamentos caribeños.*
+
+*El modelo identifica como variables explicativas significativas los gastos operativos, valor agregado, inversión en activos y arrendamiento, además de efectos diferenciados por departamento. Los resultados muestran que los gastos operativos son el principal determinante de las ventas, seguido por el valor agregado generado.*
+
+*El modelo presenta un poder explicativo robusto y significancia estadística global. Los supuestos de regresión se cumplen de manera aceptable para datos económicos reales, con ligeras desviaciones que no comprometen la validez práctica del análisis.*
+
+*Las predicciones generadas permiten evaluar diferentes escenarios operativos y confirman que la eficiencia en el uso del capital de trabajo es más determinante que la capitalización en activos fijos para el éxito comercial de los micronegocios en la región estudiada.*
+
+:::
+
+# Introducción
+
+::: content-block
+El peso al nacer es uno de los determinantes más importantes del bienestar con el que un ser humano inicia su vida. Es un indicador de morbilidad y mortalidad pediátrica y neonatal, así como un antecedente clave en las diferencias del desarrollo cognitivo y de las enfermedades crónicas en etapas posteriores. Sin embargo, también representa una problemática multifactorial en la que intervienen diversas fallas sociales, como la desigualdad económica, el acceso a la salud, las condiciones de vida y la educación en salud materno-infantil. Todo esto genera brechas en las propiedades intelectuales y materiales durante una etapa tan vital y crítica como el desarrollo óptimo de los nacidos vivos del país, lo que produce impactos en los niveles de natalidad, el desarrollo de niños y adolescentes, y en las madres presentes y futuras.
+
+Un recién nacido con bajo peso y/o desnutrición no solo refleja una falta de responsabilidad materna hacia su hijo, sino también las brechas que impiden que las madres accedan a un seguimiento adecuado y controlado de su embarazo. Esto les dificulta vivir este proceso de manera tranquila y exitosa, y hace que sus hijos no inicien sus primeros momentos de vida de forma satisfactoria.
+
+Como se mencionó anteriormente, el desarrollo prenatal del bebé representa uno de los factores más influyentes desde el punto de vista social, ya que engloba y describe las condiciones del entorno en el que nace el individuo y en el que probablemente transitara las etapas futuras de su desarrollo. Lo anterior se resume en las particularidades del embarazo de las madres de los recién nacidos vivos. Estos aspectos se abordarán en el desarrollo de la presente investigación, puesto que desde el área de la ingeniería es posible realizar una prospectiva de la situación, facilitando la formulación de soluciones desde un enfoque social.
+
+A pesar de que los antecedentes corresponden a una problemática nacional, Bogotá, a pesar de ser la capital del país y contar con un mejor desarrollo regional, no está exenta de ella. Según datos del DANE, el 17% de los casos de desnutrición neonatal del segundo semestre del año 2024 corresponden a esta ciudad.
+
+El presente estudio emplea modelos de clasificación supervisada (regresión logística y KNN) utilizando los datos de nacimientos vivos en Bogotá, con el objetivo de analizar la relación entre la desnutrición neonatal y un conjunto de variables explicativas. Entre estas, se consideran el tiempo de gestación, el tipo de parto, el número de controles prenatales, la edad materna y el número de embarazos previos. La selección de estas variables se fundamenta tanto en la revisión de literatura científica relevante como en las características sociodemográficas y sanitarias propias del contexto bogotano, las cuales han sido identificadas en informes nacionales y estudios previos como factores determinantes en el estado nutricional al nacer.
+:::
+
+# Descripción de la fuente de datos
+
+::: content-block
+**Base de datos:** Encuesta de estadísticas vitales - EEVV - 2024
+
+**Unidad de análisis:** Nacimiento
+
+**Período:** (2024)
+
+**Acceso:** [https://microdatos.dane.gov.co/index.php/catalog/878](https://microdatos.dane.gov.co/index.php/catalog/878/data-dictionary/F46?file_name=BD-EEVV-Nacimientos-2024){.uri}
+
+Los datos utilizados en esta investigación provienen de la Encuesta de Estadísticas Vitales (EEVV) 2024 del Departamento Administrativo Nacional de Estadística (DANE). Esta encuesta administra el registro administrativo de nacimientos en Colombia y recoge información detallada sobre características demográficas, sociales y clínicas relacionadas con el recién nacido y su madre.
+:::
+
+# Metodología
+
+::: content-block
+La metodología de esta investigación se basa en la aplicación de dos modelos de clasificación supervisada, K-Nearest Neighbors (KNN) y Regresión Logística, con el objetivo de identificar y analizar las fallas sociales y estructurales que inciden en la desnutrición neonatal en Bogotá durante el segundo semestre de 2024. Estos modelos permiten determinar la influencia de variables sociales, económicas y de salud en este problema de salud pública, tomando como indicador principal la desnutrición al nacer.
+
+La selección de variables incluye aspectos educativos, económicos y estructurales que reflejan el control social desde la concepción hasta el nacimiento, así como parámetros clínicos relevantes. Esto garantiza un análisis integral de los determinantes del estado nutricional neonatal.
+
+El estudio utiliza una base de datos representativa y actualizada proveniente de la Encuesta de Estadísticas Vitales (EEVV) 2024 del DANE, focalizando su análisis en la población nacida en Bogotá durante ese periodo.
+
+## Procesamiento de datos
+
+Inicialmente, la base de datos contenía 34,424 registros de nacidos vivos. Como primer paso, se realizó una limpieza rigurosa:
+
+-   Se eliminaron observaciones con valores faltantes o inconsistentes en todas las variables clave.
+
+-   Se dividió la base en dos sub-bases: recién nacidos con desnutrición (“Sí”) y sin desnutrición (“No”), con base en la variable dependiente principal.
+
+-   Para evitar sesgo por desbalance de clases, se aplicó un procedimiento de balanceo, lo que permitió construir una muestra final equilibrada de 11,872 observaciones.
+
+## Variables analizadas
+
+El modelo incorpora variables seleccionadas por su relevancia empírica documentada en la literatura científica y en lineamientos oficiales:
+
+-   Tiempo de gestación (en rangos de meses)
+
+-   Tipo de parto (Cesaria, Espontaneo o instrumentado)
+
+-   Número de controles prenatales recibidos durante el embarazo
+
+-   Edad de la madre (en rangos categóricos)
+
+-   Número de embarazos previos
+
+```{r tabla_variables}
+# TABLA DE VARIABLES DEL MODELO
+variables_modelo <- data.frame(
+  Variable = c("Peso", "Tiempo gestación", "Tipo parto", 
+               "Numero control prenatal", "Edad madre", "Numero embarazos"),
+  Descripción = c("Clasificación del peso al nacer (Normal/Delicado)",
+                 "Semanas de gestación", 
+                 "Tipo de parto registrado",
+                 "Número de controles prenatales realizados",
+                 "Grupo etario de la madre",
+                 "Número de embarazos previos"),
+  Tipo_Variable = c("Categórica (binaria)", "Categórica ordinal", 
+                   "Categórica nominal", "Cuantitativa discreta",
+                   "Categórica ordinal", "Cuantitativa discreta"),
+  Notas = c("Variable dependiente - Peso normal: ≥2500g", 
+           "Considerar <37 semanas como prematurez",
+           "Espontáneo/Cesárea/Instrumentado",
+           "Indicador de acceso a salud prenatal",
+           "Recodificado a 9 rangos etarios (Códigos 1 a 9)",
+           "Incluye embarazo actual")
+)
+
+kable(variables_modelo, 
+      caption = "Tabla 1: Variables del Modelo",
+      align = c("l", "l", "l", "l"),
+      col.names = c("Variable", "Descripción", "Tipo de Variable", "Notas")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"),
+                full_width = FALSE,
+                font_size = 12) %>%
+  row_spec(0, background = "#2C3E50", color = "white", bold = TRUE) %>%
+  column_spec(1, bold = TRUE, width = "12em") %>%
+  footnote(general = "Fuente: Elaboración propia en base a la Base de Datos de Nacimientos - 2024",
+           number = c("Datos corresponden al segundo semestre del año 2024"))
+```
+
+
 ```{r cargar_datos, include=FALSE}
 # Configuración inicial - manteniendo tu código base
 BD_EEVV <- read_csv("BD-EEVV-Nacimientos-2024.csv") %>%
@@ -989,6 +1025,56 @@ Base_datos <- bind_rows(Si, No) %>%
   ) %>%
   filter(complete.cases(.))
 ```
+
+Estas variables reflejan tanto el entorno social y estructural como el acceso a servicios de salud y el historial reproductivo, permitiendo un análisis integral de los riesgos de desnutrición neonatal.
+
+## Justificación de la selección de variables dependiente e independientes
+
+La variable dependiente seleccionada es el estado nutricional del recién nacido al momento del nacimiento, el cual se clasifica en dos categorías: “Sí” (el bebé presenta desnutrición al nacer) y “No” (el bebé no presenta desnutrición al nacer). Esta variable permite identificar los factores asociados a la desnutrición neonatal, la cual está asociada a mayores riesgos de morbilidad y mortalidad infantil, y es reconocida como un indicador crítico por la Organización Mundial de la Salud (OMS, 2017; DANE, 2024). La desnutrición al nacer refleja desigualdades en acceso a servicios de salud prenatal, nutrición materna, condiciones sociales y características biológicas de la gestación, y es además un predictor del desarrollo físico y cognitivo del niño (OMS, 2017; DANE, 2024).
+
+Entre las variables independientes, se escogieron aquellas que, según reportes oficiales y estudios previos, tienen una relación directa con el peso al nacer.
+
+-   **Tiempo de gestación (semanas) :** Es fundamental ya que la prematurez está asociada con un peso menor al esperado. Nacimientos antes de las 37 semanas suelen presentar bajo peso debido a la inmadurez fetal (DANE, 2024). Estudios confirman que el tiempo de gestación es el principal determinante biológico del peso neonatal (Wu et al., 2022; Kramer, 1987).
+
+-   **El tipo de parto (espontáneo, cesárea o instrumentado)** indica las características médicas de la gestación y el nacimiento. Partos por cesárea e instrumentados están frecuentemente relacionados con complicaciones que pueden influir en el peso del recién nacido (DANE, 2024).
+
+-   **La cantidad de consultas prenatales:**  constituye un indicador fundamental de acceso y calidad en la atención materna. Estudios del Instituto Nacional de Salud (2020) muestran mayor riesgo de bajo peso en madres con menos de cuatro controles, lo que evidencia la importancia del diagnóstico temprano de complicaciones, suplementación nutricional y seguimiento del desarrollo fetal.
+
+<!-- -->
+
+-   **La edad de la madre (años)**: Se considera porque las madres adolescentes y las de mayor edad tienen tasas más elevadas de bajo peso al nacer, conforme a las estadísticas en Colombia (Instituto Nacional de Salud, 2020). Estas poblaciones pueden presentar mayores riesgos biológicos y sociales asociados.
+
+<!-- -->
+
+-   **Número de embarazos previos:** Influye en la capacidad reproductiva y salud materna. El historial de embarazos múltiples puede afectar la nutrición y el ambiente uterino, lo cual impacta el peso del recién nacido
+
+Estas variables fueron elegidas considerando evidencia empírica documentada, garantizando una base sólida para un modelo predictivo que permita comprender y analizar factores asociados al peso al nacer en Bogotá, con miras a fortalecer políticas públicas de salud materno-infantil y mejorar indicadores en Colombia.
+
+## Descripción del modelo de regresión lineal múltiple
+
+Los datos empleados se obtuvieron de la página de microdatos y metadatos del DANE, utilizando la Encuesta Vital correspondiente al año 2024 de la sección de nacimientos. Se realizó una serie de modificaciones para lograr una mejor proporción y comprensión de los datos: la base fue filtrada no solo por la selección de variables, sino también por la distribución de frecuencias del umbral empleado (bajo peso al nacer), focalizando así la información correspondiente a los nacimientos en la ciudad de Bogotá durante el segundo semestre del año en que se realizó la encuesta.
+
+El motivo de la filtración exhaustiva fue lograr una mayor homogeneidad en los datos, fundamental para sustentar la hipótesis principal: respaldar, a través de la evidencia, los determinantes sociales que inciden en los índices de desnutrición en el territorio. Dada la magnitud y extensión de la base de datos original, se tomó la decisión de acotarla para obtener resultados esperados aplicando dos tipos de modelos de aprendizaje supervisados, cuyo objetivo es clasificar de manera binaria una serie de características de la población.
+
+Los modelos corresponden a:
+
+1.  **K- nearest neighbors.**
+
+Este modelo busca clasificar en dos sentencias  una serie de predicciones basadas en características que tienen las dos sentencias, es decir, clasificar mediante predicciones de las características en las sentencias que tienen caracteristicas cercanas, de ahí su nombre. "k" representa la cantidad de vecinos más cercanos considerados en el problema de clasificación o regresión, y "NN" se refiere a los vecinos más cercanos a la cantidad elegida para k. 
+
+En el problema con el que se está trabajando las caracteristicas que se tienen son las variables independientes y las sentencias son la variable dependiente que solo puede clasificar en dos opciones debido a la dicotomía de la variable. El umbral empleado tiene como palabras de clasificación si o no (si tiene bajo peso, no tiene bajo peso (peso moderado)).
+
+Con este modelo se busca indagar, la veracidad de las variables independientes como sintomas en una sentencia, es decir, si las variables seleccionadas abarcan las caracteristicas suficientes para dictaminar una sentencia congruente.
+
+2.  **Regresión logistica.**
+
+La regresion logistica es un modelo de predicción que a diferencia de un modelo de regresión lineal, que busca predecir la influencia de multiples variables independientes sobre una variable dependiente numerica, este por el contrario busca predecir la probabilidad de clasificar una serie de variables independientes sobre una variable dependiente binaria que encasilla 2 sentencias, basadas en el aprendizaje de un modelo en el cual se tiene conocimiento de los resultados.
+
+Teniendo en consideración, la problematica que se está modelando, los objetivos que se estiman es tener una probabilidad de clasificación que sea consecuente con el modelo anterior, con el fin de formular conclusiones veridicas y posteriormente soluciones a la problemática.
+
+## Base de datos del estudio
+
+Para este trabajo se emplea la base de datos de la Encuesta de Estadísticas Vitales (EEVV) 2024 del DANE, filtrada específicamente para el periodo del segundo semestre en la ciudad de Bogotá. El conjunto de datos fue depurado rigurosamente para incluir únicamente las observaciones completas y las variables relevantes para los modelos de clasificación KNN y Regresión Logística, asegurando así la calidad y pertinencia de la muestra seleccionada para el análisis.
 
 ```{r tabla_interactiva,}
 # TABLA INTERACTIVA FINAL
@@ -1090,6 +1176,21 @@ reactable(
 )
 
 ```
+:::
+
+# Estadisticas Descriptivas
+
+:::: content-block
+A continuación se presentan las estadísticas descriptivas, que resumen las características principales de la muestra estudiada. Este análisis preliminar permite conocer la distribución, tendencia central y dispersión de las variables clave, facilitando la comprensión del contexto y estableciendo la base para análisis posteriores.
+
+Las estadísticas descriptivas son fundamentales para identificar patrones y diferencias entre grupos, que apoyan la validación de los modelos predictivos empleados en el estudio.
+
+## Estadísticas descriptivas de las variables seleccionadas
+
+::: content-block
+### **Analisis de la Variable Dependiente: Desnutrición Neonatal**
+
+Los resultados obtenidos a partir del análisis descriptivo del peso de los nacimientos en Bogotá durante el segundo semestre de 2024 se resumen en la Tabla 1. Estos resultados permiten identificar diferencias clave entre los grupos de recién nacidos con peso delicado  “Si” y “No”.  Ambas categorías están equilibradas, lo que permite un análisis comparativo robusto. 
 
 ```{r tabla1_1_tamano_muestral}
 # TABLA 1.1: TAMAÑO MUESTRAL POR GRUPO DE PESO
@@ -1121,6 +1222,12 @@ kable(tabla_1_1,
     number = c("Datos corresponden a nacimientos en Bogotá (julio-diciembre 2024)")
   )
 ```
+
+La tabla muestra que el grupo de recién nacidos con desnutrición neonatal (“Sí”) representa el 49.5% de la muestra, mientras que el grupo “No” alcanza el 50.5%. Esto indica una distribución muy equilibrada entre ambos grupos lo que permite llevar a cabo análisis comparativos robustos y sin sesgos por desproporción entre categorías.
+
+Además, se realizó un análisis descriptivo de la variable dependiente en relación con las dos variables independientes cuantitativas del estudio, para identificar diferencias y tendencias principales entre los grupos.
+
+**Analisis del grupo de peso en relacion con los controles prenatales**
 
 ```{r tabla1_2_controles_prenatales}
 # TABLA 1.2: CONTROLES PRENATALES POR GRUPO DE PESO
@@ -1155,6 +1262,10 @@ kable(tabla_1_2,
   )
 ```
 
+El grupo de nacidos desnutridos registra un promedio de 6.6 controles, por debajo de los 7.2 en el grupo de los que no. Esto respalda estudios que señalan menor acceso a controles prenatales como factor de riesgo de bajo peso al nacer
+
+**Analisis del grupo de peso en relacion con el numero de embarazos**
+
 ```{r tabla1_3_numero_embarazos}
 # TABLA 1.3: NÚMERO DE EMBARAZOS POR GRUPO DE PESO
 tabla_1_3 <- Base_datos %>%
@@ -1188,6 +1299,12 @@ kable(tabla_1_3,
   )
 ```
 
+Ambos grupos presentan el mismo promedio de 1.9 embarazos previos, sugiriendo que en esta muestra particular este factor no distingue entre los dos grupos.
+
+### **Analisis de la Variable Independiente:** Tiempo De Gestación
+
+La distribución del tiempo de gestacion en la muestra se presenta en la Tabla \_\_\_. 
+
 ```{r tabla2_tiempo_gestacion}
 # TABLA 2: DISTRIBUCIÓN DEL TIEMPO DE GESTACIÓN
 tabla_tiempo_gestacion <- Base_datos %>%
@@ -1215,6 +1332,10 @@ kable(tabla_tiempo_gestacion,
     general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024."
   )
 ```
+
+La tabla muestra la distribución del tiempo de gestación en la muestra analizada. La mayoría de los nacimientos se concentra entre 28 y 37 semanas (53.2%), seguidos de los partos entre 38 y 41 semanas (45.5%). Los nacimientos antes de las 28 semanas representan solo el 1.3%, mientras que los partos de 42 o más semanas son extremadamente infrecuentes (1 caso). Esto indica que la mayor parte de los nacimientos ocurre dentro de rangos aceptados como "a término" o moderadamente prematuros, con muy pocos casos en los extremos.
+
+Para analizar cómo el tiempo de gestación se relaciona con la variable dependiente de desnutrición neonatal, se utiliza un gráfico de barras apiladas. Este tipo de visualización permite observar de forma clara la distribución y el comportamiento de ambos grupos, facilitando la identificación de patrones y posibles asociaciones relevantes para el estudio.
 
 ```{r grafico2_tiempo_vs_peso, fig.width=8, fig.height=5}
 # GRÁFICO 2: RELACIÓN TIEMPO DE GESTACIÓN VS PESO DELICADO (BARRAS APILADAS)
@@ -1273,6 +1394,12 @@ plot_ly(
   )
 ```
 
+El gráfico muestra la relación entre el tiempo de gestación y la presencia de desnutrición neonatal (“Peso Delicado”) en Bogotá durante el segundo semestre de 2024. Se observa que en el grupo de 28-37 semanas, la mayoría de los recién nacidos no presenta desnutrición, mientras que en el grupo de 38-41 semanas predomina la desnutrición neonatal (“Sí”). Los nacimientos en los extremos (22-27 semanas y 42 o más semanas) son muy poco frecuentes y aportan poco al total.
+
+### **Análisis de la Variable Independiente:** Tipo De Parto
+
+Los resultados del análisis descriptivo del tipo de parto, que incluye las categorías cesárea, espontáneo e instrumentado, se resumen en la Tabla \_\_\_.
+
 ```{r tabla3_tipo_parto}
 # TABLA 3: DISTRIBUCIÓN DEL TIPO DE PARTO
 tabla_tipo_parto <- Base_datos %>%
@@ -1301,6 +1428,12 @@ kable(tabla_tipo_parto,
     general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024."
   )
 ```
+
+La variable “tipo de parto” muestra una distribución claramente dominada por las cesáreas, que representan el 59.3% de los nacimientos en la muestra analizada. Este resultado refleja una tendencia creciente hacia la utilización de este procedimiento en Bogotá, en línea con los reportes recientes de la Secretaría Distrital de Salud, donde también se observa un aumento sostenido en la proporción de partos por cesárea en los últimos años.​
+
+En segundo lugar, el parto espontáneo o vaginal sin intervención constituye el 38.8% de los nacimientos, mientras que el parto instrumentado (con el uso de herramientas como fórceps o ventosas) representa solo el 1.9% del total. Este último dato evidencia que la aplicación de métodos instrumentados es poco frecuente en la cohorte estudiada.
+
+ahora, para ver la relacion de esta variable con la variable dependiente estudiada se realiza un gráfico de anillos el cual permite visualizar de manera clara cómo se distribuyen los tipos de parto (cesárea y espontáneo) y su relación con el estado nutricional neonatal (“Sí” o “No”). Esto ayuda a identificar si existe una diferencia relevante en la prevalencia de desnutrición neonatal según el tipo de parto, facilitando la interpretación y el análisis de posibles asociaciones entre esas variables.
 
 ```{r grafica3s}
 # GRÁFICO 3: DISTRIBUCIÓN DEL TIPO DE PARTO (SUNBURST)
@@ -1383,6 +1516,14 @@ plot_ly(
 
 ```
 
+La grafica evidencia diferencias importantes en la distribución del bajo peso según el tipo de parto. En el grupo de partos por cesárea, el 57.3% correspondió a recién nacidos con desnutrición, mientras que el 42.3% fue un peso moderado. Esto indica que, dentro de quienes nacen por cesárea, existe una mayor proporción de bajo peso, lo que puede vincularse tanto a indicaciones clínicas asociadas a embarazos de mayor complejidad como a prácticas hospitalarias reportadas para la ciudad.​
+
+Al analizar el parto espontáneo, la tendencia se invierte: el 61.5% de los nacidos por este medio fueron clasificados como recién nacidos sin desnutrición  y el 38.5% como recién nacidos con desnutrición. Esto sugiere que el parto espontáneo suele asociarse a mejores condiciones neonatales y puede reflejar embarazos de curso más favorable.
+
+### **Análisis de la Variable Independiente:** Edad De La madre 
+
+La distribución de la edad materna en la muestra se presenta en la Tabla 4. Esta tabla resume la frecuencia y el porcentaje de nacimientos según los distintos grupos de edad de la madre, permitiendo identificar los rangos predominantes en la población de estudio.
+
 ```{r tabla4_edad_madre}
 # TABLA 4: DISTRIBUCIÓN POR GRUPOS DE EDAD DE LA MADRE
 tabla_edad_madre <- Base_datos %>%
@@ -1420,6 +1561,14 @@ kable(tabla_edad_madre,
     general = "Fuente: Elaboración propia con base en la Encuesta de Nacimientos – DANE 2024."
   )
 ```
+
+La mayor proporción de nacimientos se concentra en los grupos de madres de 20 a 24 años (22.2%), 25 a 29 años (28.3%) y 30 a 34 años (23.9%), acumulando entre estos tres grupos el 74.4% del total. Esto indica que la mayoría de los nacimientos en Bogotá durante el periodo analizado corresponden a mujeres en edades reproductivas consideradas óptimas según literatura biomédica y cifras nacionales (DANE, 2024).​
+
+Los extremos presentan frecuencias mucho menores: sólo el 0.3% de los partos ocurrió en madres adolescentes entre 10 y 14 años lo cual aunque sea poco es una cifra muy deprimente dado el contexto, y el porcentaje tan bajo con solo 2 casos en el grupo de 50 a 54 años, lo que sugiere que la maternidad extremadamente temprana y avanzada son eventos muy poco comunes en la muestra. El grupo de 15 a 19 años, aunque representa minoría, suma el 8%, indicando la presencia significativa de embarazos adolescentes, un tema relevante para políticas de salud pública.
+
+Las madres de 35 a 39 años representan un 13.5% y de 40 a 44 años un 3.5%, reflejando una transición reproductiva progresiva hacia edades mayores, pero sin constituir un grupo dominante. Los grupos de 45 a 49 y de 50 a 54 años son prácticamente residuales en la distribución observada.
+
+También se llevó a cabo un gráfico de barras agrupadas lo cual permite comparar la frecuencia de recién nacidos con y sin peso delicado en cada grupo de edad materna facilitando la identificación de grupos de edad donde la prevalencia es mayor o donde la distribución es equilibrada.
 
 ```{r grafico4_edad_madre_grouped, fig.width=8, fig.height=4.6}
 # GRÁFICO 4:EDAD MADRE BARRAS AGRUPADAS
@@ -1490,6 +1639,10 @@ plot_ly(
     margin = list(b = 150, l = 80, r = 50, t = 100)
   )
 ```
+
+Se observa que el mayor volumen de casos se concentra en los grupos de edad de 20 a 34 años, lo que corresponde a los rangos reproductivos más frecuentes en la población.
+
+Tanto la presencia como la ausencia de peso delicado mantienen proporciones similares en cada grupo de edad, aunque algunos grupos presentan pequeñas diferencias. Por ejemplo, en madres de 25-29 años y 30-34 años, los porcentajes de peso delicado “Sí” y “No” son casi equivalentes, mientras que en los extremos de edad la cantidad de casos es mucho menor y las proporciones varían más con un porcentaje de 59.5 de niños con desnutrición en madres mayores de 45 . Destaca que el grupo de 25-29 años posee el mayor número absoluto de recién nacidos tanto con como sin peso delicado, y las diferencias porcentuales entre estados nutricionales en la mayoría de los grupos no son dramáticas.
 
 ```{r tabla5_controles_prenatales}
 # TABLA 5: ESTADÍSTICAS DE CONTROLES PRENATALES
