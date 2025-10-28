@@ -1,7 +1,10 @@
 # Librerías esenciales
+library(readr)
 library(dplyr)
 library(tidyverse)
 library(caret)
+library(ISLR)
+library(kableExtra)
 library(pROC)
 library(class)
 
@@ -48,6 +51,7 @@ BD_test_output_kNN <- knn(train = BD_entrena_input,
 BD_knnEntrenado
 
 # Gráfica del k óptimo
+
 plot(BD_knnEntrenado)
 
 # Predicciones
@@ -70,3 +74,5 @@ roc_obj <- roc(BD_test$Peso_delicado, prob_knnPrediccion$Si)
 auc_val <- auc(roc_obj)
 plot(roc_obj, main = paste("Curva ROC k-NN - AUC =", round(auc_val, 3)))
 legend("bottomright", legend = paste("AUC =", round(auc_val, 3)), bty = "n")
+
+
