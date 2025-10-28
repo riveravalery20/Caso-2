@@ -1176,7 +1176,7 @@ reactable(
 ```
 :::
 
-# Estadisticas Descriptivas
+# Resultados Descriptivos
 
 :::: content-block
 A continuación se presentan las estadísticas descriptivas, que resumen las características principales de la muestra estudiada. Este análisis preliminar permite conocer la distribución, tendencia central y dispersión de las variables clave, facilitando la comprensión del contexto y estableciendo la base para análisis posteriores.
@@ -2017,186 +2017,212 @@ La figura muestra que en ambos grupos, la media y la mediana son prácticamente 
 :::
 ::::
 
-# Estimacion De Modelos
+# Resultado De Modelo
 
 ::: content-block
-```{r librerias modelos}
-library(readr)
-library(dplyr)
-library(tidyverse)
-library(caret)
-library(ISLR)
-library(kableExtra)
-```
-
 En este estudio se emplean dos modelos de clasificación supervisada para analizar los factores asociados a la desnutrición neonatal en Bogotá: K-Nearest Neighbors (KNN) y Regresión Logística. Ambos modelos permiten abordar el problema desde perspectivas complementarias y robustecer la interpretación de los resultados.
 
-## Modelo KNN( K- Nearest- Neighbors)
+## Modelo KNN ( K- Nearest- Neighbors)
 
-```{r cargar modelo KNN}
-# Librerías esenciales
-library(dplyr)
+## Modelo **logit (** Regresión logistica)
+
+```{r cargar modelo logit}
 library(tidyverse)
 library(caret)
 library(pROC)
-library(class)
 
-# KNN COMPLETO
 set.seed(200)
 
-# División de datos
-index_muestra <- sample(11873, 11873)
-index_entrena <- sample(11873, 8904)
+index_muestra <- sample(11873,11873)
+
+index_entrena <- sample(11873,8904)
+
 index_test <- index_muestra[!index_muestra %in% index_entrena]
 
 BD_entrena <- Base_datos[index_entrena, ] %>% 
   filter(!is.na(Peso_delicado))
 
-BD_test <- Base_datos[index_test, ] %>% 
-  filter(!is.na(Peso_delicado))
+BD_test <- Base_datos[index_test, ]
 
-# Asegurar niveles correctos
-BD_entrena$Peso_delicado <- factor(BD_entrena$Peso_delicado, levels = c("Si", "No"))
-BD_test$Peso_delicado <- factor(BD_test$Peso_delicado, levels = c("Si", "No"))
+BD_entrena_input <- BD_entrena[, 1:5]
+BD_entrena_output <- BD_entrena[, 6]
 
-BD_entrena_input <- Base_datos[, 1:5]
-BD_entrena_output <- Base_datos[, 6]
+BD_test_input <- BD_test[, -6]
+BD_test_output <- BD_test[, 6]
 
-BD_test_input <- Base_datos[, -6]
-BD_test_output <- Base_datos[, 6]
+BD_entrena$Peso_delicado <- factor(BD_entrena$Peso_delicado, levels = c("No", "Si"))
+BD_test$Peso_delicado <- factor(BD_test$Peso_delicado, levels = c("No", "Si"))
 
-# Entrenar k-NN
-BD_knnEntrenado <- train(Peso_delicado ~ ., 
-                         data = BD_entrena, 
-                         method = "knn",  
-                         tuneLength = 200
-)
-#Numero optimo
+fit_logit <- glm(Peso_delicado ~ Tiempo_gestación 
+                 + Tipo_parto + Numero_control_prenatal 
+                 + Edad_madre + Numero_embarazos, data = BD_entrena, family = binomial())
+summary(fit_logit)  
 
-BD_test_output_kNN <- knn(train = BD_entrena_input, 
-                            cl = BD_entrena_output, 
-                            test = BD_test_input, 
-                            k = 43)
-# Resultados del modelo
-BD_knnEntrenado
+p_hat <- predict(fit_logit, newdata = BD_test, type = "response")
 
-# Gráfica del k óptimo
-plot(BD_knnEntrenado)
+pred_clase <- factor(ifelse(p_hat >= 0.5, "Si", "No"), levels = c("Si","No"))
 
-# Predicciones
-BD_knnPrediccion <- predict(BD_knnEntrenado, newdata = BD_test)
+confusionMatrix(pred_clase, BD_test$Peso_delicado, positive = "Si")
 
-# Matriz de confusión final
-confusionMatrix(BD_knnPrediccion, BD_test$Peso_delicado, positive = "Si")
+roc_o <- roc(response = BD_test$Peso_delicado, predictor = p_hat, levels = c("No","Si"))
+thr   <- coords(roc_o, x = "best", best.method = "youden", ret = "threshold")
 
-prob_knnPrediccion <- predict(BD_knnEntrenado, newdata = BD_test, type = "prob")
-head(prob_knnPrediccion, 10)
+umbral<-as.numeric(thr)
+pred_clase <- factor(ifelse(p_hat >= umbral, "Si", "No"), levels = c("Si","No"))
 
-data.frame(
-  Real = BD_test$Peso_delicado[1:20],
-  Predicho = BD_knnPrediccion[1:20],
-  Prob_Si = round(prob_knnPrediccion$Si[1:20], 4),
-  Prob_No = round(prob_knnPrediccion$No[1:20], 4)
-)
+confusionMatrix(pred_clase, BD_test$Peso_delicado, positive = "Si")
 
-roc_obj <- roc(BD_test$Peso_delicado, prob_knnPrediccion$Si)
-auc_val <- auc(roc_obj)
-plot(roc_obj, main = paste("Curva ROC k-NN - AUC =", round(auc_val, 3)))
-legend("bottomright", legend = paste("AUC =", round(auc_val, 3)), bty = "n")
+auc_val <- auc(roc_o)
+
 
 ```
 
-```{r probabilidades}
-prob_knnPrediccion %>%
-  head(10) %>%
+Este modelo busca clasificar, en un lenguaje probabilístico, el porcentaje de aciertos para verdaderos positivos y falsos negativos. Lo que nos posibilita una serie de planteamientos más certeros, ya que considera los niveles de significancia, y en un contexto de un desafío de salud pública, las sentencias que consideren otros aspectos y no concluyan, dan cabida a la evolución médica y la optimización continua de soluciones óptimas al sistema.
+
+### Tabla De Resumen De Variables 
+
+La siguiente tabla sintetiza el impacto y relevancia estadística de las variables independientes en el modelo, permitiendo identificar cuáles factores influyen significativamente en la predicción de desnutrición neonatal.
+
+```{r summary}
+# Tabla completa del summary con significancia
+summary_logit <- summary(fit_logit)
+coef_table <- as.data.frame(summary_logit$coefficients)
+coef_table$Variable <- rownames(coef_table)
+rownames(coef_table) <- NULL
+
+# Limpiar nombres y agregar significancia
+coef_table_completa <- coef_table %>%
   mutate(
-    Observación = 1:10,
-    .before = Si
+    Variable = gsub("_", " ", Variable),
+    Variable = gsub("Tiempo gestación", "Tiempo gestación:", Variable),
+    Variable = gsub("Tipo parto", "Tipo parto:", Variable),
+    Variable = gsub("Edad madre", "Edad madre:", Variable),
+    Significancia = ifelse(`Pr(>|z|)` < 0.001, "***",
+                          ifelse(`Pr(>|z|)` < 0.01, "**",
+                                ifelse(`Pr(>|z|)` < 0.05, "*", "")))
   ) %>%
   rename(
-    `P(Desnutrición)` = Si,
-    `P(No Desnutrición)` = No
+    Estimación = Estimate,
+    `Error Estándar` = `Std. Error`,
+    `Valor z` = `z value`,
+    `Valor p` = `Pr(>|z|)`
   ) %>%
-  kable(digits = 4, align = "c", caption = "Probabilidades de Predicción - Primeras 10 Observaciones") %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), 
-                full_width = FALSE, position = "center") %>%
-  row_spec(0, background = "#2E86AB", color = "white", bold = TRUE)
+  select(Variable, Estimación, `Error Estándar`, `Valor z`, `Valor p`, Significancia)
 
-```
-
-```{r tabla comparativa}
-tabla_comparativa <- data.frame(
-  Observación = 1:20,
-  Real = BD_test$Peso[1:20],
-  Predicho = BD_knnPrediccion[1:20],
-  `P(Desnutrición)` = round(prob_knnPrediccion$Si[1:20], 3),
-  `P(No Desnutrición)` = round(prob_knnPrediccion$No[1:20], 3),
-  Resultado = ifelse(BD_test$Peso[1:20] == BD_knnPrediccion[1:20], 
-                     "✅ Correcto", "❌ Incorrecto")
-)
-
-tabla_comparativa %>%
-  kable(align = "c", caption = "Comparación: Valores Reales vs Predicciones") %>%
+# Tabla con el mismo formato que tus métricas
+coef_table_completa %>%
+  kable(align = "lccccc", 
+        caption = "Resumen del Modelo de Regresión Logística") %>%
   kable_styling(bootstrap_options = c("striped", "hover"), 
                 full_width = FALSE) %>%
-  column_spec(6, color = ifelse(tabla_comparativa$Resultado == "✅ Correcto", 
-                               "green", "red")) %>%
-  row_spec(0, background = "#A23B72", color = "white", bold = TRUE)
-
+  row_spec(0, background = "#2E86AB", color = "white", bold = TRUE) %>%
+  column_spec(1, bold = TRUE) %>%
+  column_spec(2, color = "darkblue", bold = TRUE) %>%
+  column_spec(6, bold = TRUE) %>%
+  footnote(
+    general = "*** p < 0.001, ** p < 0.01, * p < 0.05",
+    general_title = "Niveles de significancia:"
+  )
 ```
 
-```{r  Curva ROC}
-# Curva ROC mejorada
-roc_obj <- roc(BD_test$Peso, prob_knnPrediccion$Si)
-auc_val <- auc(roc_obj)
+Se procedera a realizar el analisis de la tabla por variable presentada.
 
-# Crear dataframe para ggplot
-roc_data <- data.frame(
-  FPR = 1 - roc_obj$specificities,
-  TPR = roc_obj$sensitivities
+1.  Tiempo De Gestacion
+
+Ninguna de las categorías de tiempo de gestación (“28-37 semanas”, “38-41 semanas”, “42 o más semanas”) presenta asociación significativa con la desnutrición neonatal. Todas tienen valores p muy superiores a 0.05 (por ejemplo, p = 0.916, p = 0.897 y p = 0.999 respectivamente), lo cual indica que, en este modelo, la duración del embarazo no afecta de manera relevante la probabilidad de desnutrición al nacer.
+
+2.  Tipo De Parto
+
+**Tipo parto espontáneo**: Estimado de -0.4386, error estándar de 0.0612, valor p \<0.0001. Es un coeficiente negativo y pequeño con bajo error estándar, muy significativo. Indica que el parto espontáneo reduce el riesgo de desnutrición neonatal de forma fiable y precisa.
+
+**Tipo parto instrumentado:** Estimado -1.0914, error estándar de 0.2478, valor p \<0.0001. Coeficiente negativo importante, bajo error estándar y máxima significancia. Sugiere que el parto instrumentado reduce aún más el riesgo respecto al grupo de referencia.
+
+3.  Controles Prenatales
+
+Estimado de -0.0590, error estándar 0.0109, valor p \<0.0001. El coeficiente negativo, pequeño y muy preciso (bajo error estándar) respalda que cada control prenatal adicional disminuye el riesgo de desnutrición con alta fiabilidad.
+
+4.  Edad De La Madre
+
+Ninguna de las categorías de edad materna muestra una asociación significativa con la desnutrición neonatal (por ejemplo, para el grupo 15-19 años: estimación = 0.1501, valor p = 0.806; para 25-29 años: estimación = -0.1557, valor p = 0.797; para 50-54 años: estimación = 13.8664, valor p = 0.992). Todos los valores p están muy por encima de 0.05, descartando un efecto relevante de la edad de la madre en este modelo.
+
+5.  Numero De Embarazos
+
+El número de embarazos tampoco muestra significancia estadística (estimación = -0.0461, valor p = 0.118), lo que implica que esta variable no tiene mucha significancia en el desenlace para la muestra estudiada.
+
+6.  Conclusiones
+
+El modelo respalda la importancia del acceso y frecuencia de los controles prenatales, así como la vía del parto no quirúrgica, como factores protectores frente a la desnutrición neonatal.
+
+Variables como tiempo de gestación, edad materna y número de embarazos —frecuentemente mencionadas en la literatura perinatal— no mostraron impacto significativo bajo este enfoque estadístico.
+
+### **Métricas De Rendimiento**
+
+En esta sección se muestran las principales métricas utilizadas para evaluar la efectividad y precisión del modelo, tales como exactitud, sensibilidad, especificidad y valor predictivo, fundamentales para validar su desempeño.
+
+```{r accuracy}
+library(kableExtra)
+conf_matrix_logit <- confusionMatrix(pred_clase, BD_test$Peso_delicado, positive = "Si")
+# Tabla resumen de métricas
+metricas_logit <- data.frame(
+  Métrica = c("Accuracy", "Sensibilidad", "Especificidad", 
+              "Valor Predictivo Positivo", "Valor Predictivo Negativo",
+              "Prevalencia", "AUC"),
+  Valor = c(
+    round(conf_matrix_logit$overall["Accuracy"], 4),
+    round(conf_matrix_logit$byClass["Sensitivity"], 4),
+    round(conf_matrix_logit$byClass["Specificity"], 4),
+    round(conf_matrix_logit$byClass["Pos Pred Value"], 4),
+    round(conf_matrix_logit$byClass["Neg Pred Value"], 4),
+    round(conf_matrix_logit$byClass["Prevalence"], 4),
+    round(auc_val, 4)
+  ),
+  Interpretación = c(
+    "Proporción total de predicciones correctas",
+    "Capacidad de detectar desnutrición real",
+    "Capacidad de identificar correctamente casos sin desnutrición",
+    "Precisión cuando predice desnutrición",
+    "Precisión cuando predice no desnutrición", 
+    "Proporción real de desnutrición en los datos",
+    "Capacidad general de discriminación del modelo"
+  )
 )
 
-ggplot(roc_data, aes(x = FPR, y = TPR)) +
-  geom_line(color = "#2E86AB", size = 1.5) +
-  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "red", alpha = 0.7) +
-  geom_polygon(aes(x = FPR, y = TPR), fill = "#2E86AB", alpha = 0.3) +
-  labs(
-    title = "Curva ROC - Modelo k-NN para Detección de Desnutrición",
-    subtitle = sprintf("Área bajo la curva (AUC) = %.3f", auc_val),
-    x = "Tasa de Falsos Positivos (1 - Especificidad)",
-    y = "Tasa de Verdaderos Positivos (Sensibilidad)"
-  ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
-    plot.subtitle = element_text(size = 12, hjust = 0.5, color = "darkblue"),
-    panel.grid.minor = element_blank(),
-    legend.position = "none"
-  ) +
-  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
-  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
-  annotate("text", x = 0.7, y = 0.2, 
-           label = paste("AUC =", round(auc_val, 3)), 
-           size = 5, color = "darkblue", fontface = "bold")
-
+metricas_logit %>%
+  kable(align = "lcc", caption = "Métricas de Rendimiento del Modelo Logit") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), 
+                full_width = FALSE) %>%
+  row_spec(0, background = "#2E86AB", color = "white", bold = TRUE) %>%
+  column_spec(1, bold = TRUE) %>%
+  column_spec(2, color = "darkblue", bold = TRUE)
 
 ```
 
-```{r matriz de confusion}
-# Matriz de confusión visual mejorada
-conf_matrix <- confusionMatrix(BD_knnPrediccion, BD_test$Peso, positive = "Si")
+Los resultados publicados se consideran muy apropiados, teniendo como referencia el reporte, que nos indica que hay un 84,34% de proporción total de predicciones correctas, un 89,83% de capacidad de detección para casos de desnutrición real, un 79,12% de capacidad de identificar correctamente casos sin desnutrición, un 80,33% de precisión cuando predice desnutrición, un 89,13% de precisión cuando predice casos de no desnutrición, un 48,70% de proporción real de desnutrición en los datos y un 87,09% de una capacidad general de discriminación de todos los datos.
+
+Basándonos en el contexto en el cual está adaptado el modelo, el valor de interés es la precisión de detección de verdaderos casos de desnutrición real, ya que es la población de estudio, a la cual se le va a implementar el tratamiento de atención.  Además, permite caracterizar de manera más certera otros casos a lo largo del territorio nacional.
+
+Al igual que con el modelo KNN, los hallazgos con este modelo son positivos , ya que respaldan el buen funcionamiento de los datos seleccionados y el rumbo de la investigación.
+
+Las investigaciones que se puedan llevar a cabo con los resultados de este modelo resultan más certeras en la aplicación real en un ámbito de la medicina, ya que, como se mencionó anteriormente, las probabilidades son fundamentales para el planteamiento de hipótesis de soluciones en esta área, ya que hay muchos factores como la variabilidad de la población, reacciones inesperadas, etc., que obstaculizan las conclusiones inmutables, sobre todo cuando la evolución es fundamental para entender las problemáticas presentes y probablemente las que padecerán las generaciones futuras.
+
+### Matriz de confusión
+
+La matriz presentada ilustra la clasificación real versus la predicha, destacando la capacidad del modelo para identificar correctamente casos de desnutrición (verdaderos positivos) y no desnutrición, así como los errores cometidos.
+
+```{r matrix de confusion}
+conf_matrix_logit <- confusionMatrix(pred_clase, BD_test$Peso_delicado, positive = "Si")
 
 # Crear dataframe para la matriz
-conf_df <- as.data.frame(conf_matrix$table)
-conf_df$Porcentaje <- round(conf_df$Freq / sum(conf_df$Freq) * 100, 1)
+conf_df_logit <- as.data.frame(conf_matrix_logit$table)
+conf_df_logit$Porcentaje <- round(conf_df_logit$Freq / sum(conf_df_logit$Freq) * 100, 1)
 
-ggplot(conf_df, aes(x = Reference, y = Prediction, fill = Freq)) +
+ggplot(conf_df_logit, aes(x = Reference, y = Prediction, fill = Freq)) +
   geom_tile(color = "white", alpha = 0.8) +
   geom_text(aes(label = paste(Freq, "\n(", Porcentaje, "%)", sep = "")), 
             color = "white", size = 5, fontface = "bold") +
-  scale_fill_gradient(low = "#F18F01", high = "#C73E1D", name = "Frecuencia") +
+  scale_fill_gradient(low = "#87CEEB", high = "#1E3F66", name = "Frecuencia") +
   labs(
-    title = "Matriz de Confusión - Modelo k-NN",
+    title = "Matriz de Confusión - Modelo Logit",
     subtitle = "Desnutrición Neonatal",
     x = "Valor Real",
     y = "Predicción del Modelo"
@@ -2212,66 +2238,123 @@ ggplot(conf_df, aes(x = Reference, y = Prediction, fill = Freq)) +
 
 ```
 
-```{r summary}
-# Tabla resumen de métricas
-metricas <- data.frame(
-  Métrica = c("Accuracy", "Sensibilidad", "Especificidad", 
-              "Valor Predictivo Positivo", "Valor Predictivo Negativo",
-              "Prevalencia", "AUC"),
-  Valor = c(
-    round(conf_matrix$overall["Accuracy"], 4),
-    round(conf_matrix$byClass["Sensitivity"], 4),
-    round(conf_matrix$byClass["Specificity"], 4),
-    round(conf_matrix$byClass["Pos Pred Value"], 4),
-    round(conf_matrix$byClass["Neg Pred Value"], 4),
-    round(conf_matrix$byClass["Prevalence"], 4),
-    round(auc_val, 4)
-  ),
-  Interpretación = c(
-    "Proporción total de predicciones correctas",
-    "Capacidad de detectar desnutrición real",
-    "Capacidad de identificar correctamente casos sin desnutrición",
-    "Precisión cuando predice desnutrición",
-    "Precisión cuando predice no desnutrición", 
-    "Proporción real de desnutrición en los datos",
-    "Capacidad general de discriminación del modelo"
-  )
+Esta matriz muestra la probabilidad de aciertos en la clasificación de los datos brindados en el modelo de entrenamiento, en donde se evidencia que hay una frecuencia más alta para la clasificación de verdaderos positivos y falsos negativos, es decir, los aciertos con valores de 43.8% y 40.6%, respectivamente. Los errores de clasificación se concentran en clasificar los casos de no desnutrición con un valor de 10.7%, lo que es aproximadamente el doble del error que se muestra en la clasificación de escenarios de desnutrición con un 5%.
+
+### **Curva ROC**
+
+A continuación, se exhibe la curva ROC que refleja la capacidad discriminativa del modelo para diferenciar entre casos positivos y negativos, proporcionando una medida global de su rendimiento a través del área bajo la curva.
+
+```{r curva roc}
+# Crear dataframe para ggplot
+roc_data_logit <- data.frame(
+  FPR = 1 - roc_o$specificities,
+  TPR = roc_o$sensitivities
 )
 
-metricas %>%
-  kable(align = "lcc", caption = "Métricas de Rendimiento del Modelo k-NN") %>%
-  kable_styling(bootstrap_options = c("striped", "hover"), 
-                full_width = FALSE) %>%
-  row_spec(0, background = "#2E86AB", color = "white", bold = TRUE) %>%
-  column_spec(1, bold = TRUE) %>%
-  column_spec(2, color = "darkblue", bold = TRUE)
+roc_data_logit <- roc_data_logit[order(roc_data_logit$FPR, roc_data_logit$TPR),]
+
+ggplot(roc_data_logit, aes(x = FPR, y = TPR)) +
+  geom_segment(aes(x = 0, y = 0, xend = 1, yend = 1), 
+               linetype = "dashed", color = "#95a5a6", alpha = 0.8, linewidth = 0.6) +
+  geom_ribbon(aes(ymin = 0, ymax = TPR), fill = "#3498db", alpha = 0.15) +
+  geom_line(color = "#2980b9", linewidth = 1.5) +
+  labs(
+    title = "Curva ROC - Modelo Logit",
+    subtitle = "Detección de Desnutrición Neonatal",
+    x = "Tasa de Falsos Positivos (1 - Especificidad)",
+    y = "Tasa de Verdaderos Positivos (Sensibilidad)",
+    caption = paste("Área bajo la curva (AUC) =", round(auc_val, 4))
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(face = "bold", size = 16, hjust = 0.5, color = "black",
+                              margin = margin(b = 10)),
+    plot.subtitle = element_text(size = 12, hjust = 0.5, color = "black",
+                                 margin = margin(b = 15)),
+    plot.caption = element_text(size = 10, hjust = 0.5, color = "black",
+                                margin = margin(t = 10)),
+    axis.title = element_text(color = "black", size = 11),
+    axis.title.x = element_text(margin = margin(t = 8)),
+    axis.title.y = element_text(margin = margin(r = 8)),
+    axis.text = element_text(color = "black"),
+    panel.grid.major = element_line(color = "#ecf0f1", linewidth = 0.4),
+    panel.grid.minor = element_blank(),
+    plot.margin = margin(15, 15, 15, 15)
+  ) +
+  scale_x_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2), 
+                     expand = expansion(mult = c(0.02, 0.02))) +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2), 
+                     expand = expansion(mult = c(0.02, 0.02))) +
+  annotate("text", x = 0.65, y = 0.25, 
+           label = paste("AUC =", round(auc_val, 4)), 
+           size = 5, color = "#2c3e50", fontface = "bold")
 
 ```
 
-```{r distribucion probabilidades}
-# Gráfico adicional: Distribución de probabilidades por clase real
-prob_df <- data.frame(
-  Probabilidad = prob_knnPrediccion$Si,
-  Clase_Real = BD_test$Peso
+La curva ROC obtenida para el modelo logit muestra un área bajo la curva (AUC) de 0.8709, lo que indica una excelente capacidad discriminativa para diferenciar entre casos de desnutrición neonatal y no desnutrición en la población analizada. Este valor implica que el modelo logra clasificar correctamente aproximadamente un 87% de los pares de casos seleccionados al azar uno con desnutrición y otro sin ella atribuyendo una mayor probabilidad al caso positivo. Por tanto, los resultados reflejan la solidez de la selección de variables explicativas y sugieren que el rendimiento del modelo es suficientemente alto como para considerar su aplicación y replicabilidad en otros escenarios o regiones con características demográficas y clínicas similares.
+
+## **Distribución De Probabilidades Predichas**
+
+El siguiente gráfico muestra cómo se distribuyen las probabilidades asignadas por el modelo a cada caso, lo que ayuda a evaluar la robustez y separación entre grupos según el riesgo previsto.
+
+```{r distribucion de probabilidades}
+prob_df_logit <- data.frame(
+  Probabilidad = p_hat,
+  Real = BD_test$Peso_delicado
 )
 
-ggplot(prob_df, aes(x = Probabilidad, fill = Clase_Real)) +
+ggplot(prob_df_logit, aes(x = Probabilidad, fill = Real)) +
   geom_density(alpha = 0.6) +
-  scale_fill_manual(values = c("Si" = "#C73E1D", "No" = "#2E86AB")) +
+  scale_fill_manual(values = c("Si" = "#e74c3c", "No" = "#3498db")) +
   labs(
-    title = "Distribución de Probabilidades por Clase Real",
-    subtitle = "Separación entre casos con y sin desnutrición",
-    x = "Probabilidad de Desnutrición (P(Si))",
+    title = "Distribución de Probabilidades Predichas",
+    subtitle = "Modelo Logit - Desnutrición Neonatal",
+    x = "Probabilidad Predicha de Desnutrición",
     y = "Densidad",
-    fill = "Clase Real"
+    fill = "Estado Real"
   ) +
   theme_minimal() +
   theme(
-    plot.title = element_text(face = "bold", size = 14, hjust = 0.5),
-    plot.subtitle = element_text(size = 11, hjust = 0.5),
+    plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+    plot.subtitle = element_text(size = 12, hjust = 0.5),
     legend.position = "top"
   ) +
-  geom_vline(xintercept = 0.5, linetype = "dashed", color = "red")
+  geom_vline(xintercept = umbral, linetype = "dashed", color = "#2c3e50", linewidth = 1) +
+  annotate("text", x = umbral, y = 0, label = paste("Umbral =", round(umbral, 3)), 
+           vjust = -1, hjust = -0.1, color = "#2c3e50", fontface = "bold")
 
 ```
+
+La curva de distribución de probabilidades tiene una forma que tiende a ser muy leptocúrtica. Así que la distribución de los datos está acumulada alrededor de un valor central, que para el escenario de los casos de no desnutrición se encuentra aproximadamente en 12,5% de probabilidad predicha y para los eventos de desnutrición real, aproximadamente un 80%. Sin embargo, se evidencia que la curva de distribución no es simétrica, por lo cual hay varias curvas que reducen el nivel de confianza de la distribución de los mismos (las curvas con el rojo mas fuerte) . 
+
+Esta distribución presenta un umbral de un 56,3% de probabilidad de predicción, lo cual es alentador al estar por encima del 50%.
+
+## **Comparación: Valores Reales vs Predicciones**
+
+Finalmente, se comparan los datos observados con las predicciones del modelo para corroborar la concordancia y precisión en la clasificación, reforzando la aplicabilidad práctica del modelo logit en la problemática estudiada.
+
+```{r comparacion}
+# Crear tabla comparativa para el modelo logit
+tabla_comparativa_logit <- data.frame(
+  Observación = 1:20,
+  Real = BD_test$Peso_delicado[1:20],
+  Predicho = pred_clase[1:20],
+  `P(Desnutrición)` = round(p_hat[1:20], 3),
+  `P(No Desnutrición)` = round(1 - p_hat[1:20], 3),
+  Resultado = ifelse(BD_test$Peso_delicado[1:20] == pred_clase[1:20], 
+                     "Correcto", "Incorrecto")
+)
+
+tabla_comparativa_logit %>%
+  kable(align = "c", caption = "Comparación: Valores Reales vs Predicciones - Modelo Logit") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), 
+                full_width = FALSE) %>%
+  column_spec(6, color = ifelse(tabla_comparativa_logit$Resultado == "Correcto", 
+                                "green", "red")) %>%
+  row_spec(0, background = "#2E86AB", color = "white", bold = TRUE)
+```
+
+El número de aciertos supera el número de errores en gran medida, lo que confirma y respalda el correcto funcionamiento del modelo adaptado al tema de investigación propuesto.
+
+##  
 :::

@@ -673,6 +673,7 @@ kable(tabla_controles,
 ```
 
 #grafico 5
+
 ```{r grafico5_controles_prenatales, echo=FALSE, fig.width=12, fig.height=7}
 # GRÁFICO 5 INTERACTIVO: DISTRIBUCIÓN DE CONTROLES PRENATALES CON ZONAS DE RIESGO
 library(plotly)
@@ -852,7 +853,6 @@ fig <- plot_ly() %>%
 
 fig
 ```
-
 
 # X5 NUMEROS DE EMBARAZOS
 

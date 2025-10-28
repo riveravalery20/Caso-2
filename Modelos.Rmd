@@ -18,10 +18,7 @@ library(caret)
 library(ISLR)
 library(kableExtra)
 library(pROC)
-<<<<<<< HEAD
-=======
 
->>>>>>> df26b3bdbbac582e931dba01743d4edd34f4c028
 ```
 
 ```{r Knn}
@@ -380,6 +377,7 @@ ggplot(roc_data_logit, aes(x = FPR, y = TPR)) +
 
 ```{r accuracy}
 library(kableExtra)
+conf_matrix_logit <- confusionMatrix(pred_clase, BD_test$Peso_delicado, positive = "Si")
 # Tabla resumen de métricas
 metricas_logit <- data.frame(
   Métrica = c("Accuracy", "Sensibilidad", "Especificidad", 
