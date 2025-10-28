@@ -2024,6 +2024,16 @@ En este estudio se emplean dos modelos de clasificación supervisada para analiz
 
 ## Modelo KNN ( K- Nearest- Neighbors)
 
+El modelo k-Nearest Neighbors (k-NN) fue implementado para clasificar recién nacidos según su riesgo de desnutrición neonatal en Bogotá, basándose en variables sociales y de salud materna que reflejan las condiciones estructurales descritas en el contexto de desigualdad y acceso a servicios de salud en la capital colombiana.
+
+### Optimización Del Parámetro K
+
+Para determinar la configuración ideal que maximice la capacidad predictiva del modelo en el entorno bogotano, se analizó la relación entre el número de vecinos y la precisión obtenida
+
+```{r}
+
+```
+
 ## Modelo **logit (** Regresión logistica)
 
 ```{r cargar modelo logit}
@@ -2079,7 +2089,7 @@ auc_val <- auc(roc_o)
 
 Este modelo busca clasificar, en un lenguaje probabilístico, el porcentaje de aciertos para verdaderos positivos y falsos negativos. Lo que nos posibilita una serie de planteamientos más certeros, ya que considera los niveles de significancia, y en un contexto de un desafío de salud pública, las sentencias que consideren otros aspectos y no concluyan, dan cabida a la evolución médica y la optimización continua de soluciones óptimas al sistema.
 
-### Tabla De Resumen De Variables 
+### Tabla De Resumen De Variables
 
 La siguiente tabla sintetiza el impacto y relevancia estadística de las variables independientes en el modelo, permitiendo identificar cuáles factores influyen significativamente en la predicción de desnutrición neonatal.
 
@@ -2293,7 +2303,7 @@ ggplot(roc_data_logit, aes(x = FPR, y = TPR)) +
 
 La curva ROC obtenida para el modelo logit muestra un área bajo la curva (AUC) de 0.8709, lo que indica una excelente capacidad discriminativa para diferenciar entre casos de desnutrición neonatal y no desnutrición en la población analizada. Este valor implica que el modelo logra clasificar correctamente aproximadamente un 87% de los pares de casos seleccionados al azar uno con desnutrición y otro sin ella atribuyendo una mayor probabilidad al caso positivo. Por tanto, los resultados reflejan la solidez de la selección de variables explicativas y sugieren que el rendimiento del modelo es suficientemente alto como para considerar su aplicación y replicabilidad en otros escenarios o regiones con características demográficas y clínicas similares.
 
-## **Distribución De Probabilidades Predichas**
+### **Distribución De Probabilidades Predichas**
 
 El siguiente gráfico muestra cómo se distribuyen las probabilidades asignadas por el modelo a cada caso, lo que ayuda a evaluar la robustez y separación entre grupos según el riesgo previsto.
 
@@ -2329,7 +2339,7 @@ La curva de distribución de probabilidades tiene una forma que tiende a ser muy
 
 Esta distribución presenta un umbral de un 56,3% de probabilidad de predicción, lo cual es alentador al estar por encima del 50%.
 
-## **Comparación: Valores Reales vs Predicciones**
+### **Comparación: Valores Reales vs Predicciones**
 
 Finalmente, se comparan los datos observados con las predicciones del modelo para corroborar la concordancia y precisión en la clasificación, reforzando la aplicabilidad práctica del modelo logit en la problemática estudiada.
 
@@ -2356,5 +2366,5 @@ tabla_comparativa_logit %>%
 
 El número de aciertos supera el número de errores en gran medida, lo que confirma y respalda el correcto funcionamiento del modelo adaptado al tema de investigación propuesto.
 
-##  
+## 
 :::
